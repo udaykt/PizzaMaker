@@ -1,0 +1,44 @@
+.peppers {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  content: url(../../assets/Logos/peppers.png);
+  z-index: 7;
+}
+
+.peppers.pep-one {
+  top: 20px;
+  left: 40px;
+  transform: rotate(240deg);
+}
+.peppers.pep-two {
+  top: 20px;
+  left: 40px;
+  transform: rotate(120deg);
+}
+.peppers.pep-three {
+  top: 20px;
+  left: 40px;
+  transform: rotate(0deg);
+}
+.peppers.pep-four {
+  top: 20px;
+  left: 40px;
+  transform: rotate(60deg);
+}
+.peppers.pep-five {
+  top: 20px;
+  left: 40px;
+  transform: rotate(180deg);
+}
+.peppers.pep-six {
+  top: 20px;
+  left: 40px;
+  transform: rotate(300deg);
+}
+
+.void {
+  display: none;
+  width: 0%;
+  height: 0%;
+}

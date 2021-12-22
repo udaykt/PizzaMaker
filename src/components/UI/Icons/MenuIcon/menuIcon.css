@@ -1,0 +1,54 @@
+.menuIcon {
+  grid-area: menu;
+  width: 50px;
+  height: 50px;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+  position: relative;
+  border: hidden;
+  transform: scale(0.8);
+  filter: drop-shadow(1px 1px 1px black);
+}
+
+.menuIcon span {
+  display: block;
+  position: absolute;
+  height: 9px;
+  width: 100%;
+  background: #d3531a;
+  border-radius: 9px;
+  opacity: 1;
+  transform: rotate(0deg);
+  transition: 0.25s ease-in-out;
+}
+
+.menuIcon span:nth-child(1) {
+  top: 0px;
+}
+
+.menuIcon span:nth-child(2) {
+  top: 18px;
+}
+
+.menuIcon span:nth-child(3) {
+  top: 36px;
+}
+
+.menuIcon.open span:nth-child(1) {
+  top: 18px;
+  transform: rotate(135deg);
+}
+
+.menuIcon.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.menuIcon.open span:nth-child(3) {
+  top: 18px;
+  transform: rotate(-135deg);
+}
+.menuIcon:hover span:nth-child(1),
+.menuIcon:hover span:nth-child(2),
+.menuIcon:hover span:nth-child(3) {
+  background-color: rgb(68, 221, 68);
+}

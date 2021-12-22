@@ -1,0 +1,25 @@
+button {
+  width: 60px;
+  height: 30px;
+  display: block;
+  font-size: 0.8rem;
+  font-weight: bold;
+  font-family: monospace;
+  border-radius: 5%;
+  background: cyan;
+  border: 2px solid gray;
+  box-shadow: 2px 2px 1px blue;
+  cursor: pointer;
+}
+
+button:hover {
+  background: lightskyblue;
+}
+
+button:active {
+  background: lightgray;
+}
+
+button:focus {
+  outline: none;
+}

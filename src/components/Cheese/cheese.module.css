@@ -1,0 +1,61 @@
+:root {
+  --cheese-tb: 0;
+  --cheese-diagonal-tb: 0;
+  --cheese-diagonal-lr: 0;
+}
+
+.cheese,
+.slicedCheese {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  clip-path: polygon(
+    64% 14%,
+    84% 14%,
+    87% 39%,
+    72% 56%,
+    68% 76%,
+    48% 100%,
+    43% 82%,
+    27% 65%,
+    12% 20%,
+    37% 11%
+  );
+  border-radius: 50%;
+  background-color: var(--cheese-color);
+  z-index: 5;
+  filter: drop-shadow(1px 1px 1px #000);
+}
+
+.slicedCheese {
+  width: 80%;
+  height: 80%;
+}
+
+/* .cheese-one {
+  /* top: var(--cheese-tb); */
+
+/* .Cheese.cheese2 {
+  top: var(--cheese-diagonal-tb);
+  right: var(--cheese-diagonal-lr);
+  transform: rotate(60deg);
+}
+.Cheese.cheese3 {
+  bottom: var(--cheese-diagonal-tb);
+  right: var(--cheese-diagonal-lr);
+  transform: rotate(120deg);
+}
+.Cheese.cheese4 {
+  bottom: var(--cheese-tb);
+  transform: rotate(180deg);
+}
+.Cheese.cheese5 {
+  bottom: var(--cheese-diagonal-tb);
+  left: var(--cheese-diagonal-lr);
+  transform: rotate(240deg);
+}
+.Cheese.cheese6 {
+  top: var(--cheese-diagonal-tb);
+  left: var(--cheese-diagonal-lr);
+  transform: rotate(300deg);
+} */

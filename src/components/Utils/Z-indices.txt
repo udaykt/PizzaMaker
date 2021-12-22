@@ -1,0 +1,9 @@
+pizza - 0
+slice - 1
+crust - 2 
+sauce-slice - 3
+sauce - 4
+cheese-slice - 5
+cheese - 6
+mozzarella-slice - 7
+mozzarella - 8

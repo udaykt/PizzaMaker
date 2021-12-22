@@ -1,0 +1,12 @@
+.crust {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  border-radius: 50%;
+  background-color: var(--slice-color);
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  z-index: 2;
+  filter: drop-shadow(1px 1px 1px #000);
+}

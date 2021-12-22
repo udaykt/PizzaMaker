@@ -1,0 +1,52 @@
+.header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 15vh;
+  justify-items: center;
+  grid-template-areas: 'menu title loginButton';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 100vw;
+  min-height: 15vh;
+  z-index: 1;
+  background: linear-gradient(to right, cyan, blue);
+}
+
+.logo {
+  position: absolute;
+}
+
+.logo a {
+  display: flex;
+  text-decoration: none;
+}
+.logo img {
+  height: 50px;
+  width: 50px;
+  filter: drop-shadow(2px 2px 3px black);
+  margin-right: 1vw;
+}
+
+.logo h1 {
+  color: #eda828;
+  font-weight: lighter;
+  text-shadow: 2px 2px 2px rgb(26, 26, 26), 3px 3px 3px var(--sauce-color);
+  font-family: lobster;
+  font-size: 2.2rem;
+}
+
+a .menuIcon {
+  position: absolute;
+  left: 30px;
+  top: 25%;
+}
+
+a .profileButtonDiv {
+  position: absolute;
+  right: 30px;
+  top: 25%;
+}

@@ -1,0 +1,70 @@
+:root {
+  --slice-tb: 30px;
+  --slice-diagonal-tb: 60px;
+  --slice-diagonal-lr: 28px;
+}
+
+.slice,
+.slice-one,
+.slice-two,
+.slice-three,
+.slice-four,
+.slice-five,
+.slice-six {
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--slice-color);
+  width: 140px;
+  height: 120px;
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  border-radius: 45%;
+  filter: drop-shadow(1px 1px 1px gray);
+  z-index: 1;
+}
+
+@keyframes pull {
+  0% {
+    bottom: 30px;
+  }
+  100% {
+    bottom: -30px;
+  }
+}
+
+.slice-one {
+  top: var(--slice-tb);
+}
+.slice-two {
+  top: var(--slice-diagonal-tb);
+  right: var(--slice-diagonal-lr);
+  transform: rotate(60deg);
+}
+.slice-three {
+  bottom: var(--slice-diagonal-tb);
+  right: var(--slice-diagonal-lr);
+  transform: rotate(120deg);
+}
+.slice-four {
+  bottom: var(--slice-tb);
+  transform: rotate(180deg);
+  animation: pull 3s ease 3;
+}
+.slice-five {
+  bottom: var(--slice-diagonal-tb);
+  left: var(--slice-diagonal-lr);
+  transform: rotate(240deg);
+}
+.slice-six {
+  top: var(--slice-diagonal-tb);
+  left: var(--slice-diagonal-lr);
+
+  transform: rotate(300deg);
+}
+
+.void {
+  display: none;
+  width: 0%;
+  height: 0%;
+}

@@ -1,0 +1,27 @@
+.profileAvatar {
+  display: block;
+  width: 60px;
+  height: 60px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: darkmagenta;
+  border-radius: 50%;
+  background-color: lightcyan;
+  border: 3px solid lightskyblue;
+  filter: grayscale(1) drop-shadow(1px 1px 3px gray);
+  cursor: pointer;
+  grid-area: loginButton;
+}
+
+.profileAvatar:hover {
+  filter: grayscale(1);
+}
+
+.profileAvatar:active {
+  filter: grayscale(0.8);
+}
+
+.profileAvatar:focus {
+  outline: none;
+}
