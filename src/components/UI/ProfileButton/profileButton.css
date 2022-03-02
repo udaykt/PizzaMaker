@@ -1,27 +1,29 @@
-.profileAvatar {
+.profileButton {
+  grid-area: loginButton;
   display: block;
-  width: 60px;
-  height: 60px;
-  font-size: 1.5rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-  color: darkmagenta;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
   border-radius: 50%;
   background-color: lightcyan;
   border: 3px solid lightskyblue;
   filter: grayscale(1) drop-shadow(1px 1px 3px gray);
-  cursor: pointer;
-  grid-area: loginButton;
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: darkmagenta;
+  transition: 0.5s ease-in-out;
 }
 
-.profileAvatar:hover {
+.profileButton:hover {
   filter: grayscale(1);
 }
 
-.profileAvatar:active {
+.profileButton:active {
   filter: grayscale(0.8);
 }
 
-.profileAvatar:focus {
+.profileButton:focus {
   outline: none;
 }

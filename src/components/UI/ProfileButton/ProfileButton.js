@@ -14,9 +14,7 @@ const ProfileButton = (props) => {
   };
   return (
     <NavLink to={headerState.loginPath} onClick={toggleLoginPageHandler}>
-      <div className={'profileButtonDiv'}>
-        <Button className={'profileAvatar'}>{props.children}</Button>
-      </div>
+      <Button className={'profileButton'}>{props.children}</Button>
     </NavLink>
   );
 };

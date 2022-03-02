@@ -3,21 +3,24 @@
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 15vh;
   justify-items: center;
-  grid-template-areas: 'menu title loginButton';
-  position: absolute;
+  grid-template-areas: 'menu logo loginButton';
+  align-content: space-between;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  justify-content: space-between;
   align-items: center;
-  min-width: 100vw;
-  min-height: 15vh;
+  min-width: fit-content;
+  min-height: 10vh;
+  height: 100px;
   z-index: 1;
   background: linear-gradient(to right, cyan, blue);
 }
 
 .logo {
-  position: absolute;
+  position: fixed;
+  grid-area: logo;
+  top: 25px;
 }
 
 .logo a {
@@ -39,14 +42,25 @@
   font-size: 2.2rem;
 }
 
-a .menuIcon {
-  position: absolute;
-  left: 30px;
-  top: 25%;
+.hamburgerMenu {
+  display: block;
+  position: fixed;
+  grid-area: menu;
+  top: 25px;
+  left: 25px;
 }
 
-a .profileButtonDiv {
-  position: absolute;
-  right: 30px;
-  top: 25%;
+.avatar {
+  display: block;
+  position: fixed;
+  grid-area: loginButton;
+  top: 25px;
+  right: 25px;
 }
+
+/* @media screen and (max-width: 960px) {
+  .header {
+    background: black;
+    min-height: 10vh;
+  }
+} */

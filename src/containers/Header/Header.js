@@ -20,14 +20,18 @@ const Header = (props) => {
   const username = 'UK';
   return (
     <div className={'header'}>
-      <MenuIcon>{props.children}</MenuIcon>
+      <div className='hamburgerMenu'>
+        <MenuIcon>{props.children}</MenuIcon>
+      </div>
       <div className='logo' title='Pizza Maker'>
         <Link to='/home' onClick={handleClick}>
           <img src={appLogo} alt='' />
           <h1>Pizza Maker</h1>
         </Link>
       </div>
-      <ProfileButton>{username}</ProfileButton>
+      <div className='avatar'>
+        <ProfileButton>{username}</ProfileButton>
+      </div>
     </div>
   );
 };
