@@ -1,29 +1,34 @@
 .pizzahub {
   display: grid;
   position: relative;
+  height: 100%;
+  width: auto;
   min-height: 100vh;
   min-width: 100vw;
-  grid-template-columns: 1fr minmax(10vw, 25vw) 1fr;
-  grid-template-rows: 15vh 1fr 30vh;
+  grid-template-columns: 1fr minmax(100px, 300px) 1fr;
+  grid-template-rows: 1fr 1fr;
 }
 
 .pizza {
   display: flex;
   grid-column: 2/3;
-  grid-row: 2/3;
+  grid-row: 1/2;
+  position: relative;
+  top: 100px;
   justify-content: center;
   align-items: center;
 }
 
 .description {
   display: flex;
-  min-height: 80%;
-  min-width: 80%;
+  min-height: fit-content;
+  min-width: fit-content;
+  position: relative;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   grid-column: 1/2;
-  grid-row: 2/3;
+  grid-row: 1/2;
   color: white;
   font-size: 1rem;
   font-weight: 900;
@@ -38,40 +43,23 @@
 
 .base {
   grid-column: 1/2;
-  grid-row: 3/4;
+  grid-row: 2/3;
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: baseline;
 }
 
 .orderButton {
   grid-column: 2/3;
-  grid-row: 3/4;
+  grid-row: 2/3;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
 }
 
-.loginDiv {
-  grid-column: 2/3;
-  grid-row: 2/3;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.signUpDiv {
-  grid-column: 2/3;
-  grid-row: 2/3;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .toppingsMenu {
   grid-column: 3/4;
-  grid-row: 2/4;
+  grid-row: 1/3;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -79,5 +67,26 @@
 
 .backdrop {
   grid-column: 1/4;
-  grid-row: 1/4;
+  grid-row: 1/3;
+}
+
+@media screen and (max-width: 1300px) {
+  .pizzahub {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 50px;
+  }
+  .description {
+    margin-top: 30px;
+  }
+  .pizza {
+    position: relative;
+    top: 0;
+  }
+  .orderButton {
+    margin-bottom: 30px;
+  }
 }

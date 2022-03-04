@@ -17,7 +17,7 @@ class Pizza extends Component {
     },
     value: 'small',
     sliced: true,
-    loggedIn: true,
+    loggedIn: false,
   };
 
   quantityHandler = (value) => {

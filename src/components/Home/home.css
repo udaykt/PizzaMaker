@@ -1,0 +1,21 @@
+.home {
+  display: grid;
+  height: 100%;
+  width: auto;
+  grid-template-areas: 'header pizzahub';
+  grid-template-rows: 100px 1fr;
+}
+
+.headerDiv {
+  grid-area: header;
+  grid-row: 1/2;
+  position: fixed;
+  top: 0;
+  z-index: 100;
+}
+
+.pizzahubDiv {
+  grid-area: pizzahub;
+  grid-row: 2/3;
+  height: 100%;
+}

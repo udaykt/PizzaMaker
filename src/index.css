@@ -1,7 +1,13 @@
 body {
-  overflow: hidden;
+  overflow: auto;
   background: radial-gradient(rgb(70, 64, 64), #111110);
 }
+::-webkit-scrollbar {
+  height: 0;
+  width: 0; /* Remove scrollbar space */
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+
 :root {
   --slice-color: #cca156;
   --sauce-color: red;

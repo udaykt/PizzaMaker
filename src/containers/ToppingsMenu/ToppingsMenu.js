@@ -41,7 +41,9 @@ const ToppingsMenu = (props) => {
         {Object.entries(toppings).map(([key, value]) => {
           return (
             <div className={styles.topping} key={key + value}>
-              <h3>{key}</h3>
+              <div>
+                <h3>{key}</h3>
+              </div>
               <div className={styles.checkbox}>
                 <input
                   type='checkbox'

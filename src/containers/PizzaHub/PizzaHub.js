@@ -25,25 +25,26 @@ const PizzaHub = (props) => {
   };
   return (
     <div className={styles.pizzahub}>
-      <div className={styles.pizza}>
-        <Pizza {...state} />
-      </div>
       <div className={styles.description}>
         <strong>
           <h1>Welcome [Uday]!,</h1>
         </strong>
         <p>Make your own pizza. Customize and Order.</p>
       </div>
+      <div className='pizzaDiv'>
+        <div className={styles.pizza}>
+          <Pizza {...state} />
+        </div>
+      </div>
       <div className={styles.base}>
         <Base />
-      </div>
-      <div className={styles.orderButton}>
-        <OrderButton />
       </div>
       <div className={styles.toppingsMenu}>
         <ToppingsMenu {...state} />
       </div>
-      <div className={styles.loginDiv}></div>
+      <div className={styles.orderButton}>
+        <OrderButton />
+      </div>
       <Backdrop />
       <Switch>
         <Redirect exact from='/' to='/home' />

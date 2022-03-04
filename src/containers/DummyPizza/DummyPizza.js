@@ -60,6 +60,7 @@ const DummyPizza = (props) => {
       <div className={`sausage4`} />
       <div className={`sausage5`} />
       <div className={`sausage6`} />
+      <div className={`sausage7`} />
       <div className={`peppers`} />
       <div className={`peppers1`} />
       <div className={`peppers2`} />
@@ -67,6 +68,7 @@ const DummyPizza = (props) => {
       <div className={`peppers4`} />
       <div className={`peppers5`} />
       <div className={`peppers6`} />
+      <div className={`peppers7`} />
       <div className={`pepperoni`} />
       <div className={`pepperoni1`} />
       <div className={`pepperoni2`} />
@@ -74,6 +76,7 @@ const DummyPizza = (props) => {
       <div className={`pepperoni4`} />
       <div className={`pepperoni5`} />
       <div className={`pepperoni6`} />
+      <div className={`pepperoni7`} />
     </div>
   );
 };

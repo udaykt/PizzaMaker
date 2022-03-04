@@ -8,7 +8,8 @@
   z-index: 0;
   background-color: var(--slice-color);
   border-radius: 50%;
-  animation: spin 5s infinite linear;
+  animation: spin 10s infinite linear;
+  cursor: pointer;
 }
 
 @keyframes spin {
@@ -19,8 +20,8 @@
 .sauce {
   position: absolute;
   background-color: var(--sauce-color);
-  width: 85%;
-  height: 85%;
+  width: 90%;
+  height: 90%;
   border-radius: 50%;
   filter: drop-shadow(0.5px 0.5px 1px #000);
   z-index: 1;
@@ -99,7 +100,8 @@
 .pepperoni3,
 .pepperoni4,
 .pepperoni5,
-.pepperoni6 {
+.pepperoni6,
+.pepperoni7 {
   position: absolute;
   width: 30px;
   height: 30px;
@@ -112,7 +114,7 @@
 }
 
 .pepperoni1 {
-  top: 100px;
+  top: 90px;
   left: 150px;
 }
 .pepperoni2 {
@@ -121,7 +123,7 @@
 }
 .pepperoni3 {
   top: 140px;
-  left: 150px;
+  left: 180px;
 }
 .pepperoni4 {
   top: 40px;
@@ -135,6 +137,10 @@
   top: 130px;
   left: 80px;
 }
+.pepperoni7 {
+  top: 120px;
+  left: 120px;
+}
 
 .sausage,
 .sausage1,
@@ -142,7 +148,8 @@
 .sausage3,
 .sausage4,
 .sausage5,
-.sausage6 {
+.sausage6,
+.sausage7 {
   position: absolute;
   width: 25px;
   height: 25px;
@@ -167,8 +174,8 @@
   left: 120px;
 }
 .sausage4 {
-  top: 130px;
-  left: 180px;
+  top: 120px;
+  left: 160px;
 }
 .sausage5 {
   top: 170px;
@@ -178,6 +185,10 @@
   top: 80px;
   left: 50px;
 }
+.sausage7 {
+  top: 65px;
+  left: 100px;
+}
 
 .peppers,
 .peppers1,
@@ -185,7 +196,8 @@
 .peppers3,
 .peppers4,
 .peppers5,
-.peppers6 {
+.peppers6,
+.peppers7 {
   position: absolute;
   width: 30px;
   height: 30px;
@@ -224,5 +236,10 @@
 .peppers6 {
   top: 50px;
   left: 80px;
+  transform: rotate(210deg);
+}
+.peppers7 {
+  top: 110px;
+  left: 190px;
   transform: rotate(210deg);
 }

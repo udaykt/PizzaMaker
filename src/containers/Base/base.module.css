@@ -1,6 +1,9 @@
 .baseRoot {
-  min-width: 90%;
-  min-height: 70%;
+  min-width: 30vw;
+  min-height: 20vh;
+  position: relative;
+  width: 500px;
+  height: 200px;
   display: flex;
   color: white;
   border-radius: 20px;
@@ -12,10 +15,10 @@
 }
 
 .baseDiv {
-  width: 95%;
-  height: 50%;
+  width: 90%;
+  height: 40%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: center;
 }
 
