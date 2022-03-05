@@ -13,15 +13,17 @@
   min-height: 10vh;
   height: 100px;
   z-index: 1;
-  backdrop-filter: blur(5px);
-  background: rgba(82, 78, 78, 0.01);
-  box-shadow: 15px 15px 50px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  background-color: transparent;
+  box-shadow: 15px 15px 30px rgba(255, 255, 255, 0.1);
 }
 
 .logo {
   position: fixed;
   grid-area: logo;
   top: 25px;
+  filter: drop-shadow(2px 2px 2px black)
+    drop-shadow(2px 2px 2px var(--sauce-color));
 }
 
 .logo a {
@@ -31,14 +33,13 @@
 .logo img {
   height: 50px;
   width: 50px;
-  filter: drop-shadow(2px 2px 3px black);
-  margin-right: 1vw;
+  margin-right: 8px;
 }
 
 .logo h1 {
   color: #eda828;
   font-weight: lighter;
-  text-shadow: 2px 2px 2px rgb(26, 26, 26), 3px 3px 3px var(--sauce-color);
+  text-shadow: 2px 2px 2px rgb(26, 26, 26);
   font-family: lobster;
   font-size: 2.2rem;
 }
