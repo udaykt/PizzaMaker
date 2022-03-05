@@ -1,7 +1,7 @@
 .olive {
   position: absolute;
-  width: 25px;
-  height: 25px;
+  width: 15px;
+  height: 15px;
   content: url(../../assets/Logos/olive.png);
   filter: drop-shadow(1px 1px 1px #000);
   z-index: 8;

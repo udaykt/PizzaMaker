@@ -49,7 +49,7 @@
 .slice-four {
   bottom: var(--slice-tb);
   transform: rotate(180deg);
-  animation: pull 3s ease 3;
+  //animation: pull 3s ease 3;
 }
 .slice-five {
   bottom: var(--slice-diagonal-tb);
@@ -59,7 +59,6 @@
 .slice-six {
   top: var(--slice-diagonal-tb);
   left: var(--slice-diagonal-lr);
-
   transform: rotate(300deg);
 }
 

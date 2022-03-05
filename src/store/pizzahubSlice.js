@@ -20,23 +20,23 @@ const pizzahubSlice = createSlice({
     toppings: {
       pepperoni: {
         title: 'pepperoni',
-        medium: false,
         checked: false,
+        medium: false,
       },
       sausage: {
         title: 'sausage',
-        medium: false,
         checked: false,
+        medium: false,
       },
       peppers: {
         title: 'peppers',
-        medium: false,
         checked: false,
+        medium: false,
       },
       olives: {
         title: 'olives',
-        medium: false,
         checked: false,
+        medium: false,
       },
     },
   },
