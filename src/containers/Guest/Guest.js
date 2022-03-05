@@ -7,9 +7,10 @@ import { headerActions } from '../../store/headerSlice';
 
 const Guest = (props) => {
   const headerState = useSelector((state) => state.header);
+  const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const dispatch = useDispatch();
+
   const handleSignupClick = (e) => {
     if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
     if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
@@ -17,9 +18,16 @@ const Guest = (props) => {
     dispatch(headerActions.toggleSignupPage());
   };
 
+  const handleLoginClick = (e) => {
+    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
+    if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
+    if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
+    dispatch(headerActions.toggleLoginPage());
+  };
+
   const submitHandler = (event) => {
     event.preventDefault();
-    const { email, password } = props;
+    const { firstName, email } = props;
   };
 
   return (
@@ -27,6 +35,18 @@ const Guest = (props) => {
       <form onSubmit={submitHandler}>
         <div>
           <h1>Guest</h1>
+        </div>
+        <div className='divGroup'>
+          <label htmlFor='firstName'>Name</label>
+          <input
+            className={'inputField'}
+            id='name'
+            name='firstName'
+            type='text'
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
         </div>
         <div className='divGroup'>
           <label htmlFor='email'> Email</label>
@@ -40,20 +60,8 @@ const Guest = (props) => {
             required
           />
         </div>
-        <div className='divGroup'>
-          <label htmlFor='password'>Password</label>
-          <input
-            className={'inputField'}
-            id='password'
-            name='password'
-            type='password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
         <Button className={'loginSubmitButton'} type='submit'>
-          Login
+          Continue
         </Button>
       </form>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
@@ -76,7 +84,9 @@ const Guest = (props) => {
             fontWeight: 'bold',
           }}
         >
-          <a href='/login'>Login Instead?</a>
+          <NavLink to={headerState.loginPath} onClick={handleLoginClick}>
+            Login Instead?
+          </NavLink>
         </div>
       </div>
     </div>

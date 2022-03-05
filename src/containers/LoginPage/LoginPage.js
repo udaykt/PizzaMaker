@@ -10,11 +10,19 @@ const LoginPage = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
+
   const handleSignupClick = (e) => {
     if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
     if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
     if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
     dispatch(headerActions.toggleSignupPage());
+  };
+
+  const handleGuestClick = (e) => {
+    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
+    if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
+    if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
+    dispatch(headerActions.toggleGuestPage());
   };
 
   const submitHandler = (event) => {
@@ -76,7 +84,9 @@ const LoginPage = (props) => {
             fontWeight: 'bold',
           }}
         >
-          <a href='/guest'>Continue as Guest?</a>
+          <NavLink to={headerState.guestPath} onClick={handleGuestClick}>
+            Continue as Guest?
+          </NavLink>
         </div>
       </div>
     </div>
