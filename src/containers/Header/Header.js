@@ -24,7 +24,7 @@ const Header = (props) => {
         <MenuIcon>{props.children}</MenuIcon>
       </div>
       <div className='logo' title='Pizza Maker'>
-        <Link to='/home' onClick={handleClick}>
+        <Link to='/' onClick={handleClick}>
           <img src={appLogo} alt='' />
           <h1>Pizza Maker</h1>
         </Link>

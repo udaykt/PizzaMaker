@@ -47,7 +47,7 @@ const PizzaHub = (props) => {
       </div>
       <Backdrop />
       <Switch>
-        <Redirect exact from='/' to='/home' />
+        <Redirect exact from='/' to='/' />
         <Route path='/menu' component={Menu} />
         <Route path='/login' component={LoginPage} />
         <Route path='/signup' component={SignUp} />
