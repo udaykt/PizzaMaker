@@ -29,6 +29,11 @@ const Backdrop = (props) => {
           <Link to={headerState.signupPath}>
             <div className='backdrop' onClick={handleClick}></div>
           </Link>
+        )) ||
+        (headerState.showGuestPage && (
+          <Link to={headerState.guestPath}>
+            <div className='backdrop' onClick={handleClick}></div>
+          </Link>
         ))}
     </Fragment>
   );

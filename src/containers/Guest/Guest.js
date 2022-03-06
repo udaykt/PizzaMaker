@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { headerActions } from '../../store/headerSlice';
+import { signInAnonymously } from 'firebase/auth';
+import { auth, createGuestUserDocument } from '../Firebase/Firebase';
 
 const Guest = (props) => {
   const headerState = useSelector((state) => state.header);
-  const [firstName, setFirstName] = useState('');
-  const [email, setEmail] = useState('');
+  const [guestFirstName, setGuestFirstName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
   const dispatch = useDispatch();
 
   const handleSignupClick = (e) => {
@@ -23,6 +25,21 @@ const Guest = (props) => {
     if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
     if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
     dispatch(headerActions.toggleLoginPage());
+  };
+
+  const createGuest = async (e) => {
+    e.preventDefault();
+    try {
+      const user = await signInAnonymously(auth);
+      const additionalData = {
+        guestFirstName,
+        guestEmail,
+      };
+      console.log(additionalData);
+      createGuestUserDocument(user, additionalData);
+    } catch (error) {
+      console.log('Error while Logging in user ' + error.message);
+    }
   };
 
   const submitHandler = (event) => {
@@ -43,8 +60,8 @@ const Guest = (props) => {
             id='name'
             name='firstName'
             type='text'
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            value={guestFirstName}
+            onChange={(e) => setGuestFirstName(e.target.value)}
             required
           />
         </div>
@@ -55,12 +72,16 @@ const Guest = (props) => {
             id='email'
             name='email'
             type='email'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={guestEmail}
+            onChange={(e) => setGuestEmail(e.target.value)}
             required
           />
         </div>
-        <Button className={'loginSubmitButton'} type='submit'>
+        <Button
+          className={'loginSubmitButton'}
+          type='submit'
+          onClick={createGuest}
+        >
           Continue
         </Button>
       </form>

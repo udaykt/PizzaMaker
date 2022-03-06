@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { headerActions } from '../../store/headerSlice';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../Firebase/Firebase';
 
 const LoginPage = (props) => {
   const headerState = useSelector((state) => state.header);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const dispatch = useDispatch();
 
   const handleSignupClick = (e) => {
@@ -23,6 +25,19 @@ const LoginPage = (props) => {
     if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
     if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
     dispatch(headerActions.toggleGuestPage());
+  };
+
+  const loginUser = async (e) => {
+    e.preventDefault();
+    try {
+      const user = await signInWithEmailAndPassword(
+        auth,
+        loginEmail,
+        loginPassword
+      );
+    } catch (error) {
+      console.log('Error while Logging in user ' + error.message);
+    }
   };
 
   const submitHandler = (event) => {
@@ -43,8 +58,8 @@ const LoginPage = (props) => {
             id='email'
             name='email'
             type='email'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={loginEmail}
+            onChange={(e) => setLoginEmail(e.target.value)}
             required
           />
         </div>
@@ -55,12 +70,16 @@ const LoginPage = (props) => {
             id='password'
             name='password'
             type='password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={loginPassword}
+            onChange={(e) => setLoginPassword(e.target.value)}
             required
           />
         </div>
-        <Button className={'loginSubmitButton'} type='submit'>
+        <Button
+          className={'loginSubmitButton'}
+          type='submit'
+          onClick={loginUser}
+        >
           Login
         </Button>
       </form>

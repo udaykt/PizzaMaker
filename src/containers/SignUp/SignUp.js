@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { headerActions } from '../../store/headerSlice';
 import { NavLink } from 'react-router-dom';
 import { auth } from '../Firebase/Firebase';
+import { createUserDocument } from '../Firebase/Firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 const SignUp = (props) => {
@@ -28,16 +29,24 @@ const SignUp = (props) => {
     dispatch(headerActions.toggleGuestPage());
   };
 
-  const registerUser = async () => {
+  const registerUser = async (e) => {
+    e.preventDefault();
     try {
       const user = await createUserWithEmailAndPassword(
         auth,
         registerEmail,
         registerPassword
       );
+      const additionalData = {
+        registerFirstName,
+        registerEmail,
+        registerPassword,
+      };
       console.log(user);
+      console.log(additionalData);
+      createUserDocument(user, additionalData);
     } catch (error) {
-      console.log('Error while Registering user' + error.message);
+      console.log('Error while Registering user ' + error.message);
     }
   };
 
