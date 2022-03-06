@@ -11,6 +11,7 @@ const Backdrop = (props) => {
     if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
     if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
     if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
+    if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
   };
 
   return (
