@@ -14,7 +14,6 @@
   grid-column: 2/3;
   grid-row: 1/2;
   position: relative;
-  top: 100px;
   justify-content: center;
   align-items: center;
 }
@@ -84,7 +83,6 @@
   }
   .pizza {
     position: relative;
-    top: 0;
   }
   .orderButton {
     margin-bottom: 30px;

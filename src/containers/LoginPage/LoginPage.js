@@ -51,29 +51,33 @@ const LoginPage = (props) => {
         <div>
           <h1>Login</h1>
         </div>
-        <div className='divGroup'>
-          <label htmlFor='email'> Email</label>
-          <input
-            className={'inputField'}
-            id='email'
-            name='email'
-            type='email'
-            value={loginEmail}
-            onChange={(e) => setLoginEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className='divGroup'>
-          <label htmlFor='password'>Password</label>
-          <input
-            className={'inputField'}
-            id='password'
-            name='password'
-            type='password'
-            value={loginPassword}
-            onChange={(e) => setLoginPassword(e.target.value)}
-            required
-          />
+        <div className='formInputTextDiv'>
+          <div className='labelInputDiv'>
+            <label htmlFor='email'> Email</label>
+            <div className={'inputField'}>
+              <input
+                id='email'
+                name='email'
+                type='email'
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          <div className='labelInputDiv'>
+            <label htmlFor='password'>Password</label>
+            <div className={'inputField'}>
+              <input
+                id='password'
+                name='password'
+                type='password'
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                required
+              />
+            </div>
+          </div>
         </div>
         <Button
           className={'loginSubmitButton'}
@@ -82,32 +86,20 @@ const LoginPage = (props) => {
         >
           Login
         </Button>
+        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+          <div className='formLink'>
+            <NavLink to={headerState.signupPath} onClick={handleSignupClick}>
+              Create an account?
+            </NavLink>
+          </div>
+          /
+          <div className='formLink'>
+            <NavLink to={headerState.guestPath} onClick={handleGuestClick}>
+              Continue as Guest?
+            </NavLink>
+          </div>
+        </div>
       </form>
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        <div
-          style={{
-            textDecoration: 'none',
-            fontSize: '1rem',
-            fontWeight: 'bold',
-          }}
-        >
-          <NavLink to={headerState.signupPath} onClick={handleSignupClick}>
-            Create an account?
-          </NavLink>
-        </div>
-        /
-        <div
-          style={{
-            textDecoration: 'none',
-            fontSize: '1rem',
-            fontWeight: 'bold',
-          }}
-        >
-          <NavLink to={headerState.guestPath} onClick={handleGuestClick}>
-            Continue as Guest?
-          </NavLink>
-        </div>
-      </div>
     </div>
   );
 };

@@ -31,10 +31,8 @@ const PizzaHub = (props) => {
         </strong>
         <p>Make your own pizza. Customize and Order.</p>
       </div>
-      <div className='pizzaDiv'>
-        <div className={styles.pizza}>
-          <Pizza {...state} />
-        </div>
+      <div className={styles.pizza}>
+        <Pizza {...state} />
       </div>
       <div className={styles.base}>
         <Base />

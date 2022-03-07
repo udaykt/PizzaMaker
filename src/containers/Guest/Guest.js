@@ -53,29 +53,33 @@ const Guest = (props) => {
         <div>
           <h1>Guest</h1>
         </div>
-        <div className='divGroup'>
-          <label htmlFor='firstName'>Name</label>
-          <input
-            className={'inputField'}
-            id='name'
-            name='firstName'
-            type='text'
-            value={guestFirstName}
-            onChange={(e) => setGuestFirstName(e.target.value)}
-            required
-          />
-        </div>
-        <div className='divGroup'>
-          <label htmlFor='email'> Email</label>
-          <input
-            className={'inputField'}
-            id='email'
-            name='email'
-            type='email'
-            value={guestEmail}
-            onChange={(e) => setGuestEmail(e.target.value)}
-            required
-          />
+        <div className='formInputTextDiv'>
+          <div className='labelInputDiv'>
+            <label htmlFor='firstName'>Name</label>
+            <div className={'inputField'}>
+              <input
+                id='name'
+                name='firstName'
+                type='text'
+                value={guestFirstName}
+                onChange={(e) => setGuestFirstName(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          <div className='labelInputDiv'>
+            <label htmlFor='email'> Email</label>
+            <div className={'inputField'}>
+              <input
+                id='email'
+                name='email'
+                type='email'
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                required
+              />
+            </div>
+          </div>
         </div>
         <Button
           className={'loginSubmitButton'}
@@ -84,32 +88,20 @@ const Guest = (props) => {
         >
           Continue
         </Button>
+        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+          <div className='formLink'>
+            <NavLink to={headerState.signupPath} onClick={handleSignupClick}>
+              Create an account?
+            </NavLink>
+          </div>
+          /
+          <div className='formLink'>
+            <NavLink to={headerState.loginPath} onClick={handleLoginClick}>
+              Login Instead?
+            </NavLink>
+          </div>
+        </div>
       </form>
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        <div
-          style={{
-            textDecoration: 'none',
-            fontSize: '1rem',
-            fontWeight: 'bold',
-          }}
-        >
-          <NavLink to={headerState.signupPath} onClick={handleSignupClick}>
-            Create an account?
-          </NavLink>
-        </div>
-        /
-        <div
-          style={{
-            textDecoration: 'none',
-            fontSize: '1rem',
-            fontWeight: 'bold',
-          }}
-        >
-          <NavLink to={headerState.loginPath} onClick={handleLoginClick}>
-            Login Instead?
-          </NavLink>
-        </div>
-      </div>
     </div>
   );
 };

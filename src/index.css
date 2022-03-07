@@ -32,3 +32,9 @@ body {
   width: 0%;
   height: 0%;
 }
+
+@media screen and (max-width: 1300px) {
+  body {
+    background: linear-gradient(90deg, #111110, rgb(70, 64, 64), #111110);
+  }
+}
