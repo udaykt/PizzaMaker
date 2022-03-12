@@ -1,6 +1,9 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
+import { collection, getDoc, getDocs } from 'firebase/firestore';
+import { getDatabase } from 'firebase/database';
+import { buildUserDataInStore } from '../../store/userSlice';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -14,12 +17,18 @@ const firebaseConfig = {
 
 const app = firebase.initializeApp(firebaseConfig);
 
-export const auth = firebase.auth();
-export const firestore = firebase.firestore();
+//auth setup
+const auth = firebase.auth();
+//firestore setup
+const firestore = firebase.firestore();
+//firestore database setup
+const firebaseDatabase = getDatabase();
+//firestore database collection
+const usersCollection = collection(firestore, 'users');
 
-export const createUserDocument = async (user, additionalData) => {
+const createUserDocument = async (user, additionalData) => {
   if (!user) return;
-  const userRef = firestore.doc(`users/${user.user.uid}`);
+  const userRef = firestore.doc(`users/${user.user?.uid}`);
 
   const snapshot = await userRef.get();
 
@@ -32,28 +41,56 @@ export const createUserDocument = async (user, additionalData) => {
         createdAt: new Date(),
       });
     } catch (error) {
-      console.log('Error while creating user' + error);
+      console.error('Error while creating user' + error);
     }
   }
 };
 
-export const createGuestUserDocument = async (user, additionalData) => {
+const createGuestUserDocument = async (user, additionalData) => {
   if (!user) return;
-  const userRef = firestore.doc(`guestUsers/${user.user.uid}`);
+  const userRef = firestore.doc(`guestUsers/${user.user?.uid}`);
 
-  const snapshot = await userRef.get();
-  console.log(snapshot.exists);
-  if (!snapshot.exists) {
-    try {
-      userRef.set({
-        emailId: additionalData.guestEmail,
-        firstName: additionalData.guestFirstName,
-        createdAt: new Date(),
-      });
-    } catch (error) {
-      console.log('Error while creating guest user' + error);
-    }
+  try {
+    userRef.set({
+      emailId: additionalData.guestEmail,
+      firstName: additionalData.guestFirstName,
+      createdAt: new Date(),
+    });
+  } catch (error) {
+    console.error('Error while creating guest user' + error);
   }
 };
 
+const fetchLoggedInUser = async (user) => {
+  if (!user) return;
+  const userDocRef = firestore.doc(`users/${user?.uid}`);
+  try {
+    var userData = (await userDocRef.get()).data();
+    buildUserDataInStore(userData);
+  } catch (error) {
+    console.error('Error while fetching user data from firestore ' + error);
+  }
+  return userData;
+};
+
+const fetchAllUsers = async () => {
+  const usersCollectionRef = firestore.collection('users');
+  try {
+    var usersSnapshot = await getDocs(usersCollectionRef);
+  } catch (error) {
+    console.error('Error while fetching all users' + error);
+  }
+  return usersSnapshot.docs;
+};
+
+export {
+  auth,
+  firestore,
+  usersCollection,
+  firebaseDatabase,
+  fetchAllUsers,
+  fetchLoggedInUser,
+  createUserDocument,
+  createGuestUserDocument,
+};
 export default app;

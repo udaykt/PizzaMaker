@@ -88,15 +88,23 @@ const Guest = (props) => {
         >
           Continue
         </Button>
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <div className='formLink'>
-            <NavLink to={headerState.signupPath} onClick={handleSignupClick}>
+            <NavLink
+              to={headerState.signupPath}
+              style={{ textDecoration: 'none' }}
+              onClick={handleSignupClick}
+            >
               Create an account?
             </NavLink>
           </div>
           /
           <div className='formLink'>
-            <NavLink to={headerState.loginPath} onClick={handleLoginClick}>
+            <NavLink
+              to={headerState.loginPath}
+              style={{ textDecoration: 'none' }}
+              onClick={handleLoginClick}
+            >
               Login Instead?
             </NavLink>
           </div>

@@ -1,23 +1,26 @@
 import './header.css';
+import avatarIcon from '../../assets/Logos/avatar-icon.png';
 import appLogo from '../../assets/Logos/Logo.png';
 import ProfileButton from '../../components/UI/ProfileButton/ProfileButton';
 import MenuIcon from '../../components/UI/Icons/MenuIcon/MenuIcon';
 import { Link, NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { headerActions } from '../../store/headerSlice';
-import { useState } from 'react';
+import AvatarIcon from '../../components/UI/AvatarIcon/AvatarIcon';
+import { avatarName, avatarNameAbbr } from '../../components/Utils/Utility';
 
 const Header = (props) => {
   const headerState = useSelector((state) => state.header);
-  const [loginPath, setLoginPath] = useState('/login');
+  const userState = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const loggedIn = userState.loggedIn;
+  let avatarname = avatarName(userState.firstName);
   const handleClick = (e) => {
     if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
     if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
     if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
   };
 
-  const username = 'UK';
   return (
     <div className={'header'}>
       <div className='hamburgerMenu'>
@@ -30,7 +33,19 @@ const Header = (props) => {
         </Link>
       </div>
       <div className='avatar'>
-        <ProfileButton>{username}</ProfileButton>
+        {(!loggedIn && <ProfileButton>Login</ProfileButton>) ||
+          (loggedIn && (
+            <AvatarIcon>
+              {
+                <img
+                  id='avatar'
+                  src={avatarIcon}
+                  title={avatarname}
+                  alt={avatarname}
+                />
+              }
+            </AvatarIcon>
+          ))}
       </div>
     </div>
   );

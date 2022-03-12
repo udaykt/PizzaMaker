@@ -109,15 +109,23 @@ const SignUp = (props) => {
         >
           Signup
         </Button>
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <div className='formLink'>
-            <NavLink to={headerState.loginPath} onClick={handleLoginClick}>
+            <NavLink
+              to={headerState.loginPath}
+              style={{ textDecoration: 'none' }}
+              onClick={handleLoginClick}
+            >
               Login Instead?
             </NavLink>
           </div>
           /
           <div className='formLink'>
-            <NavLink to={headerState.guestPath} onClick={handleGuestClick}>
+            <NavLink
+              to={headerState.guestPath}
+              style={{ textDecoration: 'none' }}
+              onClick={handleGuestClick}
+            >
               Continue as Guest?
             </NavLink>
           </div>

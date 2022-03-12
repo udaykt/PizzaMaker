@@ -1,11 +1,12 @@
 import Button from '../../components/UI/Buttons/Button';
 import './loginPage.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { headerActions } from '../../store/headerSlice';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../Firebase/Firebase';
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth, fetchLoggedInUser } from '../Firebase/Firebase';
+import { userActions } from '../../store/userSlice';
 
 const LoginPage = (props) => {
   const headerState = useSelector((state) => state.header);
@@ -30,11 +31,23 @@ const LoginPage = (props) => {
   const loginUser = async (e) => {
     e.preventDefault();
     try {
-      const user = await signInWithEmailAndPassword(
+      const { user } = await signInWithEmailAndPassword(
         auth,
         loginEmail,
         loginPassword
       );
+      console.log(user?.uid);
+      if (user && user?.uid) {
+        fetchLoggedInUser(user);
+      }
+      if (
+        auth.onAuthStateChanged((user) => {
+          if (auth.currentUser === user)
+            dispatch(userActions.setLoggedIn(true));
+          else dispatch(userActions.setLoggedIn(false));
+        })
+      )
+        console.log('User :' + user + ' logged in successfully');
     } catch (error) {
       console.log('Error while Logging in user ' + error.message);
     }
@@ -53,7 +66,7 @@ const LoginPage = (props) => {
         </div>
         <div className='formInputTextDiv'>
           <div className='labelInputDiv'>
-            <label htmlFor='email'> Email</label>
+            <label htmlFor='email'>Email</label>
             <div className={'inputField'}>
               <input
                 id='email'
@@ -86,15 +99,29 @@ const LoginPage = (props) => {
         >
           Login
         </Button>
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px',
+          }}
+        >
           <div className='formLink'>
-            <NavLink to={headerState.signupPath} onClick={handleSignupClick}>
+            <NavLink
+              to={headerState.signupPath}
+              style={{ textDecoration: 'none' }}
+              onClick={handleSignupClick}
+            >
               Create an account?
             </NavLink>
           </div>
           /
           <div className='formLink'>
-            <NavLink to={headerState.guestPath} onClick={handleGuestClick}>
+            <NavLink
+              to={headerState.guestPath}
+              style={{ textDecoration: 'none' }}
+              onClick={handleGuestClick}
+            >
               Continue as Guest?
             </NavLink>
           </div>

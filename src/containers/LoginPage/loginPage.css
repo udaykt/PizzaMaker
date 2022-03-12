@@ -85,8 +85,10 @@
   box-shadow: inset -5px -5px 5px rgba(255, 255, 255, 0.15),
     inset 5px 5px 5px rgba(0, 0, 0, 0.25);
 }
-.formInputTextDiv input:hover {
+.formInputTextDiv .inputField:hover {
   border-radius: 10px;
+  box-shadow: inset -4px -4px 4px rgba(255, 255, 255, 0.15),
+    inset 4px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
 .formInputTextDiv input:focus {
@@ -96,4 +98,8 @@
 .loginSubmitButton {
   width: 200px;
   height: 50px;
+}
+
+.navLinkStyle a:hover {
+  color: bisque;
 }

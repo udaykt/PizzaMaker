@@ -1,9 +1,24 @@
 .orderButton {
-  width: 150px;
-  height: 100px;
+  width: 160px;
+  height: 80px;
   font-size: 1.5rem;
   border-radius: 10px;
-  box-shadow: -10px -10px 10px rgba(255, 255, 255, 0.09),
-    10px 10px 10px rgba(0, 0, 0, 0.2);
+  color: white;
+  box-shadow: -15px -15px 15px rgba(255, 255, 255, 0.05),
+    15px 15px 15px rgba(0, 0, 0, 0.25);
   filter: drop-shadow(1px 1px 5px #000);
+  transition: 0.3s ease-in-out;
+}
+
+.orderButton:hover {
+  background: none;
+  color: var(--slice-color);
+  box-shadow: -13px -13px 13px rgba(255, 255, 255, 0.05),
+    13px 13px 13px rgba(0, 0, 0, 0.25);
+}
+
+.orderButton:active {
+  background: none;
+  box-shadow: inset -10px -10px 10px rgba(255, 255, 255, 0.05),
+    inset 10px 10px 10px rgba(0, 0, 0, 0.25);
 }

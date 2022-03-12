@@ -15,7 +15,7 @@
   position: absolute;
   height: 9px;
   width: 100%;
-  background: #d3531a;
+  background: green;
   border-radius: 9px;
   opacity: 1;
   transform: rotate(0deg);
@@ -50,5 +50,5 @@
 .menuIcon:hover span:nth-child(1),
 .menuIcon:hover span:nth-child(2),
 .menuIcon:hover span:nth-child(3) {
-  background-color: rgb(68, 221, 68);
+  background: green;
 }

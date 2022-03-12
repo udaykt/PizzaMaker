@@ -11,6 +11,7 @@
   animation-timing-function: ease-in-out;
   animation-iteration-count: 0;
   animation-duration: 3s;
+  z-index: -1;
 }
 
 @keyframes spin {
