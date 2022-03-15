@@ -74,9 +74,8 @@ const fetchLoggedInUser = async (user) => {
 };
 
 const fetchAllUsers = async () => {
-  const usersCollectionRef = firestore.collection('users');
   try {
-    var usersSnapshot = await getDocs(usersCollectionRef);
+    var usersSnapshot = await getDocs(usersCollection);
   } catch (error) {
     console.error('Error while fetching all users' + error);
   }

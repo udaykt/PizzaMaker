@@ -10,10 +10,9 @@ import SignUp from '../SignUp/SignUp';
 import Guest from '../Guest/Guest';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { useEffect } from 'react';
+import Logout from '../Logout/Logout';
 
 const PizzaHub = (props) => {
-  const headerState = useSelector((state) => state.header);
   const userState = useSelector((state) => state.user);
   console.log(userState);
 
@@ -34,6 +33,7 @@ const PizzaHub = (props) => {
           <h1>Welcome {userState.firstName}!,</h1>
         </strong>
         <p>Make your own pizza. Customize and Order.</p>
+        <Logout />
       </div>
       <div className={styles.pizza}>
         <Pizza {...state} />

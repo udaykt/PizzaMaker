@@ -1,12 +1,13 @@
-import Button from '../../components/UI/Buttons/Button';
 import './loginPage.css';
+import Button from '../../components/UI/Buttons/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { headerActions } from '../../store/headerSlice';
-import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, fetchLoggedInUser } from '../Firebase/Firebase';
 import { userActions } from '../../store/userSlice';
+import { loginUser } from '../Firebase/Auth';
 
 const LoginPage = (props) => {
   const headerState = useSelector((state) => state.header);
@@ -28,29 +29,9 @@ const LoginPage = (props) => {
     dispatch(headerActions.toggleGuestPage());
   };
 
-  const loginUser = async (e) => {
+  const handleLoginUser = (e) => {
     e.preventDefault();
-    try {
-      const { user } = await signInWithEmailAndPassword(
-        auth,
-        loginEmail,
-        loginPassword
-      );
-      console.log(user?.uid);
-      if (user && user?.uid) {
-        fetchLoggedInUser(user);
-      }
-      if (
-        auth.onAuthStateChanged((user) => {
-          if (auth.currentUser === user)
-            dispatch(userActions.setLoggedIn(true));
-          else dispatch(userActions.setLoggedIn(false));
-        })
-      )
-        console.log('User :' + user + ' logged in successfully');
-    } catch (error) {
-      console.log('Error while Logging in user ' + error.message);
-    }
+    loginUser({ loginEmail, loginPassword });
   };
 
   const submitHandler = (event) => {
@@ -73,6 +54,7 @@ const LoginPage = (props) => {
                 name='email'
                 type='email'
                 value={loginEmail}
+                autoFocus
                 onChange={(e) => setLoginEmail(e.target.value)}
                 required
               />
@@ -95,7 +77,7 @@ const LoginPage = (props) => {
         <Button
           className={'loginSubmitButton'}
           type='submit'
-          onClick={loginUser}
+          onClick={handleLoginUser}
         >
           Login
         </Button>

@@ -14,7 +14,7 @@ const Header = (props) => {
   const userState = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const loggedIn = userState.loggedIn;
-  let avatarname = avatarName(userState.firstName);
+  let avatarname = avatarName(userState.firstName || '');
   const handleClick = (e) => {
     if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
     if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
