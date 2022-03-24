@@ -3,7 +3,7 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import { getDatabase } from 'firebase/database';
 import { collection, getDocs } from 'firebase/firestore';
-import { buildUserDataInStore } from '../../store/userSlice';
+import { buildUserDataInStore } from '../User/User';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,

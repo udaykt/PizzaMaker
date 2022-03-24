@@ -5,7 +5,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 0;
+  z-index: 100;
   background-color: var(--slice-color);
   border-radius: 50%;
   animation: spin 10s infinite linear;
@@ -142,7 +142,6 @@
   left: 120px;
 }
 
-.sausage,
 .sausage1,
 .sausage2,
 .sausage3,
@@ -157,8 +156,6 @@
   filter: drop-shadow(1px 1px 1px #000);
   content: url(../../assets/Logos/sausage.png);
   z-index: 6;
-  top: 100px;
-  left: 120px;
 }
 
 .sausage1 {
@@ -204,7 +201,7 @@
   content: url(../../assets/Logos/peppers.png);
   filter: drop-shadow(1px 1px 1px #000);
   z-index: 7;
-  top: 70px;
+  top: 80px;
   left: 120px;
 }
 

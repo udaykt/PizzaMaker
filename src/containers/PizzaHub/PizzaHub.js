@@ -17,6 +17,8 @@ const PizzaHub = (props) => {
   const userState = useSelector((state) => state.user);
   const [userName, setUserName] = useState('');
 
+  console.log(userState.loggedIn);
+
   useEffect(() => {
     if (userState) setUserName(userState.firstName);
   }, [userState]);

@@ -1,15 +1,17 @@
-import { Component } from 'react';
-import styles from './pizza.module.css';
-import { Fragment } from 'react';
-import Slice from './Slice/Slice';
+import { Component, Fragment, useState } from 'react';
+import { useSelector } from 'react-redux';
 import DummyPizza from '../DummyPizza/DummyPizza';
+import Slice from '../Slice/Slice';
+import styles from './pizza.module.css';
 
 const SMALL = '6';
 const MEDIUM = '12';
 const LARGE = '5';
 
-class Pizza extends Component {
-  state = {
+const Pizza = (props) => {
+  const userState = useSelector((state) => state.user);
+  const loggedIn = userState.loggedIn;
+  const state = {
     quantity: {
       small: { active: false, value: SMALL },
       medium: { active: false, value: MEDIUM },
@@ -17,54 +19,50 @@ class Pizza extends Component {
     },
     value: 'small',
     sliced: true,
-    loggedIn: true,
+    loggedIn,
   };
 
-  quantityHandler = (value) => {
-    switch (this.props.quantity) {
+  const quantityHandler = (value) => {
+    switch (props.quantity) {
       case 'small':
-        return this.state.quantity.small.value;
+        return state.quantity.small.value;
       case 'medium':
-        return this.state.quantity.medium.value;
+        return state.quantity.medium.value;
       case 'large':
-        return this.state.quantity.large.value;
+        return state.quantity.large.value;
       default:
-        return this.state.quantity.small.value;
+        return state.quantity.small.value;
     }
   };
-  buildStyle() {
+  const buildStyle = () => {
     let top = Math.floor(Math.random() * (70 - 5) + 5);
     let left = Math.floor(Math.random() * (70 - 20) + 30);
     return {
       top: `${top}px`,
       left: `${left}px`,
     };
-  }
+  };
 
-  render() {
-    const quantity = 6;
-    const arr = [...Array(quantity).keys()];
-    //slices is singular
-    return (
-      <Fragment>
-        <div className={styles.pizza}>
-          {(this.state.loggedIn &&
-            Object.entries(this.props.parts).map(([k, v]) => {
-              return (
-                <Slice
-                  key={k + v}
-                  part={v}
-                  quantity={this.quantityHandler(this.props.value)}
-                  {...this.props}
-                  style={this.buildStyle}
-                />
-              );
-            })) ||
-            (!this.state.loggedIn && <DummyPizza />)}
-        </div>
-      </Fragment>
-    );
-  }
-}
+  //slices is singular
+  return (
+    <Fragment>
+      <div className={styles.pizza}>
+        {(state.loggedIn &&
+          Object.entries(props.parts).map(([k, v]) => {
+            return (
+              <Slice
+                key={k + v}
+                part={v}
+                quantity={quantityHandler(props.value)}
+                {...props}
+                style={buildStyle}
+              />
+            );
+          })) ||
+          (!state.loggedIn && <DummyPizza />)}
+      </div>
+    </Fragment>
+  );
+};
 
 export default Pizza;

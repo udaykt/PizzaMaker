@@ -53,7 +53,6 @@ const DummyPizza = (props) => {
       <div className={`olive6`} />
       <div className={`olive7`} />
       <div className={`olive1`} />
-      <div className={`sausage`} />
       <div className={`sausage1`} />
       <div className={`sausage2`} />
       <div className={`sausage3`} />

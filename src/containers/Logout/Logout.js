@@ -1,6 +1,6 @@
 import Button from '../../components/UI/Buttons/Button';
-import { buildUserDataInStore } from '../../store/userSlice';
 import { logoutUser } from '../Firebase/Auth';
+import { buildUserDataInStore } from '../User/User';
 
 const Logout = (props) => {
   const signout = async () => {
