@@ -1,19 +1,22 @@
-import { auth } from '../Firebase/Firebase';
 import Button from '../../components/UI/Buttons/Button';
 import { buildUserDataInStore } from '../../store/userSlice';
+import { logoutUser } from '../Firebase/Auth';
 
 const Logout = (props) => {
   const signout = async () => {
-    await auth
-      .signOut()
-      .then(() => {
+    logoutUser()
+      .then((user) => {
         buildUserDataInStore({ loggedIn: false, firstName: '', emailId: '' });
       })
       .catch((e) => {
-        console.error('error in signing out user');
+        console.error('Error in signing out user' + e);
       });
   };
-  return <Button onClick={signout}>Logout</Button>;
+  return (
+    <Button className={props.className} onClick={signout}>
+      Logout
+    </Button>
+  );
 };
 
 export default Logout;

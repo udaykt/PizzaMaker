@@ -1,0 +1,35 @@
+.profileMenuDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  right: 0;
+  z-index: 100;
+}
+
+.hideProfileMenuDiv {
+  display: none;
+}
+
+.profileMenu nav {
+  width: 250px;
+  height: 200px;
+}
+
+.profileMenu,
+.profileMenu ul {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  list-style-type: none;
+  width: 95%;
+  height: 100%;
+  user-select: none;
+  border-radius: 10px;
+  background-color: var(--slice-color);
+}
+
+.profileMenuButton {
+  width: 150px;
+}

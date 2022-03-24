@@ -4,6 +4,7 @@ const LOGIN_PATH = '/login';
 const SIGNUP_PATH = '/signup';
 const GUEST_PATH = '/guest';
 const MENU_PATH = '/menu';
+const PROFILE_PATH = '/profile';
 const HOME_PATH = '/';
 
 const headerSlice = createSlice({
@@ -13,11 +14,13 @@ const headerSlice = createSlice({
     showMenuPage: false,
     showSignUpPage: false,
     showGuestPage: false,
+    showProfileMenu: false,
     menuPath: MENU_PATH,
     loginPath: LOGIN_PATH,
     signupPath: SIGNUP_PATH,
     guestPath: GUEST_PATH,
     homePath: HOME_PATH,
+    profilePath: PROFILE_PATH,
   },
   reducers: {
     toggleMenuPage(state) {
@@ -39,6 +42,9 @@ const headerSlice = createSlice({
       state.showGuestPage = !state.showGuestPage;
       if (state.guestPath === GUEST_PATH) state.guestPath = HOME_PATH;
       else state.guestPath = GUEST_PATH;
+    },
+    toggleProfileMenu(state) {
+      state.showProfileMenu = !state.showProfileMenu;
     },
   },
 });

@@ -1,20 +1,25 @@
-import Pizza from '../Pizza/Pizza';
-import styles from './pizzahub.module.css';
-import ToppingsMenu from '../ToppingsMenu/ToppingsMenu';
-import OrderButton from '../../components/UI/OrderButton/OrderButton';
-import Base from '../Base/Base';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import Backdrop from '../../components/UI/Backdrop/Backdrop';
+import OrderButton from '../../components/UI/OrderButton/OrderButton';
+import { ProfileMenu } from '../../components/UI/ProfileMenu/ProfileMenu';
+import Base from '../Base/Base';
+import Guest from '../Guest/Guest';
 import LoginPage from '../LoginPage/LoginPage';
 import Menu from '../Menu/Menu';
+import Pizza from '../Pizza/Pizza';
 import SignUp from '../SignUp/SignUp';
-import Guest from '../Guest/Guest';
-import { Switch, Route, Redirect } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import Logout from '../Logout/Logout';
+import ToppingsMenu from '../ToppingsMenu/ToppingsMenu';
+import styles from './pizzahub.module.css';
 
 const PizzaHub = (props) => {
   const userState = useSelector((state) => state.user);
-  console.log(userState);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    if (userState) setUserName(userState.firstName);
+  }, [userState]);
 
   const state = {
     parts: {
@@ -30,10 +35,9 @@ const PizzaHub = (props) => {
     <div className={styles.pizzahub}>
       <div className={styles.description}>
         <strong>
-          <h1>Welcome {userState.firstName}!,</h1>
+          <h1>Welcome {`${userName ? userName : `User`}`}!,</h1>
         </strong>
         <p>Make your own pizza. Customize and Order.</p>
-        <Logout />
       </div>
       <div className={styles.pizza}>
         <Pizza {...state} />
@@ -47,6 +51,7 @@ const PizzaHub = (props) => {
       <div className={styles.orderButton}>
         <OrderButton />
       </div>
+      <ProfileMenu />
       <Backdrop />
       <Switch>
         <Redirect exact from='/' to='/' />

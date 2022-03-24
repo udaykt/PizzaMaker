@@ -1,19 +1,17 @@
-import './loginPage.css';
-import Button from '../../components/UI/Buttons/Button';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
+import Button from '../../components/UI/Buttons/Button';
 import { headerActions } from '../../store/headerSlice';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, fetchLoggedInUser } from '../Firebase/Firebase';
-import { userActions } from '../../store/userSlice';
 import { loginUser } from '../Firebase/Auth';
+import './loginPage.css';
 
 const LoginPage = (props) => {
   const headerState = useSelector((state) => state.header);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const handleSignupClick = (e) => {
     if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
@@ -31,17 +29,26 @@ const LoginPage = (props) => {
 
   const handleLoginUser = (e) => {
     e.preventDefault();
-    loginUser({ loginEmail, loginPassword });
-  };
-
-  const submitHandler = (event) => {
-    event.preventDefault();
-    const { email, password } = props;
+    loginUser({ loginEmail, loginPassword })
+      .then((user) => {
+        if (user) {
+          console.log('User :' + user?.email + ' logged in successfully');
+          if (headerState.showLoginPage && loginEmail && loginPassword) {
+            dispatch(headerActions.toggleLoginPage());
+            history.push('/');
+          }
+        } else {
+          console.error('Login unsuccessfull ' + e);
+        }
+      })
+      .catch((e) => {
+        console.error('Error while logging in user ' + e);
+      });
   };
 
   return (
     <div className={headerState.showLoginPage ? 'loginPage' : 'hideLoginPage'}>
-      <form onSubmit={submitHandler}>
+      <form onSubmit={handleLoginUser}>
         <div>
           <h1>Login</h1>
         </div>
@@ -74,11 +81,7 @@ const LoginPage = (props) => {
             </div>
           </div>
         </div>
-        <Button
-          className={'loginSubmitButton'}
-          type='submit'
-          onClick={handleLoginUser}
-        >
+        <Button className={'loginSubmitButton'} type='submit'>
           Login
         </Button>
         <div

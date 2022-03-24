@@ -1,8 +1,8 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
-import { collection, getDoc, getDocs } from 'firebase/firestore';
 import { getDatabase } from 'firebase/database';
+import { collection, getDocs } from 'firebase/firestore';
 import { buildUserDataInStore } from '../../store/userSlice';
 
 const firebaseConfig = {
@@ -31,15 +31,17 @@ const createUserDocument = async (user, additionalData) => {
   const userRef = firestore.doc(`users/${user.user?.uid}`);
 
   const snapshot = await userRef.get();
+  const userObj = {
+    emailId: additionalData.registerEmail,
+    firstName: additionalData.registerFirstName,
+    password: additionalData.registerPassword,
+    createdAt: new Date(),
+  };
 
   if (!snapshot.exists) {
     try {
-      userRef.set({
-        emailId: additionalData.registerEmail,
-        firstName: additionalData.registerFirstName,
-        password: additionalData.registerPassword,
-        createdAt: new Date(),
-      });
+      userRef.set(userObj);
+      buildUserDataInStore(userObj);
     } catch (error) {
       console.error('Error while creating user' + error);
     }

@@ -1,12 +1,10 @@
-import './signUp.css';
-import Button from '../../components/UI/Buttons/Button';
-import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { NavLink, useHistory } from 'react-router-dom';
+import Button from '../../components/UI/Buttons/Button';
 import { headerActions } from '../../store/headerSlice';
-import { NavLink } from 'react-router-dom';
-import { auth } from '../Firebase/Firebase';
-import { createUserDocument } from '../Firebase/Firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUser } from '../Firebase/Auth';
+import './signUp.css';
 
 const SignUp = (props) => {
   const headerState = useSelector((state) => state.header);
@@ -14,6 +12,7 @@ const SignUp = (props) => {
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const handleLoginClick = (e) => {
     if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
@@ -31,33 +30,34 @@ const SignUp = (props) => {
 
   const registerUser = async (e) => {
     e.preventDefault();
-    try {
-      const user = await createUserWithEmailAndPassword(
-        auth,
-        registerEmail,
-        registerPassword
-      );
-      const additionalData = {
-        registerFirstName,
-        registerEmail,
-        registerPassword,
-      };
-      console.log(user);
-      console.log(additionalData);
-      createUserDocument(user, additionalData);
-    } catch (error) {
-      console.log('Error while Registering user ' + error.message);
-    }
-  };
-
-  const submitHandler = (event) => {
-    event.preventDefault();
-    const { email, password } = props;
+    createUser({
+      registerFirstName,
+      registerEmail,
+      registerPassword,
+    })
+      .then((user) => {
+        if (user) {
+          if (
+            headerState.showSignUpPage &&
+            registerEmail &&
+            registerFirstName &&
+            registerPassword
+          ) {
+            dispatch(headerActions.toggleSignupPage());
+            history.push('/');
+          }
+        } else {
+          console.error('SignUp unsuccessfull ' + e);
+        }
+      })
+      .catch((error) => {
+        console.log('Error while Registering user ' + error.message);
+      });
   };
 
   return (
     <div className={headerState.showSignUpPage ? 'signUp' : 'hideSignUp'}>
-      <form onSubmit={submitHandler}>
+      <form onSubmit={registerUser}>
         <div>
           <h1>Sign Up</h1>
         </div>
@@ -102,11 +102,7 @@ const SignUp = (props) => {
             </div>
           </div>
         </div>
-        <Button
-          className={'signUpSubmitButton'}
-          type='submit'
-          onClick={registerUser}
-        >
+        <Button className={'signUpSubmitButton'} type='submit'>
           Signup
         </Button>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>

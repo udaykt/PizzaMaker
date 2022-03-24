@@ -1,13 +1,13 @@
-import './header.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import avatarIcon from '../../assets/Logos/avatar-icon.png';
 import appLogo from '../../assets/Logos/Logo.png';
-import ProfileButton from '../../components/UI/ProfileButton/ProfileButton';
-import MenuIcon from '../../components/UI/Icons/MenuIcon/MenuIcon';
-import { Link, NavLink } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { headerActions } from '../../store/headerSlice';
 import AvatarIcon from '../../components/UI/AvatarIcon/AvatarIcon';
-import { avatarName, avatarNameAbbr } from '../../components/Utils/Utility';
+import MenuIcon from '../../components/UI/Icons/MenuIcon/MenuIcon';
+import LoginButton from '../../components/UI/LoginButton/LoginButton';
+import { avatarName } from '../../components/Utils/Utility';
+import { headerActions } from '../../store/headerSlice';
+import './header.css';
 
 const Header = (props) => {
   const headerState = useSelector((state) => state.header);
@@ -33,17 +33,15 @@ const Header = (props) => {
         </Link>
       </div>
       <div className='avatar'>
-        {(!loggedIn && <ProfileButton>Login</ProfileButton>) ||
+        {(!loggedIn && <LoginButton>Login</LoginButton>) ||
           (loggedIn && (
             <AvatarIcon>
-              {
-                <img
-                  id='avatar'
-                  src={avatarIcon}
-                  title={avatarname}
-                  alt={avatarname}
-                />
-              }
+              <img
+                id='avatar'
+                src={avatarIcon}
+                title={avatarname}
+                alt={avatarname}
+              />
             </AvatarIcon>
           ))}
       </div>

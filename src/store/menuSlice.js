@@ -2,7 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const menuSlice = createSlice({
   name: 'menu',
-  initialState: { showLoginPage: false, showMenuPage: false },
+  initialState: {
+    showLoginPage: false,
+    showMenuPage: false,
+  },
   reducers: {
     toggleLoginPage(state) {
       state.showLoginPage = !state.showLoginPage;

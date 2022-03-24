@@ -1,21 +1,22 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { headerActions } from '../../../store/headerSlice';
 import Button from '../Buttons/Button';
 import './avatarIcon.css';
 
 const AvatarIcon = (props) => {
   const headerState = useSelector((state) => state.header);
+  const dispatch = useDispatch();
 
-  const toggleAvatarButtonHandler = () => {};
+  const toggleAvatarButtonHandler = (e) => {
+    console.log(headerState.showProfileMenu);
+    dispatch(headerActions.toggleProfileMenu());
+  };
+
   return (
-    <NavLink
-      to={headerState.loginPath}
-      style={{ textDecoration: 'none' }}
-      onClick={toggleAvatarButtonHandler}
-    >
-      <Button className={'avatarIcon'}>{props.children}</Button>
-    </NavLink>
+    <Button className={'avatarIcon'} onClick={toggleAvatarButtonHandler}>
+      {props.children}
+    </Button>
   );
 };
 export default AvatarIcon;

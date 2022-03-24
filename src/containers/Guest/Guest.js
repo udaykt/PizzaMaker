@@ -1,17 +1,17 @@
-import './guest.css';
-import Button from '../../components/UI/Buttons/Button';
-import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { NavLink, useHistory } from 'react-router-dom';
+import Button from '../../components/UI/Buttons/Button';
 import { headerActions } from '../../store/headerSlice';
-import { signInAnonymously } from 'firebase/auth';
-import { auth, createGuestUserDocument } from '../Firebase/Firebase';
+import { createGuest } from '../Firebase/Auth';
+import './guest.css';
 
 const Guest = (props) => {
   const headerState = useSelector((state) => state.header);
   const [guestFirstName, setGuestFirstName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const handleSignupClick = (e) => {
     if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
@@ -27,29 +27,30 @@ const Guest = (props) => {
     dispatch(headerActions.toggleLoginPage());
   };
 
-  const createGuest = async (e) => {
+  const registerGuest = async (e) => {
     e.preventDefault();
-    try {
-      const user = await signInAnonymously(auth);
-      const additionalData = {
-        guestFirstName,
-        guestEmail,
-      };
-      console.log(additionalData);
-      createGuestUserDocument(user, additionalData);
-    } catch (error) {
-      console.log('Error while Logging in user ' + error.message);
-    }
-  };
-
-  const submitHandler = (event) => {
-    event.preventDefault();
-    const { firstName, email } = props;
+    createGuest({
+      guestFirstName,
+      guestEmail,
+    })
+      .then((user) => {
+        if (user) {
+          if (headerState.showGuestPage && guestEmail && guestEmail) {
+            dispatch(headerActions.toggleGuestPage());
+            history.push('/');
+          }
+        } else {
+          console.error('Guest SignUp unsuccessfull ' + e);
+        }
+      })
+      .catch((error) => {
+        console.log('Error while Logging in guest user ' + error.message);
+      });
   };
 
   return (
     <div className={headerState.showGuestPage ? 'guestPage' : 'hideGuestPage'}>
-      <form onSubmit={submitHandler}>
+      <form onSubmit={registerGuest}>
         <div>
           <h1>Guest</h1>
         </div>
@@ -81,11 +82,7 @@ const Guest = (props) => {
             </div>
           </div>
         </div>
-        <Button
-          className={'loginSubmitButton'}
-          type='submit'
-          onClick={createGuest}
-        >
+        <Button className={'loginSubmitButton'} type='submit'>
           Continue
         </Button>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>

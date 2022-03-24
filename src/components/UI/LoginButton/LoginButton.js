@@ -1,10 +1,10 @@
-import './profileButton.css';
+import './loginButton.css';
 import Button from '../Buttons/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { headerActions } from '../../../store/headerSlice';
 import { NavLink } from 'react-router-dom';
 
-const ProfileButton = (props) => {
+const LoginButton = (props) => {
   const headerState = useSelector((state) => state.header);
   const dispatch = useDispatch();
   const toggleLoginPageHandler = (e) => {
@@ -19,9 +19,9 @@ const ProfileButton = (props) => {
       style={{ textDecoration: 'none' }}
       onClick={toggleLoginPageHandler}
     >
-      <Button className={'profileButton'}>{props.children}</Button>
+      <Button className={'loginButton'}>{props.children}</Button>
     </NavLink>
   );
 };
 
-export default ProfileButton;
+export default LoginButton;
