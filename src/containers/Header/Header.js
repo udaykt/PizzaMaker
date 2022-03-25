@@ -33,7 +33,14 @@ const Header = (props) => {
         </Link>
       </div>
       <div className='avatar'>
-        {(!loggedIn && <LoginButton>Login</LoginButton>) ||
+        {(!loggedIn && (
+          <div className='loginSignupDiv'>
+            <LoginButton type='login'>Login</LoginButton>
+            <div className='signupButtonDiv'>
+              <LoginButton type='signup'>Sign Up</LoginButton>
+            </div>
+          </div>
+        )) ||
           (loggedIn && (
             <AvatarIcon>
               <img

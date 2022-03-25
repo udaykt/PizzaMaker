@@ -1,5 +1,6 @@
 body {
   overflow: auto;
+  user-select: none;
   background: radial-gradient(rgb(70, 64, 64), #111110);
 }
 ::-webkit-scrollbar {

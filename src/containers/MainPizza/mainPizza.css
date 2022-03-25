@@ -1,0 +1,284 @@
+.mainPizza {
+  width: 300px;
+  height: 300px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  z-index: 100;
+}
+.slice,
+.sauceSlice,
+.cheeseSlice {
+  position: relative;
+  transform-origin: 100% 100%;
+  background-color: var(--slice-color);
+  width: 500px;
+  height: 500px;
+  left: 50%;
+  top: 50%;
+  border: 1px solid #000;
+  margin-top: -500px;
+  margin-left: -500px;
+  /* animation: pull 3s ease-in-out infinite; */
+}
+.sauceSlice {
+  background-color: var(--sauce-color);
+  border-radius: 100% 0 0 0;
+  width: 140px;
+  height: 140px;
+  margin-top: -140px;
+  margin-left: -140px;
+  z-index: 101;
+}
+.cheeseSlice {
+  border-radius: 100% 0 0 0;
+  background-color: var(--cheese-color);
+  width: 130px;
+  height: 130px;
+  margin-top: -130px;
+  margin-left: -130px;
+  z-index: 102;
+}
+
+@keyframes pull {
+  0% {
+    top: 50%;
+  }
+  100% {
+    top: 40%;
+  }
+}
+
+.sector:hover {
+  background: #000;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.sauce {
+  position: absolute;
+  background-color: var(--sauce-color);
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  filter: drop-shadow(0.5px 0.5px 1px #000);
+  z-index: 1;
+}
+
+.cheese {
+  position: absolute;
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  background-color: var(--cheese-color);
+  z-index: 3;
+  filter: drop-shadow(0.5px 0.5px 1px #000);
+}
+
+.mozarella {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  background-color: var(--mozzarella-color);
+  z-index: 2;
+  filter: drop-shadow(0.5px 0.5px 1px #000);
+}
+
+.olives,
+.olive1,
+.olive2,
+.olive3,
+.olive4,
+.olive5,
+.olive6,
+.olive7 {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  content: url(../../assets/Logos/olive.png);
+  filter: drop-shadow(1px 1px 1px #000);
+  z-index: 8;
+  top: 60px;
+  left: 60px;
+}
+
+.olive1 {
+  top: 100px;
+  left: 80px;
+}
+.olive2 {
+  top: 160px;
+  left: 100px;
+}
+.olive3 {
+  top: 150px;
+  left: 150px;
+}
+.olive4 {
+  top: 100px;
+  left: 180px;
+}
+.olive5 {
+  top: 50px;
+  left: 150px;
+}
+.olive6 {
+  top: 160px;
+  left: 50px;
+}
+.olive7 {
+  top: 50px;
+  left: 100px;
+}
+
+.pepperoni,
+.pepperoni1,
+.pepperoni2,
+.pepperoni3,
+.pepperoni4,
+.pepperoni5,
+.pepperoni6,
+.pepperoni7 {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  content: url(../../assets/Logos/pepperoni.png);
+  filter: drop-shadow(1px 1px 1px #000);
+  z-index: 5;
+  top: 80px;
+  left: 80px;
+}
+
+.pepperoni1 {
+  top: 90px;
+  left: 150px;
+}
+.pepperoni2 {
+  top: 180px;
+  left: 120px;
+}
+.pepperoni3 {
+  top: 140px;
+  left: 180px;
+}
+.pepperoni4 {
+  top: 40px;
+  left: 120px;
+}
+.pepperoni5 {
+  top: 110px;
+  left: 40px;
+}
+.pepperoni6 {
+  top: 130px;
+  left: 80px;
+}
+.pepperoni7 {
+  top: 120px;
+  left: 120px;
+}
+
+.sausage1,
+.sausage2,
+.sausage3,
+.sausage4,
+.sausage5,
+.sausage6,
+.sausage7 {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border-radius: 40%;
+  filter: drop-shadow(1px 1px 1px #000);
+  content: url(../../assets/Logos/sausage.png);
+  z-index: 6;
+}
+
+.sausage1 {
+  top: 70px;
+  left: 160px;
+}
+.sausage2 {
+  top: 180px;
+  left: 150px;
+}
+.sausage3 {
+  top: 140px;
+  left: 120px;
+}
+.sausage4 {
+  top: 120px;
+  left: 160px;
+}
+.sausage5 {
+  top: 170px;
+  left: 60px;
+}
+.sausage6 {
+  top: 80px;
+  left: 50px;
+}
+.sausage7 {
+  top: 65px;
+  left: 100px;
+}
+
+.peppers,
+.peppers1,
+.peppers2,
+.peppers3,
+.peppers4,
+.peppers5,
+.peppers6,
+.peppers7 {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  content: url(../../assets/Logos/peppers.png);
+  filter: drop-shadow(1px 1px 1px #000);
+  z-index: 7;
+  top: 80px;
+  left: 120px;
+}
+
+.peppers1 {
+  top: 110px;
+  left: 100px;
+  transform: rotate(30deg);
+}
+.peppers2 {
+  top: 150px;
+  left: 170px;
+  transform: rotate(60deg);
+}
+.peppers3 {
+  top: 130px;
+  left: 60px;
+  transform: rotate(120deg);
+}
+.peppers4 {
+  top: 70px;
+  left: 170px;
+  transform: rotate(150deg);
+}
+.peppers5 {
+  top: 170px;
+  left: 90px;
+  transform: rotate(180deg);
+}
+.peppers6 {
+  top: 50px;
+  left: 80px;
+  transform: rotate(210deg);
+}
+.peppers7 {
+  top: 110px;
+  left: 190px;
+  transform: rotate(210deg);
+}

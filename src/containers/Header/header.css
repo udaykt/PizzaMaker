@@ -67,10 +67,13 @@
   width: 45px;
   border-radius: 50%;
 }
+.loginSignupDiv {
+  display: flex;
+  gap: 20px;
+}
 
-/* @media screen and (max-width: 960px) {
-  .header {
-    background: black;
-    min-height: 10vh;
+@media screen and (max-width: 780px) {
+  .signupButtonDiv {
+    display: none;
   }
-} */
+}
