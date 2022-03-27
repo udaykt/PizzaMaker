@@ -9,7 +9,7 @@
   left: 0;
   right: 0;
   align-items: center;
-  min-width: fit-content;
+  min-width: 720px;
   min-height: 10vh;
   height: 100px;
   z-index: 1;

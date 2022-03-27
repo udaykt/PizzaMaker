@@ -1,14 +1,16 @@
-import { Fragment } from 'react';
-import { NavLink, withRouter } from 'react-router-dom';
-import Button from '../../components/UI/Buttons/Button';
+import React, { Fragment } from 'react';
+import { NavLink } from 'react-router-dom';
 import {
   ABOUT_PATH,
+  CHECKOUT_PATH,
   CONTACT_PATH,
   ORDERS_PATH,
   PROFILE_PATH,
-} from '../../components/Utils/Constants';
-import './menu.css';
-const Menu = (props) => {
+} from '../../Utils/Constants';
+import Button from '../Buttons/Button';
+import './dashboardMenu.css';
+
+const DashboardMenu = (props) => {
   const menuItems = [
     {
       name: 'My Profile',
@@ -19,6 +21,10 @@ const Menu = (props) => {
       path: ORDERS_PATH,
     },
     {
+      name: 'Checkout',
+      path: CHECKOUT_PATH,
+    },
+    {
       name: 'Contact',
       path: CONTACT_PATH,
     },
@@ -27,11 +33,12 @@ const Menu = (props) => {
       path: ABOUT_PATH,
     },
   ];
+
   return (
     <Fragment>
-      <div className={true ? 'menu' : 'hideMenu'}>
-        <div className='menuLogo'>
-          <h1>Menu</h1>
+      <div className={'dashboardMenu'}>
+        <div className='dashBoardLogo'>
+          <h1>Dashboard</h1>
         </div>
         <div className='menuLinks'>
           <nav>
@@ -54,4 +61,4 @@ const Menu = (props) => {
   );
 };
 
-export default withRouter(Menu);
+export default DashboardMenu;

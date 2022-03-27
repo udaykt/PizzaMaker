@@ -1,31 +1,18 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink, useHistory, withRouter } from 'react-router-dom';
 import Button from '../../components/UI/Buttons/Button';
-import { headerActions } from '../../store/headerSlice';
+import {
+  HOME_PATH,
+  LOGIN_PATH,
+  SIGNUP_PATH,
+} from '../../components/Utils/Constants';
 import { createGuest } from '../Firebase/Auth';
 import './guest.css';
 
 const Guest = (props) => {
-  const headerState = useSelector((state) => state.header);
   const [guestFirstName, setGuestFirstName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
-  const dispatch = useDispatch();
   const history = useHistory();
-
-  const handleSignupClick = (e) => {
-    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
-    if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
-    if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
-    dispatch(headerActions.toggleSignupPage());
-  };
-
-  const handleLoginClick = (e) => {
-    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
-    if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
-    if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
-    dispatch(headerActions.toggleLoginPage());
-  };
 
   const registerGuest = async (e) => {
     e.preventDefault();
@@ -35,9 +22,8 @@ const Guest = (props) => {
     })
       .then((user) => {
         if (user) {
-          if (headerState.showGuestPage && guestEmail && guestEmail) {
-            dispatch(headerActions.toggleGuestPage());
-            history.push('/');
+          if (guestEmail && guestEmail) {
+            history.push(HOME_PATH);
           }
         } else {
           console.error('Guest SignUp unsuccessfull ' + e);
@@ -49,7 +35,7 @@ const Guest = (props) => {
   };
 
   return (
-    <div className={headerState.showGuestPage ? 'guestPage' : 'hideGuestPage'}>
+    <div className={true ? 'guestPage' : 'hideGuestPage'}>
       <form onSubmit={registerGuest}>
         <div>
           <h1>Guest</h1>
@@ -87,21 +73,13 @@ const Guest = (props) => {
         </Button>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <div className='formLink'>
-            <NavLink
-              to={headerState.signupPath}
-              style={{ textDecoration: 'none' }}
-              onClick={handleSignupClick}
-            >
+            <NavLink to={SIGNUP_PATH} style={{ textDecoration: 'none' }}>
               Create an account?
             </NavLink>
           </div>
           /
           <div className='formLink'>
-            <NavLink
-              to={headerState.loginPath}
-              style={{ textDecoration: 'none' }}
-              onClick={handleLoginClick}
-            >
+            <NavLink to={LOGIN_PATH} style={{ textDecoration: 'none' }}>
               Login Instead?
             </NavLink>
           </div>
@@ -111,4 +89,4 @@ const Guest = (props) => {
   );
 };
 
-export default Guest;
+export default withRouter(Guest);

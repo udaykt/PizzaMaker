@@ -1,0 +1,18 @@
+.dashboardMenu {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  left: 1%;
+  width: 38%;
+  height: 90%;
+  border-radius: 10px;
+  background-color: var(--slice-color);
+  z-index: 100;
+}
+.dashBoardLogo {
+  font-size: 0.8rem;
+  font-family: monospace;
+  text-transform: uppercase;
+}

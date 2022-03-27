@@ -1,7 +1,5 @@
-import './mainPizza.css';
-import Sauce from '../../components/Sauce/Sauce';
 import { Fragment } from 'react';
-import Peppers from '../../components/Peppers/Peppers';
+import './mainPizza.css';
 
 const MainPizza = (props) => {
   const pizzaSlices = {

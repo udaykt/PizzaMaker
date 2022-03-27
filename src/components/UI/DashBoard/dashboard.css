@@ -1,0 +1,19 @@
+.dashboard {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  right: 1%;
+  width: 60%;
+  height: 95%;
+  background-color: var(--slice-color);
+  border-radius: 20px;
+  box-shadow: inset -5px -5px 5px rgba(255, 255, 255, 0.25),
+    inset 5px 5px 5px rgba(0, 0, 0, 0.25);
+}
+
+.dashboard p {
+  color: black;
+  font-family: monospace;
+  font-size: 1rem;
+}

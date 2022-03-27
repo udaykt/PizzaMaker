@@ -1,9 +1,9 @@
-import store from '../../store';
 import {
   createUserWithEmailAndPassword,
   signInAnonymously,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
+import store from '../../store';
 import { userActions } from '../../store/userSlice';
 import {
   auth,

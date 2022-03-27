@@ -1,41 +1,33 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { headerActions } from '../../../store/headerSlice';
+import { useHistory } from 'react-router-dom';
+import { pizzahubActions } from '../../../store/pizzahubSlice';
+import { HOME_PATH } from '../../Utils/Constants';
 import './backdrop.css';
-import { Link } from 'react-router-dom';
 
 const Backdrop = (props) => {
-  const headerState = useSelector((state) => state.header);
+  const pizzaHubSlice = useSelector((state) => state.pizzahub);
   const dispatch = useDispatch();
+  const history = useHistory();
+
+  useEffect(() => {
+    if (window.location.pathname !== HOME_PATH)
+      dispatch(pizzahubActions.setBackdrop(true));
+    console.log(window.location.pathname);
+  });
+
   const handleClick = (e) => {
-    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
-    if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
-    if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
-    if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
+    history.push(HOME_PATH);
+    dispatch(pizzahubActions.setBackdrop(false));
   };
 
   return (
     <Fragment>
-      {(headerState.showMenuPage && (
-        <Link to={headerState.menuPath}>
-          <div className='backdrop' onClick={handleClick}></div>
-        </Link>
-      )) ||
-        (headerState.showLoginPage && (
-          <Link to={headerState.loginPath}>
-            <div className='backdrop' onClick={handleClick}></div>
-          </Link>
-        )) ||
-        (headerState.showSignUpPage && (
-          <Link to={headerState.signupPath}>
-            <div className='backdrop' onClick={handleClick}></div>
-          </Link>
-        )) ||
-        (headerState.showGuestPage && (
-          <Link to={headerState.guestPath}>
-            <div className='backdrop' onClick={handleClick}></div>
-          </Link>
-        ))}
+      {pizzaHubSlice.backdrop && (
+        <div className='backdrop' onClick={handleClick}>
+          {props.children}
+        </div>
+      )}
     </Fragment>
   );
 };

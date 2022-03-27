@@ -1,32 +1,19 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink, useHistory, withRouter } from 'react-router-dom';
 import Button from '../../components/UI/Buttons/Button';
-import { headerActions } from '../../store/headerSlice';
+import {
+  GUEST_PATH,
+  HOME_PATH,
+  LOGIN_PATH,
+} from '../../components/Utils/Constants';
 import { createUser } from '../Firebase/Auth';
 import './signUp.css';
 
 const SignUp = (props) => {
-  const headerState = useSelector((state) => state.header);
   const [registerFirstName, setRegisterFirstName] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
-  const dispatch = useDispatch();
   const history = useHistory();
-
-  const handleLoginClick = (e) => {
-    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
-    if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
-    if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
-    dispatch(headerActions.toggleLoginPage());
-  };
-
-  const handleGuestClick = (e) => {
-    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
-    if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
-    if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
-    dispatch(headerActions.toggleGuestPage());
-  };
 
   const registerUser = async (e) => {
     e.preventDefault();
@@ -37,14 +24,8 @@ const SignUp = (props) => {
     })
       .then((user) => {
         if (user) {
-          if (
-            headerState.showSignUpPage &&
-            registerEmail &&
-            registerFirstName &&
-            registerPassword
-          ) {
-            dispatch(headerActions.toggleSignupPage());
-            history.push('/');
+          if (registerEmail && registerFirstName && registerPassword) {
+            history.push(HOME_PATH);
           }
         } else {
           console.error('SignUp unsuccessfull ' + e);
@@ -56,7 +37,7 @@ const SignUp = (props) => {
   };
 
   return (
-    <div className={headerState.showSignUpPage ? 'signUp' : 'hideSignUp'}>
+    <div className={true ? 'signUp' : 'hideSignUp'}>
       <form onSubmit={registerUser}>
         <div>
           <h1>Sign Up</h1>
@@ -107,21 +88,13 @@ const SignUp = (props) => {
         </Button>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <div className='formLink'>
-            <NavLink
-              to={headerState.loginPath}
-              style={{ textDecoration: 'none' }}
-              onClick={handleLoginClick}
-            >
+            <NavLink to={LOGIN_PATH} style={{ textDecoration: 'none' }}>
               Login Instead?
             </NavLink>
           </div>
           /
           <div className='formLink'>
-            <NavLink
-              to={headerState.guestPath}
-              style={{ textDecoration: 'none' }}
-              onClick={handleGuestClick}
-            >
+            <NavLink to={GUEST_PATH} style={{ textDecoration: 'none' }}>
               Continue as Guest?
             </NavLink>
           </div>
@@ -131,4 +104,4 @@ const SignUp = (props) => {
   );
 };
 
-export default SignUp;
+export default withRouter(SignUp);

@@ -1,7 +1,6 @@
-import { Component, Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import DummyPizza from '../DummyPizza/DummyPizza';
-import MainPizza from '../MainPizza/MainPizza';
 import Slice from '../Slice/Slice';
 import styles from './pizza.module.css';
 
@@ -44,7 +43,6 @@ const Pizza = (props) => {
     };
   };
 
-  //slices is singular
   return (
     <Fragment>
       <div className={styles.pizza}>

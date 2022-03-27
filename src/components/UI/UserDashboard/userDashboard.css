@@ -1,0 +1,20 @@
+.userDashboard {
+  display: flex;
+  position: fixed;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: var(--slice-color);
+  width: 80%;
+  min-width: 600px;
+  height: 60%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 20px;
+  z-index: 100;
+}
+@media screen and (min-width: 350px) and (max-width: 600px) {
+  .userDashboard {
+    height: 30%;
+  }
+}

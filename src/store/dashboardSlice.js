@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const authSlice = createSlice({
-  name: 'auth',
-  initialState: { showLoginPage: false, showMenuPage: false },
+const dashboardSlice = createSlice({
+  name: 'dashboard',
+  initialState: { showProfile: false, showMenuPage: false },
   reducers: {
     toggleLoginPage(state) {
       state.showLoginPage = !state.showLoginPage;
@@ -13,6 +13,6 @@ const authSlice = createSlice({
   },
 });
 
-export const headerActions = authSlice.actions;
+export const headerActions = dashboardSlice.actions;
 
-export default authSlice;
+export default dashboardSlice;

@@ -1,28 +1,34 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
-import { headerActions } from '../../../../store/headerSlice';
+import { useDispatch } from 'react-redux';
+import { useHistory, withRouter } from 'react-router-dom';
+import { pizzahubActions } from '../../../../store/pizzahubSlice';
+import { HOME_PATH, MENU_PATH } from '../../../Utils/Constants';
 import './menuIcon.css';
 
 const MenuIcon = (props) => {
-  const headerState = useSelector((state) => state.header);
   const dispatch = useDispatch();
+  const history = useHistory();
+  var open = window.location.pathname === MENU_PATH;
+
   const toggleMenuIconHandler = () => {
-    if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
-    if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
-    dispatch(headerActions.toggleMenuPage());
+    if (window.location.pathname === HOME_PATH) {
+      history.push(MENU_PATH);
+      dispatch(pizzahubActions.setBackdrop(true));
+    } else {
+      history.push(HOME_PATH);
+      dispatch(pizzahubActions.setBackdrop(false));
+    }
   };
   return (
-    <NavLink to={headerState.menuPath} onClick={toggleMenuIconHandler}>
-      <div
-        title='Menu'
-        className={`menuIcon ${headerState.showMenuPage ? 'open' : ''}`}
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </NavLink>
+    <div
+      title='Menu'
+      className={`menuIcon ${open ? 'open' : ''}`}
+      onClick={toggleMenuIconHandler}
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
   );
 };
 
-export default MenuIcon;
+export default withRouter(MenuIcon);

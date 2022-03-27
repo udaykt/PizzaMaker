@@ -1,31 +1,18 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink, useHistory, withRouter } from 'react-router-dom';
 import Button from '../../components/UI/Buttons/Button';
-import { headerActions } from '../../store/headerSlice';
+import {
+  GUEST_PATH,
+  HOME_PATH,
+  SIGNUP_PATH,
+} from '../../components/Utils/Constants';
 import { loginUser } from '../Firebase/Auth';
 import './loginPage.css';
 
 const LoginPage = (props) => {
-  const headerState = useSelector((state) => state.header);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  const dispatch = useDispatch();
   const history = useHistory();
-
-  const handleSignupClick = (e) => {
-    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
-    if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
-    if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
-    dispatch(headerActions.toggleSignupPage());
-  };
-
-  const handleGuestClick = (e) => {
-    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
-    if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
-    if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
-    dispatch(headerActions.toggleGuestPage());
-  };
 
   const handleLoginUser = (e) => {
     e.preventDefault();
@@ -33,9 +20,8 @@ const LoginPage = (props) => {
       .then((user) => {
         if (user) {
           console.log('User :' + user?.email + ' logged in successfully');
-          if (headerState.showLoginPage && loginEmail && loginPassword) {
-            dispatch(headerActions.toggleLoginPage());
-            history.push('/');
+          if (loginEmail && loginPassword) {
+            history.push(HOME_PATH);
           }
         } else {
           console.error('Login unsuccessfull ' + e);
@@ -47,7 +33,7 @@ const LoginPage = (props) => {
   };
 
   return (
-    <div className={headerState.showLoginPage ? 'loginPage' : 'hideLoginPage'}>
+    <div className={true ? 'loginPage' : 'hideLoginPage'}>
       <form onSubmit={handleLoginUser}>
         <div>
           <h1>Login</h1>
@@ -92,21 +78,13 @@ const LoginPage = (props) => {
           }}
         >
           <div className='formLink'>
-            <NavLink
-              to={headerState.signupPath}
-              style={{ textDecoration: 'none' }}
-              onClick={handleSignupClick}
-            >
+            <NavLink to={SIGNUP_PATH} style={{ textDecoration: 'none' }}>
               Create an account?
             </NavLink>
           </div>
           /
           <div className='formLink'>
-            <NavLink
-              to={headerState.guestPath}
-              style={{ textDecoration: 'none' }}
-              onClick={handleGuestClick}
-            >
+            <NavLink to={GUEST_PATH} style={{ textDecoration: 'none' }}>
               Continue as Guest?
             </NavLink>
           </div>
@@ -116,4 +94,4 @@ const LoginPage = (props) => {
   );
 };
 
-export default LoginPage;
+export default withRouter(LoginPage);

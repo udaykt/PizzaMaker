@@ -1,11 +1,11 @@
-import styles from './slice.module.css';
 import Cheese from '../../components/Cheese/Cheese';
-import Sauce from '../../components/Sauce/Sauce';
-import Peppers from '../../components/Peppers/Peppers';
-import Pepperoni from '../../components/Pepperoni/Pepperoni';
-import Sausage from '../../components/Sausage/Sausage';
-import Olive from '../../components/Olive/Olive';
 import Mozzarella from '../../components/Mozzarella/Mozzerella';
+import Olive from '../../components/Olive/Olive';
+import Pepperoni from '../../components/Pepperoni/Pepperoni';
+import Peppers from '../../components/Peppers/Peppers';
+import Sauce from '../../components/Sauce/Sauce';
+import Sausage from '../../components/Sausage/Sausage';
+import styles from './slice.module.css';
 
 const Slice = (props) => {
   return (

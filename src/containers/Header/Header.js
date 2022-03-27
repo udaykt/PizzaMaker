@@ -5,6 +5,7 @@ import appLogo from '../../assets/Logos/Logo.png';
 import AvatarIcon from '../../components/UI/AvatarIcon/AvatarIcon';
 import MenuIcon from '../../components/UI/Icons/MenuIcon/MenuIcon';
 import LoginButton from '../../components/UI/LoginButton/LoginButton';
+import { HOME_PATH } from '../../components/Utils/Constants';
 import { avatarName } from '../../components/Utils/Utility';
 import { headerActions } from '../../store/headerSlice';
 import './header.css';
@@ -27,7 +28,7 @@ const Header = (props) => {
         <MenuIcon>{props.children}</MenuIcon>
       </div>
       <div className='logo' title='Pizza Maker'>
-        <Link to='/' onClick={handleClick}>
+        <Link to={HOME_PATH} onClick={handleClick}>
           <img src={appLogo} alt='' />
           <h1>Pizza Maker</h1>
         </Link>

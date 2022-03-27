@@ -1,45 +1,46 @@
-import './loginButton.css';
+import { useDispatch } from 'react-redux';
+import { useHistory, withRouter } from 'react-router-dom';
+import { pizzahubActions } from '../../../store/pizzahubSlice';
+import { HOME_PATH, LOGIN_PATH, SIGNUP_PATH } from '../../Utils/Constants';
 import Button from '../Buttons/Button';
-import { useDispatch, useSelector } from 'react-redux';
-import { headerActions } from '../../../store/headerSlice';
-import { NavLink } from 'react-router-dom';
+import './loginButton.css';
 
 const LoginButton = (props) => {
-  const headerState = useSelector((state) => state.header);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const toggleLoginPageHandler = (e) => {
-    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
-    if (headerState.showSignUpPage) dispatch(headerActions.toggleSignupPage());
-    if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
-    dispatch(headerActions.toggleLoginPage());
+    if (window.location.pathname === HOME_PATH || SIGNUP_PATH) {
+      history.push(LOGIN_PATH);
+      dispatch(pizzahubActions.setBackdrop(true));
+    } else {
+      history.push(HOME_PATH);
+      dispatch(pizzahubActions.setBackdrop(false));
+    }
   };
   const toggleSignupPageHandler = (e) => {
-    if (headerState.showMenuPage) dispatch(headerActions.toggleMenuPage());
-    if (headerState.showLoginPage) dispatch(headerActions.toggleLoginPage());
-    if (headerState.showGuestPage) dispatch(headerActions.toggleGuestPage());
-    dispatch(headerActions.toggleSignupPage());
+    if (window.location.pathname === HOME_PATH || LOGIN_PATH) {
+      history.push(SIGNUP_PATH);
+      dispatch(pizzahubActions.setBackdrop(true));
+    } else {
+      history.push(HOME_PATH);
+      dispatch(pizzahubActions.setBackdrop(false));
+    }
   };
   const items = {
     login: {
       handler: toggleLoginPageHandler,
-      routePath: headerState.loginPath,
     },
     signup: {
       handler: toggleSignupPageHandler,
-      routePath: headerState.signupPath,
     },
   };
 
   return (
-    <NavLink
-      to={items[props.type].routePath}
-      style={{ textDecoration: 'none' }}
-      onClick={items[props.type].handler}
-    >
-      <Button className={'loginButton'}>{props.children}</Button>
-    </NavLink>
+    <Button className={'loginButton'} onClick={items[props.type].handler}>
+      {props.children}
+    </Button>
   );
 };
 
-export default LoginButton;
+export default withRouter(LoginButton);

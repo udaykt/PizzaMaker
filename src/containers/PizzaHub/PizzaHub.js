@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import Backdrop from '../../components/UI/Backdrop/Backdrop';
 import OrderButton from '../../components/UI/OrderButton/OrderButton';
 import { ProfileMenu } from '../../components/UI/ProfileMenu/ProfileMenu';
+import UserDashboard from '../../components/UI/UserDashboard/UserDashboard';
+import {
+  DASHBOARD_PATH,
+  GUEST_PATH,
+  HOME_PATH,
+  LOGIN_PATH,
+  MENU_PATH,
+  SIGNUP_PATH,
+} from '../../components/Utils/Constants';
 import Base from '../Base/Base';
 import Guest from '../Guest/Guest';
 import LoginPage from '../LoginPage/LoginPage';
@@ -15,9 +24,8 @@ import styles from './pizzahub.module.css';
 
 const PizzaHub = (props) => {
   const userState = useSelector((state) => state.user);
-  const [userName, setUserName] = useState('');
 
-  console.log(userState.loggedIn);
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     if (userState) setUserName(userState.firstName);
@@ -56,14 +64,15 @@ const PizzaHub = (props) => {
       <ProfileMenu />
       <Backdrop />
       <Switch>
-        <Redirect exact from='/' to='/' />
-        <Route path='/menu' component={Menu} />
-        <Route path='/login' component={LoginPage} />
-        <Route path='/signup' component={SignUp} />
-        <Route path='/guest' component={Guest} />
+        <Redirect exact from={HOME_PATH} to={HOME_PATH} />
+        <Route path={MENU_PATH} component={Menu} />
+        <Route path={LOGIN_PATH} component={LoginPage} />
+        <Route path={SIGNUP_PATH} component={SignUp} />
+        <Route path={GUEST_PATH} component={Guest} />
+        <Route path={DASHBOARD_PATH} component={UserDashboard} />
       </Switch>
     </div>
   );
 };
 
-export default PizzaHub;
+export default withRouter(PizzaHub);

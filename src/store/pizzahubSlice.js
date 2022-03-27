@@ -39,6 +39,7 @@ const pizzahubSlice = createSlice({
         medium: false,
       },
     },
+    backdrop: false,
   },
   reducers: {
     toggleTopping(state, action) {
@@ -52,6 +53,10 @@ const pizzahubSlice = createSlice({
     toggleBase(state, action) {
       state.base[action.payload.title].checked =
         !state.base[action.payload.title].checked;
+    },
+    setBackdrop(state, action) {
+      console.log(action.payload);
+      state.backdrop = action.payload;
     },
   },
 });
