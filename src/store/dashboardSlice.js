@@ -13,6 +13,6 @@ const dashboardSlice = createSlice({
   },
 });
 
-export const headerActions = dashboardSlice.actions;
+export const dashboardActions = dashboardSlice.actions;
 
 export default dashboardSlice;

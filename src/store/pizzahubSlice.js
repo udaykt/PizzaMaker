@@ -55,7 +55,6 @@ const pizzahubSlice = createSlice({
         !state.base[action.payload.title].checked;
     },
     setBackdrop(state, action) {
-      console.log(action.payload);
       state.backdrop = action.payload;
     },
   },

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { NavLink, useHistory, withRouter } from 'react-router-dom';
 import Button from '../../components/UI/Buttons/Button';
 import {
@@ -6,6 +7,7 @@ import {
   LOGIN_PATH,
   SIGNUP_PATH,
 } from '../../components/Utils/Constants';
+import { pizzahubActions } from '../../store/pizzahubSlice';
 import { createGuest } from '../Firebase/Auth';
 import './guest.css';
 
@@ -13,6 +15,7 @@ const Guest = (props) => {
   const [guestFirstName, setGuestFirstName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const registerGuest = async (e) => {
     e.preventDefault();
@@ -24,6 +27,7 @@ const Guest = (props) => {
         if (user) {
           if (guestEmail && guestEmail) {
             history.push(HOME_PATH);
+            dispatch(pizzahubActions.setBackdrop(false));
           }
         } else {
           console.error('Guest SignUp unsuccessfull ' + e);
@@ -51,6 +55,7 @@ const Guest = (props) => {
                 value={guestFirstName}
                 onChange={(e) => setGuestFirstName(e.target.value)}
                 required
+                autoFocus
               />
             </div>
           </div>

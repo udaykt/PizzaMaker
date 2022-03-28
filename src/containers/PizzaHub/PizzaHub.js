@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import Backdrop from '../../components/UI/Backdrop/Backdrop';
 import OrderButton from '../../components/UI/OrderButton/OrderButton';
-import { ProfileMenu } from '../../components/UI/ProfileMenu/ProfileMenu';
+import ProfileMenu from '../../components/UI/ProfileMenu/ProfileMenu';
 import UserDashboard from '../../components/UI/UserDashboard/UserDashboard';
 import {
   DASHBOARD_PATH,

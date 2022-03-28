@@ -14,13 +14,13 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+button:hover:enabled {
   background: none;
   box-shadow: -3px -3px 5px rgba(255, 255, 255, 0.3),
     3px 3px 5px rgba(0, 0, 0, 0.25);
 }
 
-button:active {
+button:active:enabled {
   background: none;
   box-shadow: inset -3px -3px 5px rgba(255, 255, 255, 0.3),
     inset 3px 3px 5px rgba(0, 0, 0, 0.25);
@@ -28,4 +28,10 @@ button:active {
 
 button:focus {
   outline: none;
+}
+
+button:disabled {
+  filter: grayscale(1);
+  color: gray;
+  cursor: not-allowed;
 }

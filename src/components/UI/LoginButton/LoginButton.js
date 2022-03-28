@@ -29,15 +29,20 @@ const LoginButton = (props) => {
   };
   const items = {
     login: {
+      buttonStyle: 'loginButton',
       handler: toggleLoginPageHandler,
     },
     signup: {
+      buttonStyle: 'signupButton',
       handler: toggleSignupPageHandler,
     },
   };
 
   return (
-    <Button className={'loginButton'} onClick={items[props.type].handler}>
+    <Button
+      className={items[props.type].buttonStyle}
+      onClick={items[props.type].handler}
+    >
       {props.children}
     </Button>
   );

@@ -37,7 +37,6 @@ const Menu = (props) => {
           <nav>
             <ul>
               {menuItems.map((i) => {
-                console.log(i.path);
                 return (
                   <li key={i.name}>
                     <NavLink to={i.path} style={{ textDecoration: 'none' }}>

@@ -1,0 +1,32 @@
+.profile {
+  width: 90%;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile table {
+  display: table;
+  border: 1px solid black;
+  width: 100%;
+  height: 80%;
+}
+.profile td {
+  text-align: left;
+  letter-spacing: 1px;
+  font-size: 1rem;
+}
+
+.profile tr {
+  text-align: left;
+  letter-spacing: 1px;
+  font-size: 1rem;
+}
+
+.profile th {
+  text-align: center;
+  letter-spacing: 1px;
+  font-size: 1rem;
+}

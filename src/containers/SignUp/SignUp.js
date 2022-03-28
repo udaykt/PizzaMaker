@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { NavLink, useHistory, withRouter } from 'react-router-dom';
 import Button from '../../components/UI/Buttons/Button';
 import {
@@ -6,6 +7,7 @@ import {
   HOME_PATH,
   LOGIN_PATH,
 } from '../../components/Utils/Constants';
+import { pizzahubActions } from '../../store/pizzahubSlice';
 import { createUser } from '../Firebase/Auth';
 import './signUp.css';
 
@@ -14,6 +16,7 @@ const SignUp = (props) => {
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const registerUser = async (e) => {
     e.preventDefault();
@@ -26,6 +29,7 @@ const SignUp = (props) => {
         if (user) {
           if (registerEmail && registerFirstName && registerPassword) {
             history.push(HOME_PATH);
+            dispatch(pizzahubActions.setBackdrop(false));
           }
         } else {
           console.error('SignUp unsuccessfull ' + e);
@@ -53,6 +57,7 @@ const SignUp = (props) => {
                 value={registerFirstName}
                 onChange={(e) => setRegisterFirstName(e.target.value)}
                 required
+                autoFocus
               />
             </div>
           </div>
