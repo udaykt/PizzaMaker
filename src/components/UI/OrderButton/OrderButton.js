@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { auth, createOrder } from '../../../containers/Firebase/Firebase';
+import { auth } from '../../../containers/Firebase/Firebase';
 import { pizzaActions } from '../../../store/pizzaSlice';
 import { CHECKOUT_PATH } from '../../Utils/Constants';
 import Button from '../Buttons/Button';
@@ -16,7 +16,7 @@ const OrderButton = (props) => {
   const history = useHistory();
 
   const OrderSubmitHandler = (e) => {
-    createOrder(auth.currentUser, { baseState, toppingsState });
+    //createOrder(auth.currentUser, { baseState, toppingsState });
     history.push(CHECKOUT_PATH);
     dispatch(pizzaActions.toggleIsSliced());
   };

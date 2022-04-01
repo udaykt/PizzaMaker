@@ -27,10 +27,10 @@ const firebaseDatabase = getDatabase();
 //firestore users collection
 const usersCollection = collection(firestore, 'users');
 //firestore orders collection
-const ordersCollection = firestore
-  .collection('users')
-  .doc(auth.currentUser)
-  .collection('orders');
+// const ordersCollection = firestore
+//   .collection('users')
+//   .doc(auth.currentUser)
+//   .collection('orders');
 
 const createUserDocument = async (user, additionalData) => {
   if (!user) return;
@@ -94,44 +94,45 @@ const fetchAllUsers = async () => {
   return usersSnapshot.docs;
 };
 
-const createOrder = async (user, orderData) => {
-  const { baseState, toppingsState } = orderData;
-  if (user) {
-    try {
-      const uid = user.uid;
-      const ingredientState = { base: baseState, toppings: toppingsState };
-      const order = { uid, ingredients: ingredientState };
-      await firestore
-        .collection('users')
-        .doc(uid)
-        .collection('orders')
-        .add(order);
-    } catch (e) {
-      console.error('Error while creating user order' + e);
-    }
-  }
-};
+// const createOrder = async (user, orderData) => {
+//   const { baseState, toppingsState } = orderData;
+//   if (user) {
+//     try {
+//       const uid = user?.uid;
+//       const ingredientState = { base: baseState, toppings: toppingsState };
+//       const order = { uid, ingredients: ingredientState };
+//       if (uid)
+//         await firestore
+//           .collection('users')
+//           .doc(uid.toString())
+//           .collection('orders')
+//           .add(order);
+//     } catch (e) {
+//       console.error('Error while creating user order' + e);
+//     }
+//   }
+// };
 
-const fetchUserOrders = async () => {
-  try {
-    const userOrdersSnapshot = await getDocs(ordersCollection);
-    var orders = userOrdersSnapshot.docs;
-    console.log(orders);
-  } catch (e) {
-    console.log('Error while fetching user orders' + e);
-  }
-  return orders;
-};
+// const fetchUserOrders = async () => {
+//   try {
+//     const userOrdersSnapshot = await getDocs(ordersCollection);
+//     var orders = userOrdersSnapshot.docs;
+//     console.log(orders);
+//   } catch (e) {
+//     console.log('Error while fetching user orders' + e);
+//   }
+//   return orders;
+// };
 
 export {
   auth,
   firestore,
   usersCollection,
-  ordersCollection,
+  // ordersCollection,
   firebaseDatabase,
-  createOrder,
+  //createOrder,
   fetchAllUsers,
-  fetchUserOrders,
+  // fetchUserOrders,
   fetchLoggedInUser,
   createUserDocument,
   createGuestUserDocument,
