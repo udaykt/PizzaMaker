@@ -43,8 +43,8 @@ const headerSlice = createSlice({
       if (state.guestPath === GUEST_PATH) state.guestPath = HOME_PATH;
       else state.guestPath = GUEST_PATH;
     },
-    toggleProfileMenu(state) {
-      state.showProfileMenu = !state.showProfileMenu;
+    toggleProfileMenu(state, action) {
+      state.showProfileMenu = action.payload;
     },
   },
 });

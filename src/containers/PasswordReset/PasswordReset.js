@@ -1,42 +1,6 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { NavLink, useHistory, withRouter } from 'react-router-dom';
-import Button from '../../components/UI/Buttons/Button';
-import {
-  GUEST_PATH,
-  HOME_PATH,
-  SIGNUP_PATH,
-} from '../../components/Utils/Constants';
-import { pizzahubActions } from '../../store/pizzahubSlice';
-import { loginUser } from '../Firebase/Auth';
-import { fetchLoggedInUser } from '../Firebase/Firebase';
-import './loginPage.css';
+import React from 'react';
 
-const LoginPage = (props) => {
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const history = useHistory();
-  const dispatch = useDispatch();
-
-  const handleLoginUser = (e) => {
-    e.preventDefault();
-    loginUser({ loginEmail, loginPassword })
-      .then((user) => {
-        if (user) {
-          fetchLoggedInUser();
-          if (loginEmail && loginPassword) {
-            history.push(HOME_PATH);
-            dispatch(pizzahubActions.setBackdrop(false));
-          }
-        } else {
-          console.error('Login unsuccessfull ' + e);
-        }
-      })
-      .catch((e) => {
-        console.error('Error while logging in user ' + e);
-      });
-  };
-
+const PasswordReset = (props) => {
   return (
     <div className={true ? 'loginPage' : 'hideLoginPage'}>
       <form onSubmit={handleLoginUser}>
@@ -99,4 +63,4 @@ const LoginPage = (props) => {
   );
 };
 
-export default withRouter(LoginPage);
+export default PasswordReset;

@@ -17,3 +17,8 @@ export const avatarName = (avatarName) => {
   });
   return name.trim();
 };
+
+export const USERTYPE = {
+  STANDARD: 'standard',
+  GUEST: 'guest',
+};

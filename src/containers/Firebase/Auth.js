@@ -15,7 +15,7 @@ import {
 auth.onAuthStateChanged((user) => {
   if (user) {
     store.dispatch(userActions.setLoggedIn(true));
-    fetchLoggedInUser(user);
+    fetchLoggedInUser();
     console.log(user.uid + ' user logged in:Auth.js');
   } else {
     store.dispatch(userActions.setLoggedIn(false));
@@ -82,6 +82,10 @@ const logoutUser = async () => {
   await auth.signOut().catch((e) => {
     console.error('Error in signing out user:Auth.js ' + e);
   });
+};
+
+const forgotPassword = async () => {
+  await auth.sendPasswordResetEmail(auth.currentUser.email);
 };
 
 export { loginUser, createGuest, createUser, logoutUser };
