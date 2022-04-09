@@ -5,6 +5,7 @@ export const LOGIN_PATH = '/login';
 export const SIGNUP_PATH = '/signup';
 export const GUEST_PATH = '/guest';
 export const MENU_PATH = '/menu';
+export const CONFIRM_PATH = '/confirm';
 export const DASHBOARD_PATH = '/dashboard';
 export const PROFILE_PATH = DASHBOARD_PATH + '/profile';
 export const ORDERS_PATH = DASHBOARD_PATH + '/orders';

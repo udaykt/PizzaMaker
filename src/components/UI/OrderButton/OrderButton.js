@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { auth } from '../../../containers/Firebase/Firebase';
+import { orderActions } from '../../../store/orderSlice';
+import { initialPizzaState } from '../../../store/pizzahubSlice';
 import { pizzaActions } from '../../../store/pizzaSlice';
 import { CHECKOUT_PATH } from '../../Utils/Constants';
 import Button from '../Buttons/Button';
@@ -11,12 +12,11 @@ const OrderButton = (props) => {
   const loggedIn = useSelector((state) => state.user.loggedIn);
   const baseState = pizzahubState.base;
   const toppingsState = pizzahubState.toppings;
-
+  const orderState = { base: baseState, toppings: toppingsState };
   const dispatch = useDispatch();
   const history = useHistory();
 
   const OrderSubmitHandler = (e) => {
-    //createOrder(auth.currentUser, { baseState, toppingsState });
     history.push(CHECKOUT_PATH);
     dispatch(pizzaActions.toggleIsSliced());
   };
@@ -26,7 +26,10 @@ const OrderButton = (props) => {
       type='submit'
       value='Order'
       onClick={OrderSubmitHandler}
-      disabled={!loggedIn}
+      disabled={
+        !loggedIn ||
+        JSON.stringify(initialPizzaState) === JSON.stringify(orderState)
+      }
     >
       Order
     </Button>

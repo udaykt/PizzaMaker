@@ -1,5 +1,4 @@
 body {
-  overflow: auto;
   user-select: none;
   min-width: 720px;
   background: radial-gradient(rgb(70, 64, 64), #111110);

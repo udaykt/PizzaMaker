@@ -23,16 +23,17 @@ const Pizza = (props) => {
   };
 
   const quantityHandler = (value) => {
-    switch (props.quantity) {
-      case 'small':
-        return state.quantity.small.value;
-      case 'medium':
-        return state.quantity.medium.value;
-      case 'large':
-        return state.quantity.large.value;
-      default:
-        return state.quantity.small.value;
-    }
+    // console.log(props.quantity);
+    // switch (props.quantity) {
+    //   case 'small':
+    //     return state.quantity.small.value;
+    //   case 'medium':
+    //     return state.quantity.medium.value;
+    //   case 'large':
+    //     return state.quantity.large.value;
+    //   default:
+    //     return state.quantity.small.value;
+    // }
   };
   const buildStyle = () => {
     let top = Math.floor(Math.random() * (70 - 5) + 5);

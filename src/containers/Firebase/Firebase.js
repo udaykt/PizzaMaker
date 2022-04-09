@@ -26,11 +26,6 @@ const firestore = firebase.firestore();
 const firebaseDatabase = getDatabase();
 //firestore users collection
 const usersCollection = collection(firestore, 'users');
-//firestore orders collection
-// const ordersCollection = firestore
-//   .collection('users')
-//   .doc(auth.currentUser)
-//   .collection('orders');
 
 const createUserDocument = async (user, additionalData) => {
   if (!user) return;
@@ -94,45 +89,52 @@ const fetchAllUsers = async () => {
   return usersSnapshot.docs;
 };
 
-// const createOrder = async (user, orderData) => {
-//   const { baseState, toppingsState } = orderData;
-//   if (user) {
-//     try {
-//       const uid = user?.uid;
-//       const ingredientState = { base: baseState, toppings: toppingsState };
-//       const order = { uid, ingredients: ingredientState };
-//       if (uid)
-//         await firestore
-//           .collection('users')
-//           .doc(uid.toString())
-//           .collection('orders')
-//           .add(order);
-//     } catch (e) {
-//       console.error('Error while creating user order' + e);
-//     }
-//   }
-// };
+const createOrder = async (user, orderState) => {
+  if (user && orderState) {
+    try {
+      const uid = user?.uid;
+      const order = { uid, ingredients: orderState };
+      if (uid) {
+        const orderDocRef = await firestore
+          .collection('users')
+          .doc(uid.toString())
+          .collection('orders')
+          .add(order);
+        var orderData = (await orderDocRef.get()).data();
+        return { orderId: orderDocRef.id, ...orderData };
+      }
+    } catch (e) {
+      console.error('Error while creating user order' + e);
+    }
+  }
+};
 
-// const fetchUserOrders = async () => {
-//   try {
-//     const userOrdersSnapshot = await getDocs(ordersCollection);
-//     var orders = userOrdersSnapshot.docs;
-//     console.log(orders);
-//   } catch (e) {
-//     console.log('Error while fetching user orders' + e);
-//   }
-//   return orders;
-// };
+const fetchUserOrders = async () => {
+  const user = auth.currentUser;
+  const uid = user.uid;
+  if (user && uid) {
+    try {
+      const colRef = firestore
+        .collection('users')
+        .doc(uid.toString())
+        .collection('orders');
+      const userOrdersSnapshot = await getDocs(colRef);
+      if (userOrdersSnapshot) var orders = userOrdersSnapshot.docs;
+    } catch (e) {
+      console.log('Error while fetching user orders' + e);
+    }
+  }
+  return orders;
+};
 
 export {
   auth,
   firestore,
   usersCollection,
-  // ordersCollection,
   firebaseDatabase,
-  //createOrder,
+  createOrder,
   fetchAllUsers,
-  // fetchUserOrders,
+  fetchUserOrders,
   fetchLoggedInUser,
   createUserDocument,
   createGuestUserDocument,

@@ -4,6 +4,7 @@ import headerSlice from './headerSlice';
 import pizzahubSlice from './pizzahubSlice';
 import pizzaSlice from './pizzaSlice';
 import userSlice from './userSlice';
+import orderSlice from './orderSlice';
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     pizza: pizzaSlice.reducer,
     user: userSlice.reducer,
     dashboard: dashboardSlice.reducer,
+    order: orderSlice.reducer,
   },
 });
 

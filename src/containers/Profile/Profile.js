@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import { LOGIN_PATH } from '../../components/Utils/Constants';
-import { auth, fetchLoggedInUser } from '../Firebase/Firebase';
 import Logout from '../Logout/Logout';
 import './profile.css';
 
 const Profile = (props) => {
-  const currUser = auth.currentUser;
-  const [userData, setUserData] = useState();
-
-  useEffect(() => {
-    fetchLoggedInUser().then((data) => setUserData(data));
-  }, [currUser]);
+  const userState = useSelector((state) => state.user);
 
   return (
     <div className='profile'>
@@ -19,15 +14,15 @@ const Profile = (props) => {
         <tbody>
           <tr>
             <th scope='row'>First Name :</th>
-            <td>{userData?.firstName}</td>
+            <td>{userState.firstName}</td>
           </tr>
           <tr>
             <th scope='row'>E-Mail Id :</th>
-            <td>{userData?.emailId}</td>
+            <td>{userState.emailId}</td>
           </tr>
           <tr>
             <th scope='row'>User Type :</th>
-            <td>{userData?.userType}</td>
+            <td>{userState.userType}</td>
           </tr>
         </tbody>
       </table>

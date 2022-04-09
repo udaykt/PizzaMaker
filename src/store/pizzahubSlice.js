@@ -62,4 +62,43 @@ const pizzahubSlice = createSlice({
 
 export const pizzahubActions = pizzahubSlice.actions;
 
+export const initialPizzaState = {
+  base: {
+    sauce: {
+      title: 'sauce',
+      checked: false,
+    },
+    mozzarella: {
+      title: 'mozzarella',
+      checked: false,
+    },
+    cheese: {
+      title: 'cheese',
+      checked: false,
+    },
+  },
+  toppings: {
+    pepperoni: {
+      title: 'pepperoni',
+      checked: false,
+      medium: false,
+    },
+    sausage: {
+      title: 'sausage',
+      checked: false,
+      medium: false,
+    },
+    peppers: {
+      title: 'peppers',
+      checked: false,
+      medium: false,
+    },
+    olives: {
+      title: 'olives',
+      checked: false,
+      medium: false,
+    },
+  },
+};
+
 export default pizzahubSlice;

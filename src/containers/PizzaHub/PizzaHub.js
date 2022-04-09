@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import Backdrop from '../../components/UI/Backdrop/Backdrop';
+import Modal from '../../components/UI/Modal/Modal';
 import OrderButton from '../../components/UI/OrderButton/OrderButton';
 import ProfileMenu from '../../components/UI/ProfileMenu/ProfileMenu';
 import UserDashboard from '../../components/UI/UserDashboard/UserDashboard';
 import {
+  CONFIRM_PATH,
   DASHBOARD_PATH,
   GUEST_PATH,
   HOME_PATH,
@@ -24,12 +26,14 @@ import styles from './pizzahub.module.css';
 
 const PizzaHub = (props) => {
   const userState = useSelector((state) => state.user);
+  const pizzahubState = useSelector((state) => state.pizzahub);
 
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
+    document.body.style.overflow = pizzahubState.backdrop ? 'hidden' : 'auto';
     if (userState) setUserName(userState.firstName);
-  }, [userState]);
+  }, [userState, pizzahubState]);
 
   const state = {
     parts: {
@@ -70,6 +74,7 @@ const PizzaHub = (props) => {
         <Route path={SIGNUP_PATH} component={SignUp} />
         <Route path={GUEST_PATH} component={Guest} />
         <Route path={DASHBOARD_PATH} component={UserDashboard} />
+        <Route path={CONFIRM_PATH} component={Modal} />
       </Switch>
     </div>
   );

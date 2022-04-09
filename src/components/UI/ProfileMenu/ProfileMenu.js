@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
-import OutsideClickHandler from 'react-outside-click-handler/build/OutsideClickHandler';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
+import { NavLink, withRouter } from 'react-router-dom';
 import Logout from '../../../containers/Logout/Logout';
 import { headerActions } from '../../../store/headerSlice';
 import { LOGIN_PATH, PROFILE_PATH } from '../../Utils/Constants';

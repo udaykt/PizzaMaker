@@ -7,6 +7,7 @@ const Button = (props) => {
       type={props.type || 'button'}
       onClick={props.onClick}
       disabled={props.disabled || false}
+      onChange={props.onChange}
     >
       {props.children}
     </button>

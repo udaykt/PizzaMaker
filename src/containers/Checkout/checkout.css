@@ -1,0 +1,40 @@
+.checkout {
+  position: absolute;
+  display: flex;
+  top: 0;
+  gap: 30px;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.checkout table {
+  width: 80%;
+}
+
+.checkout thead {
+  text-align: center;
+}
+
+.checkout tbody td {
+  width: 70%;
+}
+
+.emptyCheckout {
+  text-align: center;
+}
+
+.checkoutOrderButton,
+.customizeButton {
+  position: relative;
+  bottom: 20px;
+  width: 150px;
+  height: 50px;
+  border-radius: 50px;
+}
+
+.checkoutButtons {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
