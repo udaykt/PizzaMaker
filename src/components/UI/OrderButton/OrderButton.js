@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { orderActions } from '../../../store/orderSlice';
 import { initialPizzaState } from '../../../store/pizzahubSlice';
 import { pizzaActions } from '../../../store/pizzaSlice';
 import { CHECKOUT_PATH } from '../../Utils/Constants';

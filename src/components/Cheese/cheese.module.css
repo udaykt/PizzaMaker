@@ -7,24 +7,12 @@
 .cheese,
 .slicedCheese {
   position: absolute;
-  width: 90%;
-  height: 90%;
-  clip-path: polygon(
-    64% 14%,
-    84% 14%,
-    87% 39%,
-    72% 56%,
-    68% 76%,
-    48% 100%,
-    43% 82%,
-    27% 65%,
-    12% 20%,
-    37% 11%
-  );
-  border-radius: 50%;
   background-color: var(--cheese-color);
-  z-index: 5;
-  filter: drop-shadow(1px 1px 1px #000);
+  right: 0;
+  bottom: 0;
+  width: 85%;
+  height: 85%;
+  border-radius: 100% 0 0 0;
 }
 
 .slicedCheese {

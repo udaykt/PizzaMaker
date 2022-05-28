@@ -8,6 +8,7 @@ import { useHistory } from 'react-router-dom';
 import { CONFIRM_PATH, HOME_PATH } from '../../components/Utils/Constants';
 import { auth, createOrder } from '../Firebase/Firebase';
 import { orderActions } from '../../store/orderSlice';
+import { uiActions } from '../../store/uiSlice';
 
 const SELECTED = 'selected';
 const NOTSELECTED = 'not selected';
@@ -34,7 +35,7 @@ const Checkout = (props) => {
 
   const customizeHandler = (e) => {
     history.push(HOME_PATH);
-    dispatch(pizzahubActions.setBackdrop(false));
+    dispatch(uiActions.setBackdrop(false));
   };
 
   const orderHandler = (e) => {
@@ -52,8 +53,10 @@ const Checkout = (props) => {
   return (
     (JSON.stringify(initialPizzaState) !== JSON.stringify(order) && (
       <div className='checkout'>
-        <Pizza {...state} />
-        <table>
+        <div className='pizzaCheckoutDiv'>
+          <Pizza {...state} />
+        </div>
+        <table className='ingredients'>
           <thead>
             <tr>
               <td colSpan={2}>

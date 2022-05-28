@@ -1,10 +1,9 @@
 .mozzarella {
-  width: 50%;
-  height: 50%;
-  background-color: var(--mozzarella-color);
-  border-radius: 40%;
   position: absolute;
-  top: 20px;
-  z-index: 4;
-  filter: drop-shadow(1px 1px 1px #000);
+  background-color: var(--mozzarella-color);
+  right: 0;
+  bottom: 0;
+  width: 75%;
+  height: 75%;
+  border-radius: 100% 0 0 0;
 }

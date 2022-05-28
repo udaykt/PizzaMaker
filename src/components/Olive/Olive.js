@@ -7,19 +7,14 @@ const Olive = (props) => {
 
   return (
     <Fragment>
-      {quantity.checked ? (
+      {quantity.checked && (
         <div>
-          <div className={'olive'} style={props.style()}></div>
-          <div className={'olive'} style={props.style()}></div>
-          <div className={'olive'} style={props.style()}></div>
+          <div className={'olive'} style={props.sprinkler()}></div>
+          <div className={'olive'} style={props.sprinkler()}></div>
         </div>
-      ) : (
-        <div className={'void'} />
       )}
-      {quantity.checked && quantity.medium ? (
-        <div className={'olive'} style={props.style()}></div>
-      ) : (
-        <div className={'void'} />
+      {quantity.checked && quantity.medium && (
+        <div className={'olive'} style={props.sprinkler()}></div>
       )}
     </Fragment>
   );

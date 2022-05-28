@@ -1,44 +1,35 @@
 .mainPizza {
-  width: 300px;
-  height: 300px;
+  width: 240px;
+  height: 240px;
   border: 1px solid #ccc;
-  border-radius: 50%;
-  position: relative;
   overflow: hidden;
-  z-index: 100;
+  z-index: 1;
 }
 .slice,
 .sauceSlice,
 .cheeseSlice {
-  position: relative;
+  position: absolute;
   transform-origin: 100% 100%;
-  background-color: var(--slice-color);
-  width: 500px;
-  height: 500px;
-  left: 50%;
-  top: 50%;
+  right: 50%;
+  bottom: 50%;
+  border-radius: 100% 0 0 0;
   border: 1px solid #000;
-  margin-top: -500px;
-  margin-left: -500px;
   /* animation: pull 3s ease-in-out infinite; */
+}
+.slice {
+  background-color: var(--slice-color);
+  width: 150px;
+  height: 150px;
 }
 .sauceSlice {
   background-color: var(--sauce-color);
-  border-radius: 100% 0 0 0;
   width: 140px;
   height: 140px;
-  margin-top: -140px;
-  margin-left: -140px;
-  z-index: 101;
 }
 .cheeseSlice {
-  border-radius: 100% 0 0 0;
   background-color: var(--cheese-color);
   width: 130px;
   height: 130px;
-  margin-top: -130px;
-  margin-left: -130px;
-  z-index: 102;
 }
 
 @keyframes pull {
@@ -89,7 +80,7 @@
   filter: drop-shadow(0.5px 0.5px 1px #000);
 }
 
-.olives,
+.Olives,
 .olive1,
 .olive2,
 .olive3,
@@ -136,7 +127,7 @@
   left: 100px;
 }
 
-.pepperoni,
+.Pepperoni,
 .pepperoni1,
 .pepperoni2,
 .pepperoni3,
@@ -184,7 +175,7 @@
   left: 120px;
 }
 
-.sausage1,
+.Sausage1,
 .sausage2,
 .sausage3,
 .sausage4,
@@ -229,7 +220,7 @@
   left: 100px;
 }
 
-.peppers,
+.Peppers,
 .peppers1,
 .peppers2,
 .peppers3,

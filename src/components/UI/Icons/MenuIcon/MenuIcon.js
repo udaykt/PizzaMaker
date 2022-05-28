@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { useHistory, withRouter } from 'react-router-dom';
 import { pizzahubActions } from '../../../../store/pizzahubSlice';
+import { uiActions } from '../../../../store/uiSlice';
 import { HOME_PATH, MENU_PATH } from '../../../Utils/Constants';
 import './menuIcon.css';
 
@@ -12,10 +13,10 @@ const MenuIcon = (props) => {
   const toggleMenuIconHandler = () => {
     if (window.location.pathname === HOME_PATH) {
       history.push(MENU_PATH);
-      dispatch(pizzahubActions.setBackdrop(true));
+      dispatch(uiActions.setBackdrop(true));
     } else {
       history.push(HOME_PATH);
-      dispatch(pizzahubActions.setBackdrop(false));
+      dispatch(uiActions.setBackdrop(false));
     }
   };
   return (

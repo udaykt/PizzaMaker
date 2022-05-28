@@ -8,12 +8,10 @@ const Cheese = (props) => {
 
   return (
     <Fragment>
-      {quantity.checked ? (
+      {quantity.checked && (
         <div
           className={sliced ? styles[`slicedCheese`] : styles['cheese']}
         ></div>
-      ) : (
-        <div className={'void'} />
       )}
     </Fragment>
   );

@@ -8,14 +8,11 @@
 .slicedSauce {
   position: absolute;
   background-color: var(--sauce-color);
+  right: 0;
+  bottom: 0;
   width: 90%;
   height: 90%;
-  clip-path: polygon(50% 100%, 0 0, 100% 0);
-  border-radius: 40%;
-  filter: drop-shadow(0 6px 5px #000);
-  z-index: 3;
-  bottom: 0;
-  margin: 15px 0 0 0;
+  border-radius: 100% 0 0 0;
 }
 
 .slicedSauce {

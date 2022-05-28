@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { headerActions } from '../../../store/headerSlice';
 import { pizzahubActions } from '../../../store/pizzahubSlice';
+import { uiActions } from '../../../store/uiSlice';
 import { HOME_PATH } from '../../Utils/Constants';
 import Button from '../Buttons/Button';
 import './avatarIcon.css';
@@ -16,7 +17,7 @@ const AvatarIcon = (props) => {
     if (headerState.showProfileMenu) {
       if (window.location.pathname !== HOME_PATH) {
         history.push(HOME_PATH);
-        dispatch(pizzahubActions.setBackdrop(false));
+        dispatch(uiActions.setBackdrop(false));
       }
       dispatch(headerActions.toggleProfileMenu(false));
     } else dispatch(headerActions.toggleProfileMenu(true));

@@ -7,18 +7,14 @@ const Pepperoni = (props) => {
 
   return (
     <Fragment>
-      {quantity.checked ? (
+      {quantity.checked && (
         <div>
-          <div className={'pepperoni'} style={props.style()}></div>
-          <div className={'pepperoni'} style={props.style()}></div>
+          <div className={'pepperoni'} style={props.sprinkler()}></div>
+          <div className={'pepperoni'} style={props.sprinkler()}></div>
         </div>
-      ) : (
-        <div className={'void'} />
       )}
-      {quantity.checked && quantity.medium ? (
-        <div className={'pepperoni'} style={props.style()}></div>
-      ) : (
-        <div className={'void'} />
+      {quantity.checked && quantity.medium && (
+        <div className={'pepperoni'} style={props.sprinkler()}></div>
       )}
     </Fragment>
   );

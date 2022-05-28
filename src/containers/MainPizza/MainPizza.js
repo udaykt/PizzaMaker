@@ -1,5 +1,7 @@
 import { Fragment } from 'react';
+import Olive from '../../components/Olive/Olive';
 import './mainPizza.css';
+import olive from '../../assets/Logos/olive.png';
 
 const MainPizza = (props) => {
   const pizzaSlices = {
@@ -174,7 +176,7 @@ const MainPizza = (props) => {
       {sliceSizes.small.map((slice) => {
         console.log(slice);
         return (
-          <Fragment key={slice.rotate+slice.skew}>
+          <Fragment key={slice.rotate + slice.skew}>
             <div
               className='slice'
               style={{
@@ -192,7 +194,17 @@ const MainPizza = (props) => {
               style={{
                 transform: `rotate(${slice.rotate}deg) skew(${slice.skew}deg)`,
               }}
-            ></div>
+            >
+              <img
+                src={olive}
+                alt='olive'
+                style={{
+                  objectFit: 'contain',
+                  width: '100px',
+                  height: '100px',
+                }}
+              />
+            </div>
           </Fragment>
         );
       })}

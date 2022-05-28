@@ -7,9 +7,10 @@ import {
   HOME_PATH,
   SIGNUP_PATH,
 } from '../../components/Utils/Constants';
-import { pizzahubActions } from '../../store/pizzahubSlice';
+import { orderActions } from '../../store/orderSlice';
+import { uiActions } from '../../store/uiSlice';
 import { loginUser } from '../Firebase/Auth';
-import { fetchLoggedInUser } from '../Firebase/Firebase';
+import { fetchLoggedInUser, fetchUserOrders } from '../Firebase/Firebase';
 import './loginPage.css';
 
 const LoginPage = (props) => {
@@ -24,9 +25,10 @@ const LoginPage = (props) => {
       .then((user) => {
         if (user) {
           fetchLoggedInUser();
+          fetchUserOrders();
           if (loginEmail && loginPassword) {
             history.push(HOME_PATH);
-            dispatch(pizzahubActions.setBackdrop(false));
+            dispatch(uiActions.setBackdrop(false));
           }
         } else {
           console.error('Login unsuccessfull ' + e);

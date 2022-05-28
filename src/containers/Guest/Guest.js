@@ -8,6 +8,7 @@ import {
   SIGNUP_PATH,
 } from '../../components/Utils/Constants';
 import { pizzahubActions } from '../../store/pizzahubSlice';
+import { uiActions } from '../../store/uiSlice';
 import { createGuest } from '../Firebase/Auth';
 import './guest.css';
 
@@ -27,7 +28,7 @@ const Guest = (props) => {
         if (user) {
           if (guestEmail && guestEmail) {
             history.push(HOME_PATH);
-            dispatch(pizzahubActions.setBackdrop(false));
+            dispatch(uiActions.setBackdrop(false));
           }
         } else {
           console.error('Guest SignUp unsuccessfull ' + e);

@@ -8,6 +8,7 @@ import {
   LOGIN_PATH,
 } from '../../components/Utils/Constants';
 import { pizzahubActions } from '../../store/pizzahubSlice';
+import { uiActions } from '../../store/uiSlice';
 import { createUser } from '../Firebase/Auth';
 import './signUp.css';
 
@@ -29,7 +30,7 @@ const SignUp = (props) => {
         if (user) {
           if (registerEmail && registerFirstName && registerPassword) {
             history.push(HOME_PATH);
-            dispatch(pizzahubActions.setBackdrop(false));
+            dispatch(uiActions.setBackdrop(false));
           }
         } else {
           console.error('SignUp unsuccessfull ' + e);

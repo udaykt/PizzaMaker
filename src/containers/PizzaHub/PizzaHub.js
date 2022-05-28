@@ -18,6 +18,7 @@ import {
 import Base from '../Base/Base';
 import Guest from '../Guest/Guest';
 import LoginPage from '../LoginPage/LoginPage';
+import MainPizza from '../MainPizza/MainPizza';
 import Menu from '../Menu/Menu';
 import Pizza from '../Pizza/Pizza';
 import SignUp from '../SignUp/SignUp';
@@ -26,14 +27,14 @@ import styles from './pizzahub.module.css';
 
 const PizzaHub = (props) => {
   const userState = useSelector((state) => state.user);
-  const pizzahubState = useSelector((state) => state.pizzahub);
+  const uiState = useSelector((state) => state.ui);
 
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
-    document.body.style.overflow = pizzahubState.backdrop ? 'hidden' : 'auto';
+    document.body.style.overflow = uiState.backdrop ? 'hidden' : 'auto';
     if (userState) setUserName(userState.firstName);
-  }, [userState, pizzahubState]);
+  }, [userState, uiState]);
 
   const state = {
     parts: {
@@ -53,7 +54,7 @@ const PizzaHub = (props) => {
         </strong>
         <p>Make your own pizza. Customize and Order.</p>
       </div>
-      <div className={styles.pizza}>
+      <div className={styles.pizzaDiv}>
         <Pizza {...state} />
       </div>
       <div className={styles.base}>

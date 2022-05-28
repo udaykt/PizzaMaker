@@ -3,7 +3,6 @@
   width: 25px;
   height: 25px;
   border-radius: 40%;
-  top: 0;
   filter: drop-shadow(1px 1px 1px #000);
   content: url(../../assets/Logos/sausage.png);
   z-index: 6;

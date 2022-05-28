@@ -7,18 +7,14 @@ const Sausage = (props) => {
 
   return (
     <Fragment>
-      {quantity.checked ? (
+      {quantity.checked && (
         <div>
-          <div className={'sausage'} style={props.style()}></div>
-          <div className={'sausage'} style={props.style()}></div>
+          <div className={'sausage'} style={props.sprinkler()}></div>
+          <div className={'sausage'} style={props.sprinkler()}></div>
         </div>
-      ) : (
-        <div className={'void'} />
       )}
-      {quantity.checked && quantity.medium ? (
-        <div className={'sausage'} style={props.style()}></div>
-      ) : (
-        <div className={'void'} />
+      {quantity.checked && quantity.medium && (
+        <div className={'sausage'} style={props.sprinkler()}></div>
       )}
     </Fragment>
   );

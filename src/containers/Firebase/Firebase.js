@@ -4,6 +4,8 @@ import 'firebase/compat/firestore';
 import { getDatabase } from 'firebase/database';
 import { collection, getDocs } from 'firebase/firestore';
 import { USERTYPE } from '../../components/Utils/Utility';
+import store from '../../store';
+import { orderActions } from '../../store/orderSlice';
 import { buildUserDataInStore } from '../User/User';
 
 const firebaseConfig = {
@@ -93,7 +95,11 @@ const createOrder = async (user, orderState) => {
   if (user && orderState) {
     try {
       const uid = user?.uid;
-      const order = { uid, ingredients: orderState };
+      const order = {
+        uid,
+        ingredients: orderState,
+        createdAt: new Date(),
+      };
       if (uid) {
         const orderDocRef = await firestore
           .collection('users')
@@ -101,17 +107,19 @@ const createOrder = async (user, orderState) => {
           .collection('orders')
           .add(order);
         var orderData = (await orderDocRef.get()).data();
-        return { orderId: orderDocRef.id, ...orderData };
+        var finalOrder = { oid: orderDocRef.id, ...orderData };
+        store.dispatch(orderActions.setCurrentOrder(finalOrder));
       }
     } catch (e) {
       console.error('Error while creating user order' + e);
     }
   }
+  return finalOrder;
 };
 
 const fetchUserOrders = async () => {
   const user = auth.currentUser;
-  const uid = user.uid;
+  const uid = user?.uid;
   if (user && uid) {
     try {
       const colRef = firestore
@@ -119,9 +127,15 @@ const fetchUserOrders = async () => {
         .doc(uid.toString())
         .collection('orders');
       const userOrdersSnapshot = await getDocs(colRef);
-      if (userOrdersSnapshot) var orders = userOrdersSnapshot.docs;
+      if (userOrdersSnapshot) {
+        var orders = [];
+        userOrdersSnapshot.forEach((i) => {
+          orders.push({ oid: i.id, ...i.data() });
+        });
+        store.dispatch(orderActions.setUserOrders(orders));
+      }
     } catch (e) {
-      console.log('Error while fetching user orders' + e);
+      console.error('Error while fetching user orders' + e);
     }
   }
   return orders;

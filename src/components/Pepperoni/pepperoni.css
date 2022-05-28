@@ -4,7 +4,6 @@
   height: 30px;
   content: url(../../assets/Logos/pepperoni.png);
   filter: drop-shadow(1px 1px 1px #000);
-  z-index: 5;
 }
 
 .pepperoni:before {
@@ -14,11 +13,8 @@
   height: 30px;
   background: var(--pepperoni-color);
   border-radius: 50%;
-  top: -35px;
-  left: 20px;
   margin: 5px;
   filter: drop-shadow(0.5px 0.5px 1px #000);
-  z-index: 6;
   display: none;
 }
 

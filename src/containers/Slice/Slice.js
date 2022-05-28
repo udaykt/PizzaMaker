@@ -9,12 +9,12 @@ import styles from './slice.module.css';
 
 const Slice = (props) => {
   return (
-    <div className={styles[`slice-${props.part}`]}>
+    <div className={styles[`slice`]} style={props.style}>
       <Sauce {...props} />
       <Cheese {...props} />
       <Mozzarella {...props} />
-      <Peppers {...props} />
       <Pepperoni {...props} />
+      <Peppers {...props} />
       <Sausage {...props} />
       <Olive {...props} />
     </div>

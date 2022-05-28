@@ -8,10 +8,8 @@ const Sauce = (props) => {
   const sliced = useSelector((state) => state.pizza.isSliced);
   return (
     <Fragment>
-      {quantity.checked ? (
+      {quantity.checked && (
         <div className={sliced ? styles[`slicedSauce`] : styles[`sauce`]} />
-      ) : (
-        <div className={'void'} />
       )}
     </Fragment>
   );

@@ -6,18 +6,14 @@ const Peppers = (props) => {
   const quantity = useSelector((state) => state.pizzahub.toppings.peppers);
   return (
     <Fragment>
-      {quantity.checked ? (
+      {quantity.checked && (
         <div>
-          <div className={`peppers`} style={props.style()}></div>
-          <div className={`peppers`} style={props.style()}></div>
+          <div className={`peppers`} style={props.sprinkler()}></div>
+          <div className={`peppers`} style={props.sprinkler()}></div>
         </div>
-      ) : (
-        <div className={'void'} />
       )}
-      {quantity.checked && quantity.medium ? (
-        <div className={`peppers`} style={props.style()}></div>
-      ) : (
-        <div className={'void'} />
+      {quantity.checked && quantity.medium && (
+        <div className={`peppers`} style={props.sprinkler()}></div>
       )}
     </Fragment>
   );

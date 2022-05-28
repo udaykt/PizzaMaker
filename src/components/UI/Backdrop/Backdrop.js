@@ -2,28 +2,29 @@ import { Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { pizzahubActions } from '../../../store/pizzahubSlice';
+import { uiActions } from '../../../store/uiSlice';
 import { HOME_PATH } from '../../Utils/Constants';
 import './backdrop.css';
 
 const Backdrop = (props) => {
-  const pizzaHubSlice = useSelector((state) => state.pizzahub);
+  const uiState = useSelector((state) => state.ui);
   const dispatch = useDispatch();
   const history = useHistory();
 
   useEffect(() => {
     if (window.location.pathname !== HOME_PATH)
-      dispatch(pizzahubActions.setBackdrop(true));
+      dispatch(uiActions.setBackdrop(true));
     console.log(window.location.pathname);
   });
 
   const handleClick = (e) => {
     history.push(HOME_PATH);
-    dispatch(pizzahubActions.setBackdrop(false));
+    dispatch(uiActions.setBackdrop(false));
   };
 
   return (
     <Fragment>
-      {pizzaHubSlice.backdrop && (
+      {uiState.backdrop && (
         <div className='backdrop' onClick={handleClick}>
           {props.children}
         </div>
