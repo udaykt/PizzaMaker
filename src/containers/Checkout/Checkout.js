@@ -71,7 +71,7 @@ const Checkout = (props) => {
                   <td>
                     <h3>{k}</h3>
                   </td>
-                  <td>
+                  <td id='baseValues'>
                     <h3>{v.checked ? SELECTED : NOTSELECTED}</h3>
                   </td>
                 </tr>
