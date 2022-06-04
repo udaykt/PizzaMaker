@@ -3,8 +3,7 @@
   display: grid;
   grid-template-areas: 'checkoutPizza ingredients checkoutButtons';
   grid-template-columns: 1fr;
-  grid-template-rows: 300px 1fr 100px;
-  row-gap: 20px;
+  grid-template-rows: 350px 1fr 250px;
   top: 0;
   height: 100%;
   width: 100%;
@@ -15,12 +14,11 @@
   justify-content: center;
   align-items: center;
   position: relative;
-  top: 0;
-  height: 300px;
   grid-area: checkoutPizza;
   grid-row: 1/2;
   grid-column: 1/1;
 }
+
 .ingredients {
   grid-area: ingredients;
   grid-row: 2/3;
@@ -72,9 +70,4 @@
 }
 
 @media screen and (max-width: 1360px) {
-  .pizzaCheckoutDiv {
-    position: relative;
-    width: 200px;
-    height: 200px;
-  }
 }

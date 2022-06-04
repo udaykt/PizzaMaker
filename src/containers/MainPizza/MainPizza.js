@@ -5,13 +5,13 @@ import olive from '../../assets/Logos/olive.png';
 
 const MainPizza = (props) => {
   const pizzaSlices = {
-    small: 4,
+    regular: 4,
     medium: 6,
     large: 8,
     extraLarge: 10,
   };
   const sliceSizes = {
-    small: [
+    regular: [
       {
         rotate: 0,
         skew: 0,
@@ -173,7 +173,7 @@ const MainPizza = (props) => {
 
   return (
     <div className='mainPizza'>
-      {sliceSizes.small.map((slice) => {
+      {sliceSizes.regular.map((slice) => {
         console.log(slice);
         return (
           <Fragment key={slice.rotate + slice.skew}>

@@ -3,14 +3,15 @@ import { useSelector } from 'react-redux';
 import { SLICESSIZES, TOPPING_COUNT } from '../../components/Utils/Utility';
 import DummyPizza from '../DummyPizza/DummyPizza';
 import Slice from '../Slice/Slice';
-import styles from './pizza.module.css';
+import './pizza.css';
 
-const SMALL = '6';
+const REGULAR = '6';
 const MEDIUM = '12';
 const LARGE = '5';
 
 const Pizza = (props) => {
   const userState = useSelector((state) => state.user);
+  const size = useSelector((state) => state.pizza.size);
   const loggedIn = userState.loggedIn;
 
   const slicesSizes = SLICESSIZES;
@@ -19,11 +20,11 @@ const Pizza = (props) => {
 
   const state = {
     quantity: {
-      small: { active: false, value: SMALL },
+      regular: { active: false, value: REGULAR },
       medium: { active: false, value: MEDIUM },
       large: { active: false, value: LARGE },
     },
-    value: 'small',
+    value: 'regular',
     sliced: true,
     loggedIn,
   };
@@ -31,14 +32,14 @@ const Pizza = (props) => {
   const quantityHandler = (value) => {
     // console.log(props.quantity);
     // switch (props.quantity) {
-    //   case 'small':
-    //     return state.quantity.small.value;
+    //   case 'regular':
+    //     return state.quantity.regular.value;
     //   case 'medium':
     //     return state.quantity.medium.value;
     //   case 'large':
     //     return state.quantity.large.value;
     //   default:
-    //     return state.quantity.small.value;
+    //     return state.quantity.regular.value;
     // }
   };
   const buildStyle = () => {
@@ -81,9 +82,9 @@ const Pizza = (props) => {
 
   return (
     <Fragment>
-      <div className={styles.pizza}>
+      <div className={'pizza'}>
         {(state.loggedIn &&
-          slicesSizes.medium.map((slice) => {
+          slicesSizes[size].map((slice) => {
             return (
               <Slice
                 key={slice.rotate}

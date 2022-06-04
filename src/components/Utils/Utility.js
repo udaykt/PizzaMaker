@@ -24,7 +24,7 @@ export const USERTYPE = {
 };
 
 export const SLICESSIZES = {
-  small: [
+  regular: [
     {
       rotate: 0,
       size: 100,
@@ -148,15 +148,21 @@ export const SLICESSIZES = {
 
 export const TOPPING_COUNT = {
   SMALL_PIZZA: {
-    small: 2,
+    regular: 2,
     medium: 3,
   },
   MEDIUM_PIZZA: {
-    small: 3,
+    regular: 3,
     medium: 4,
   },
   LARGE_PIZZA: {
-    small: 4,
+    regular: 4,
     medium: 5,
   },
+};
+
+export const PIZZASIZES = {
+  R: 'regular',
+  M: 'medium',
+  L: 'large',
 };

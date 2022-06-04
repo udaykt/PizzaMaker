@@ -12,7 +12,7 @@ import { uiActions } from '../../store/uiSlice';
 
 const SELECTED = 'selected';
 const NOTSELECTED = 'not selected';
-const SMALL = 'small';
+const REGULAR = 'regular';
 const MEDIUM = 'medium';
 
 const Checkout = (props) => {
@@ -85,7 +85,7 @@ const Checkout = (props) => {
                   </td>
                   <td>
                     <h3>
-                      {v.checked ? (v.medium ? MEDIUM : SMALL) : NOTSELECTED}
+                      {v.checked ? (v.medium ? MEDIUM : REGULAR) : NOTSELECTED}
                     </h3>
                   </td>
                 </tr>

@@ -7,14 +7,17 @@ const pizzahubSlice = createSlice({
       sauce: {
         title: 'sauce',
         checked: false,
+        color: 'var(--sauce-color)',
       },
       mozzarella: {
         title: 'mozzarella',
         checked: false,
+        color: 'var(--mozzarella-color)',
       },
       cheese: {
         title: 'cheese',
         checked: false,
+        color: 'var(--cheese-color)',
       },
     },
     toppings: {

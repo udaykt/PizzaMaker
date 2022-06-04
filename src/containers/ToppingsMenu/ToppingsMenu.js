@@ -74,7 +74,7 @@ const ToppingsMenu = (props) => {
                   }}
                   disabled={!toppings[key].checked}
                 />
-                <label htmlFor={key + '_small'}>small</label>
+                <label htmlFor={key + '_small'}>regular</label>
                 <input
                   type='radio'
                   id={key + '_medium'}
