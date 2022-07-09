@@ -147,17 +147,17 @@ export const SLICESSIZES = {
 };
 
 export const TOPPING_COUNT = {
-  SMALL_PIZZA: {
-    regular: 2,
-    medium: 3,
+  regular: {
+    pepperoni: 1,
+    peppers: 2,
+    sausage: 2,
+    olives: 2,
   },
-  MEDIUM_PIZZA: {
-    regular: 3,
-    medium: 4,
-  },
-  LARGE_PIZZA: {
-    regular: 4,
-    medium: 5,
+  medium: {
+    pepperoni: 2,
+    peppers: 3,
+    sausage: 3,
+    olives: 3,
   },
 };
 

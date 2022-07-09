@@ -55,7 +55,13 @@ const ToppingsMenu = (props) => {
                 <label
                   style={
                     value.checked
-                      ? { backgroundColor: getStyle(key) }
+                      ? {
+                          backgroundColor: getStyle(key),
+                          backgroundImage:
+                            'url(../../assets/Logos/peppers.png)',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat',
+                        }
                       : { backgroundColor: 'gray' }
                   }
                   htmlFor={key}
