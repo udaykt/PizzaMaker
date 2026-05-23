@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://json.schemastore.org/spring-boot-application-properties.json
 spring:
   application:
     name: pizza-maker-api
@@ -38,4 +39,4 @@ app:
     expiration-ms: 86400000
 
 server:
-  port: 8080
+  port: ${PORT:8080}
