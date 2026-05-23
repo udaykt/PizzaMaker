@@ -12,3 +12,4 @@ export const ORDERS_PATH = DASHBOARD_PATH + '/orders';
 export const CHECKOUT_PATH = DASHBOARD_PATH + '/checkout';
 export const CONTACT_PATH = DASHBOARD_PATH + '/contact';
 export const ABOUT_PATH = DASHBOARD_PATH + '/about';
+export const ADMIN_PATH = DASHBOARD_PATH + '/admin';

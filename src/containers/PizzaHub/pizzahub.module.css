@@ -79,6 +79,31 @@
   grid-row: 1/3;
 }
 
+.priceTag {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+  background: rgba(255, 107, 0, 0.12);
+  border: 1px solid rgba(255, 107, 0, 0.4);
+  border-radius: 12px;
+  padding: 10px 24px;
+}
+
+.priceLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.priceValue {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #ff6b00;
+  letter-spacing: 1px;
+}
+
 @media screen and (max-width: 1360px) {
   .pizzahub {
     display: flex;
@@ -86,15 +111,31 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    gap: 50px;
+    gap: 40px;
   }
   .description {
-    margin-top: 30px;
+    margin-top: 120px;
   }
   .pizza {
     position: relative;
   }
   .orderButton {
     margin-bottom: 30px;
+  }
+  .toppingsMenu {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .description h1 {
+    font-size: 1.4rem;
+  }
+  .priceValue {
+    font-size: 1.5rem;
+  }
+  .priceTag {
+    padding: 8px 16px;
   }
 }

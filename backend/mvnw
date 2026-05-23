@@ -1,0 +1,17 @@
+#!/bin/sh
+# Maven Wrapper startup script, version 3.3.2
+
+MAVEN_WRAPPER_JAR="$MAVEN_PROJECTBASEDIR/.mvn/wrapper/maven-wrapper.jar"
+MAVEN_WRAPPER_PROPERTIES="$MAVEN_PROJECTBASEDIR/.mvn/wrapper/maven-wrapper.properties"
+
+if [ -z "$MAVEN_PROJECTBASEDIR" ]; then
+    MAVEN_PROJECTBASEDIR="$(cd "$(dirname "$0")" && pwd)"
+fi
+
+if [ ! -f "$MAVEN_WRAPPER_JAR" ]; then
+    echo "Downloading Maven Wrapper..."
+    curl -o "$MAVEN_WRAPPER_JAR" \
+        "https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.3.2/maven-wrapper-3.3.2.jar"
+fi
+
+exec java -jar "$MAVEN_WRAPPER_JAR" "$@"

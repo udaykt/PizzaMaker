@@ -76,4 +76,10 @@
   .signupButtonDiv {
     display: none;
   }
+  .header {
+    min-width: 320px;
+  }
+  .logo h1 {
+    font-size: 1.4rem;
+  }
 }
