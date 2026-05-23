@@ -1,70 +1,167 @@
-# Getting Started with Create React App
+# PizzaMaker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Full-stack pizza ordering app — React + Firebase frontend, production-grade Spring Boot REST backend.
 
-## Available Scripts now
+---
 
-In the project directory, you can run:
+## Architecture
 
-### `npm start`
+```
+Browser
+  │
+  └── React UI (Redux Toolkit · Material-UI · Firebase Auth)
+        │
+        ▼  HTTP / REST
+  ┌─────────────────────────────────────────────────────┐
+  │              Spring Boot API  (port 8080)           │
+  │                                                     │
+  │  AuthController  OrderController  MenuController    │
+  │        │               │               │           │
+  │        └───────────────┴───────────────┘           │
+  │                        │                           │
+  │              Service Layer (business logic)        │
+  │       AuthService  OrderService  MenuService       │
+  │                        │                           │
+  │              Repository Layer (Spring Data JPA)    │
+  │          UserRepository    OrderRepository         │
+  │                        │                           │
+  │              ┌──────────────────┐                  │
+  │              │  H2 (dev/test)   │                  │
+  │              │  PostgreSQL (prod)│                  │
+  │              └──────────────────┘                  │
+  │                                                     │
+  │  Cross-cutting: JWT Filter · GlobalExceptionHandler │
+  │                 Flyway · Actuator · Swagger UI      │
+  └─────────────────────────────────────────────────────┘
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+---
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+| Layer | Technology |
+|---|---|
+| Language | Java 21 |
+| Framework | Spring Boot 3.3.5 |
+| Security | Spring Security 6 + JWT (jjwt 0.12.3) |
+| Persistence | Spring Data JPA + Hibernate |
+| DB (dev) | H2 in-memory |
+| DB (prod) | PostgreSQL 16 |
+| Migrations | Flyway |
+| API Docs | springdoc-openapi 2.6 / Swagger UI |
+| Observability | Spring Boot Actuator |
+| Async | `@Async` with `ThreadPoolTaskExecutor` |
+| Build | Maven + Maven Wrapper |
+| Tests | JUnit 5 + Mockito + MockMvc |
+| CI | GitHub Actions |
+| Containers | Docker + Docker Compose |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## How to Run Locally
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Option 1 — Dev mode (H2, no Docker)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+cd backend
+./mvnw spring-boot:run          # Windows: .\mvnw.cmd spring-boot:run
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- API: http://localhost:8080
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- H2 Console: http://localhost:8080/h2-console  (JDBC URL: `jdbc:h2:mem:pizzadb`)
+- Actuator: http://localhost:8080/actuator/health
 
-### `npm run eject`
+### Option 2 — Full stack with PostgreSQL (Docker Compose)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+# Build the jar first
+cd backend && ./mvnw package -DskipTests && cd ..
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# Start everything
+docker-compose up --build
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Run tests
 
-You don’t have to ever use `eject`. The curated feature set is suitable for regular and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+cd backend
+./mvnw test
+```
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## API Endpoints
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/v1/auth/register` | Public | Register standard user, returns JWT |
+| POST | `/api/v1/auth/login` | Public | Login, returns JWT |
+| POST | `/api/v1/auth/guest` | Public | Register guest user, returns JWT |
+| GET | `/api/v1/menu/toppings` | Public | List available toppings |
+| GET | `/api/v1/menu/sizes` | Public | List sizes with pricing |
+| GET | `/api/v1/users/me` | User | Get current user profile |
+| POST | `/api/v1/orders` | User | Place a new order |
+| GET | `/api/v1/orders/my` | User | Get own orders (paginated) |
+| GET | `/api/v1/orders/{oid}` | User | Get specific order |
+| GET | `/api/v1/orders` | Admin | Get all orders (paginated) |
+| PUT | `/api/v1/orders/{oid}/status` | Admin | Update order status |
+| GET | `/actuator/health` | Public | Health check |
 
-### Code Splitting
+Pagination params: `?page=0&size=10&sort=createdAt,desc`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## Design Patterns
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+| Pattern | Where | Why |
+|---|---|---|
+| **Repository** | `UserRepository`, `OrderRepository` | Decouples data access from business logic; easy to swap DB |
+| **DTO / Mapper** | `*Request`, `*Response`, `UserMapper`, `OrderMapper` | Prevents entity leakage to API layer; stable API contract |
+| **Chain of Responsibility** | Spring Security filter chain → `JwtAuthenticationFilter` | Each filter handles one concern, passes to next |
+| **Strategy** | `PasswordEncoder` (BCrypt injected via DI) | Swap hashing algorithm without changing callers |
+| **Facade** | `AuthService` (wraps repo + JWT + encoder) | Single entry point hides multi-step auth flow |
+| **Decorator** | `@Async` on `NotificationService` | Adds async behaviour without modifying business logic |
+| **Template Method** | `OncePerRequestFilter` in `JwtAuthenticationFilter` | Framework calls `doFilterInternal`; subclass fills the step |
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 10 FAANG Interview Questions
 
-### Advanced Configuration
+**1. Why JWT over sessions for this API?**
+JWT is stateless — the server holds no session state, making it trivially horizontally scalable. Each request carries a self-contained, signed token. Trade-off: tokens can't be invalidated before expiry without a blocklist (Redis), which we'd add in a production system.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+**2. How does Spring Security's filter chain work here?**
+`JwtAuthenticationFilter` runs before `UsernamePasswordAuthenticationFilter`. It extracts the Bearer token, validates it, loads `UserDetails`, and sets the `SecurityContext`. Downstream filters and controllers see an authenticated principal — no session involved.
 
-### Deployment
+**3. Why Flyway instead of `ddl-auto: create`?**
+Flyway gives deterministic, versioned, auditable schema migrations that run in order (`V1__`, `V2__`). `ddl-auto: create` destroys data on restart and can silently diverge between environments. Production databases must never be managed by Hibernate's DDL tool.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+**4. Walk me through placing an order end-to-end.**
+`POST /api/v1/orders` → `JwtAuthenticationFilter` validates token → `OrderController.placeOrder` called with `@AuthenticationPrincipal` → `@Valid` checks `@NotNull pizzaSize` → `OrderService.placeOrder` loads user, builds `Order`, saves, fires `@Async` notification → returns `OrderResponse` DTO (entity never leaves service layer).
 
-### `npm run build` fails to minify
+**5. How did you handle concurrent order placement safely?**
+`@Transactional` on `placeOrder` wraps the save in a single DB transaction. For true high-concurrency (e.g., seat reservation), we'd add an optimistic lock (`@Version`) on the entity to detect concurrent modifications without blocking reads.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**6. What's the difference between `@Mock` and `@MockBean` in your tests?**
+`@Mock` (Mockito) creates a plain mock — no Spring context, used in `@ExtendWith(MockitoExtension)` unit tests for pure logic. `@MockBean` replaces a Spring bean in the full application context during `@SpringBootTest` — right for controller tests where the full filter chain and MVC config must be live.
+
+**7. How would you scale this to 10,000 orders/second?**
+(1) Stateless JWT means any node handles any request — add instances behind a load balancer. (2) Move order writes to an async queue (Kafka `order.placed` topic) so the HTTP response returns immediately. (3) Read replicas for `GET /orders`. (4) Cache menu endpoints with Redis. (5) Connection pooling with HikariCP (already Spring Boot default).
+
+**8. Why `@Transactional(readOnly = true)` on query methods?**
+Signals Hibernate to skip dirty-checking on entities loaded in that session (no snapshot needed), and lets the DB driver/replica route to a read replica. Small wins per query; significant at scale.
+
+**9. How would you revoke a JWT before it expires?**
+Store a `token_version` counter per user in the DB (or Redis). Embed it in the JWT claim on issue. In `JwtAuthenticationFilter`, verify the claim matches current DB value. Incrementing `token_version` on logout/password-change instantly invalidates all existing tokens for that user.
+
+**10. What's wrong with the original Firebase implementation you replaced?**
+Plaintext passwords were stored in Firestore documents — a critical OWASP A02 (Cryptographic Failures) violation. Any Firestore rules misconfiguration would have exposed all credentials in plaintext. The new backend BCrypt-hashes passwords, stores only the hash, and removes the entire client-side auth bypass surface.
+
+---
+
+## Security Notes
+
+- JWT secret must be a Base64-encoded 256-bit key in production (set via `JWT_SECRET` env var).
+- The dev secret in `application.yml` is for local use only — never commit a real secret.
+- Guest users have `null` password hash; they authenticate only via JWT (no password endpoint).
