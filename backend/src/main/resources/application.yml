@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://json.schemastore.org/spring-boot-application-properties.json
 spring:
   application:
-    name: pizza-maker-api
+    name: pizzamaker-api
 
   datasource:
     url: jdbc:h2:mem:pizzadb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE
