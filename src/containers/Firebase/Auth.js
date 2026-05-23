@@ -1,9 +1,9 @@
+import toast from 'react-hot-toast';
 import api from '../../api/axiosClient';
 import store from '../../store';
 import { userActions } from '../../store/userSlice';
 import { buildUserDataInStore } from '../User/User';
 
-// On page load — restore session from localStorage if token exists
 const storedUser = localStorage.getItem('user');
 if (storedUser) {
   try {
@@ -27,6 +27,7 @@ const loginUser = async (loginDetails) => {
   localStorage.setItem('user', JSON.stringify(userData));
   buildUserDataInStore(userData);
   store.dispatch(userActions.setLoggedIn(true));
+  toast.success(`Welcome back, ${data.firstName}!`);
   return data;
 };
 
@@ -42,6 +43,7 @@ const createUser = async (userDetails) => {
   localStorage.setItem('user', JSON.stringify(userData));
   buildUserDataInStore(userData);
   store.dispatch(userActions.setLoggedIn(true));
+  toast.success(`Account created! Welcome, ${data.firstName}!`);
   return data;
 };
 
@@ -56,6 +58,7 @@ const createGuest = async (guestDetails) => {
   localStorage.setItem('user', JSON.stringify(userData));
   buildUserDataInStore(userData);
   store.dispatch(userActions.setLoggedIn(true));
+  toast.success(`Welcome, ${data.firstName}! Continuing as guest.`);
   return data;
 };
 
@@ -64,6 +67,7 @@ const logoutUser = async () => {
   localStorage.removeItem('user');
   store.dispatch(userActions.setLoggedIn(false));
   buildUserDataInStore({ uid: '', firstName: '', emailId: '', userType: '' });
+  toast.success('Logged out successfully.');
 };
 
 export { loginUser, createGuest, createUser, logoutUser };

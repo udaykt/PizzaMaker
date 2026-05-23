@@ -40,7 +40,7 @@ const ToppingsMenu = (props) => {
       <div className={styles.toppings}>
         {Object.entries(toppings).map(([key, value]) => {
           return (
-            <div className={styles.topping} key={key + value}>
+            <div className={`${styles.topping} ${value.checked ? styles.toppingActive : ''}`} key={key + value}>
               <div>
                 <h3>{key}</h3>
               </div>

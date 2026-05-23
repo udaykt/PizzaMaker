@@ -42,6 +42,24 @@
   padding: 5px;
   box-shadow: -10px -10px 10px rgba(255, 255, 255, 0.05),
     10px 10px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.topping:hover {
+  transform: scale(1.015);
+  box-shadow: -10px -10px 14px rgba(255, 255, 255, 0.07),
+    10px 10px 14px rgba(0, 0, 0, 0.35);
+}
+
+.toppingActive {
+  border: 1px solid rgba(186, 218, 85, 0.4);
+  animation: toppingPop 0.25s ease;
+}
+
+@keyframes toppingPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
 
 .topping h3 {
