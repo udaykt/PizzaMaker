@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
+import useOrderUpdates from '../../hooks/useOrderUpdates';
 import { fetchUserOrders } from '../Firebase/Firebase';
 import './orders.css';
 
@@ -12,6 +13,14 @@ const STATUS_COLORS = {
   DELIVERED:  { bg: '#d6d8d9', color: '#383d41' },
 };
 
+const STATUS_EMOJI = {
+  PENDING:   '🕐',
+  CONFIRMED: '✅',
+  PREPARING: '👨‍🍳',
+  READY:     '📦',
+  DELIVERED: '🎉',
+};
+
 const formatIngredients = (ingredients) => {
   if (!ingredients) return '—';
   return Object.entries(ingredients)
@@ -21,8 +30,15 @@ const formatIngredients = (ingredients) => {
 };
 
 const Orders = () => {
-  const userOrders = useSelector((state) => state.order.userOrders);
+  const reduxOrders = useSelector((state) => state.order.userOrders);
+  const currentUserUid = useSelector((state) => state.user.uid);
+
+  // Local copy so we can update status live without re-fetching
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Sync from Redux on mount / when reduxOrders changes
+  useEffect(() => { setOrders(reduxOrders); }, [reduxOrders]);
 
   useEffect(() => {
     setLoading(true);
@@ -30,6 +46,23 @@ const Orders = () => {
       .catch(() => toast.error('Could not load orders.'))
       .finally(() => setLoading(false));
   }, []);
+
+  // Live WebSocket handler — only apply updates that belong to this user
+  const handleLiveUpdate = useCallback((update) => {
+    if (update.userUid !== currentUserUid) return;
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.oid === update.oid ? { ...o, status: update.status } : o
+      )
+    );
+    const emoji = STATUS_EMOJI[update.status] || '🍕';
+    toast(`${emoji} Order #${update.oid.slice(0, 8)}… is now ${update.status}`, {
+      duration: 4000,
+      icon: null,
+    });
+  }, [currentUserUid]);
+
+  useOrderUpdates(handleLiveUpdate);
 
   if (loading) {
     return (
@@ -45,16 +78,23 @@ const Orders = () => {
 
   return (
     <div className='orders'>
-      <h1>My Orders</h1>
-      {userOrders.length === 0 ? (
+      <div className='ordersHeader'>
+        <h1>My Orders</h1>
+        <span className='liveIndicator'>
+          <span className='liveDot' />
+          Live
+        </span>
+      </div>
+      {orders.length === 0 ? (
         <div className='ordersEmpty'>
           <span className='ordersEmptyIcon'>🍕</span>
           <p>No orders yet! Go make your first pizza.</p>
         </div>
       ) : (
         <ul className='ordersList'>
-          {userOrders.map((order) => {
+          {orders.map((order) => {
             const statusStyle = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
+            const emoji = STATUS_EMOJI[order.status] || '🕐';
             return (
               <li key={order.oid} className='orderCard'>
                 <div className='orderCardHeader'>
@@ -63,7 +103,7 @@ const Orders = () => {
                     className='orderStatus'
                     style={{ background: statusStyle.bg, color: statusStyle.color }}
                   >
-                    {order.status}
+                    {emoji} {order.status}
                   </span>
                 </div>
                 <div className='orderCardBody'>

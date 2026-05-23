@@ -3,6 +3,7 @@ package com.pizzamaker.service;
 import com.pizzamaker.dto.request.OrderRequest;
 import com.pizzamaker.dto.request.UpdateStatusRequest;
 import com.pizzamaker.dto.response.OrderResponse;
+import com.pizzamaker.dto.response.OrderStatusUpdate;
 import com.pizzamaker.dto.response.PageResponse;
 import com.pizzamaker.entity.Order;
 import com.pizzamaker.entity.User;
@@ -13,6 +14,7 @@ import com.pizzamaker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public OrderResponse placeOrder(String email, OrderRequest request) {
@@ -82,7 +85,15 @@ public class OrderService {
         Order order = orderRepository.findByOid(oid)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + oid));
         order.setStatus(request.status());
-        return OrderMapper.toResponse(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+
+        // Broadcast real-time status update to all subscribers on /topic/orders
+        messagingTemplate.convertAndSend(
+                "/topic/orders",
+                new OrderStatusUpdate(saved.getOid(), saved.getUser().getUid(), saved.getStatus())
+        );
+
+        return OrderMapper.toResponse(saved);
     }
 
     private PageResponse<OrderResponse> toPageResponse(Page<Order> page) {
