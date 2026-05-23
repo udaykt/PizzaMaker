@@ -1,6 +1,5 @@
 import { useDispatch } from 'react-redux';
 import { useHistory, withRouter } from 'react-router-dom';
-import { pizzahubActions } from '../../../store/pizzahubSlice';
 import { uiActions } from '../../../store/uiSlice';
 import { HOME_PATH, LOGIN_PATH, SIGNUP_PATH } from '../../Utils/Constants';
 import Button from '../Buttons/Button';

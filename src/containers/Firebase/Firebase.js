@@ -52,4 +52,3 @@ const fetchMenuPricing = async () => {
 };
 
 export { createOrder, fetchUserOrders, fetchLoggedInUser, fetchMenuPricing };
-export default {};

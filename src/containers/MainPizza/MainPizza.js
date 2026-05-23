@@ -1,15 +1,8 @@
 import { Fragment } from 'react';
-import Olive from '../../components/Olive/Olive';
 import './mainPizza.css';
 import olive from '../../assets/Logos/olive.png';
 
 const MainPizza = (props) => {
-  const pizzaSlices = {
-    regular: 4,
-    medium: 6,
-    large: 8,
-    extraLarge: 10,
-  };
   const sliceSizes = {
     regular: [
       {
@@ -132,45 +125,6 @@ const MainPizza = (props) => {
       },
     ],
   };
-  const state = {
-    base: {
-      sauce: {
-        title: 'sauce',
-        checked: false,
-      },
-      mozzarella: {
-        title: 'mozzarella',
-        checked: false,
-      },
-      cheese: {
-        title: 'cheese',
-        checked: false,
-      },
-    },
-    toppings: {
-      pepperoni: {
-        title: 'pepperoni',
-        medium: false,
-        checked: false,
-      },
-      sausage: {
-        title: 'sausage',
-        medium: false,
-        checked: false,
-      },
-      peppers: {
-        title: 'peppers',
-        medium: false,
-        checked: false,
-      },
-      olives: {
-        title: 'olives',
-        medium: false,
-        checked: false,
-      },
-    },
-  };
-
   return (
     <div className='mainPizza'>
       {sliceSizes.regular.map((slice) => {
