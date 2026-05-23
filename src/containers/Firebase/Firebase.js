@@ -1,9 +1,10 @@
+import toast from 'react-hot-toast';
 import api from '../../api/axiosClient';
 import store from '../../store';
+import { menuActions } from '../../store/menuSlice';
 import { orderActions } from '../../store/orderSlice';
 import { buildUserDataInStore } from '../User/User';
 
-// Translate pizzahub Redux state → OrderRequest body expected by the backend
 const buildOrderPayload = (orderState) => {
   const { base, toppings } = orderState;
   return {
@@ -22,10 +23,10 @@ const buildOrderPayload = (orderState) => {
   };
 };
 
-// Called from Checkout.js — user param ignored, auth comes from token via interceptor
 const createOrder = async (_user, orderState) => {
   const { data } = await api.post('/api/v1/orders', buildOrderPayload(orderState));
   store.dispatch(orderActions.setCurrentOrder(data));
+  toast.success(`Order #${data.oid} placed! We're making your pizza.`);
   return data;
 };
 
@@ -41,5 +42,14 @@ const fetchLoggedInUser = async () => {
   return data;
 };
 
-export { createOrder, fetchUserOrders, fetchLoggedInUser };
+const fetchMenuPricing = async () => {
+  try {
+    const { data } = await api.get('/api/v1/menu/sizes');
+    store.dispatch(menuActions.setSizePricing(data));
+  } catch (_) {
+    // fallback defaults already in slice
+  }
+};
+
+export { createOrder, fetchUserOrders, fetchLoggedInUser, fetchMenuPricing };
 export default {};
