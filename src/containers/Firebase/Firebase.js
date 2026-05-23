@@ -5,8 +5,11 @@ import { menuActions } from '../../store/menuSlice';
 import { orderActions } from '../../store/orderSlice';
 import { buildUserDataInStore } from '../User/User';
 
+const SIZE_TO_ENUM = { regular: 'R', medium: 'M', large: 'L' };
+
 const buildOrderPayload = (orderState) => {
   const { base, toppings } = orderState;
+  const selectedSize = store.getState().pizza.size;
   return {
     sauce:           base.sauce.checked,
     mozzarella:      base.mozzarella.checked,
@@ -19,7 +22,7 @@ const buildOrderPayload = (orderState) => {
     peppersMedium:   toppings.peppers.checked && toppings.peppers.medium,
     olives:          toppings.olives.checked,
     olivesMedium:    toppings.olives.checked && toppings.olives.medium,
-    pizzaSize:       'M',
+    pizzaSize:       SIZE_TO_ENUM[selectedSize] || 'M',
   };
 };
 

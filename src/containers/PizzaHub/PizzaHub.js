@@ -47,8 +47,10 @@ const PizzaHub = (props) => {
     if (userState) setUserName(userState.firstName);
   }, [userState, uiState]);
 
+  const SIZE_TO_ENUM = { regular: 'R', medium: 'M', large: 'L' };
+
   const computePrice = () => {
-    const sizeKey = pizzaSize ? pizzaSize.toUpperCase() : 'M';
+    const sizeKey = (pizzaSize && SIZE_TO_ENUM[pizzaSize]) || 'M';
     let total = sizePricing[sizeKey] || 12;
     const { base, toppings } = pizzahubState;
     Object.values(base).forEach((b) => { if (b.checked) total += BASE_ITEM_PRICE; });
