@@ -103,3 +103,12 @@
 .navLinkStyle a:hover {
   color: bisque;
 }
+
+.fieldError {
+  color: #c0392b;
+  font-size: 0.78rem;
+  font-family: monospace;
+  font-weight: bold;
+  margin-top: -2px;
+  padding-left: 4px;
+}

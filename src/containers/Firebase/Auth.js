@@ -1,91 +1,73 @@
-import {
-  createUserWithEmailAndPassword,
-  signInAnonymously,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
+import toast from 'react-hot-toast';
+import api from '../../api/axiosClient';
 import store from '../../store';
 import { userActions } from '../../store/userSlice';
-import {
-  auth,
-  createGuestUserDocument,
-  createUserDocument,
-  fetchLoggedInUser,
-} from './Firebase';
+import { buildUserDataInStore } from '../User/User';
 
-auth.onAuthStateChanged((user) => {
-  if (user) {
+const storedUser = localStorage.getItem('user');
+if (storedUser) {
+  try {
+    const userData = JSON.parse(storedUser);
+    buildUserDataInStore(userData);
     store.dispatch(userActions.setLoggedIn(true));
-    fetchLoggedInUser();
-    console.log(user.uid + ' user logged in:Auth.js');
-  } else {
-    store.dispatch(userActions.setLoggedIn(false));
-    console.log(user + ' user logged out:Auth.js');
+  } catch (_) {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   }
-});
+}
 
 const loginUser = async (loginDetails) => {
   const { loginEmail, loginPassword } = loginDetails;
-  var user;
-  if (loginEmail && loginPassword) {
-    user = await signInWithEmailAndPassword(
-      auth,
-      loginEmail,
-      loginPassword
-    ).catch((e) => {
-      console.error('Error while logging in user: Auth.js ' + e);
-    });
-  }
-  return user;
-};
-
-const createGuest = async (guestDetails) => {
-  const { guestFirstName, guestEmail } = guestDetails;
-  var user;
-  if (guestFirstName && guestEmail) {
-    user = await signInAnonymously(auth).catch((e) => {
-      console.error('Error while creating guest user: Auth.js ' + e);
-    });
-    const additionalData = {
-      guestFirstName,
-      guestEmail,
-    };
-    console.log(additionalData);
-    createGuestUserDocument(user, additionalData);
-  }
-  return user;
+  const { data } = await api.post('/api/v1/auth/login', {
+    emailId: loginEmail,
+    password: loginPassword,
+  });
+  localStorage.setItem('token', data.token);
+  const userData = { uid: data.uid, firstName: data.firstName, emailId: loginEmail, userType: data.userType };
+  localStorage.setItem('user', JSON.stringify(userData));
+  buildUserDataInStore(userData);
+  store.dispatch(userActions.setLoggedIn(true));
+  toast.success(`Welcome back, ${data.firstName}!`);
+  return data;
 };
 
 const createUser = async (userDetails) => {
   const { registerFirstName, registerEmail, registerPassword } = userDetails;
-  var user;
-  if (registerEmail && registerFirstName && registerPassword) {
-    user = await createUserWithEmailAndPassword(
-      auth,
-      registerEmail,
-      registerPassword
-    ).catch((e) => {
-      console.error('Error while creating user: Auth.js ' + e);
-    });
-    const additionalData = {
-      registerFirstName,
-      registerEmail,
-      registerPassword,
-    };
-    console.log(user);
-    console.log(additionalData);
-    createUserDocument(user, additionalData);
-  }
-  return user;
+  const { data } = await api.post('/api/v1/auth/register', {
+    firstName: registerFirstName,
+    emailId: registerEmail,
+    password: registerPassword,
+  });
+  localStorage.setItem('token', data.token);
+  const userData = { uid: data.uid, firstName: data.firstName, emailId: registerEmail, userType: data.userType };
+  localStorage.setItem('user', JSON.stringify(userData));
+  buildUserDataInStore(userData);
+  store.dispatch(userActions.setLoggedIn(true));
+  toast.success(`Account created! Welcome, ${data.firstName}!`);
+  return data;
+};
+
+const createGuest = async (guestDetails) => {
+  const { guestFirstName, guestEmail } = guestDetails;
+  const { data } = await api.post('/api/v1/auth/guest', {
+    firstName: guestFirstName,
+    emailId: guestEmail,
+  });
+  localStorage.setItem('token', data.token);
+  const userData = { uid: data.uid, firstName: data.firstName, emailId: guestEmail, userType: data.userType };
+  localStorage.setItem('user', JSON.stringify(userData));
+  buildUserDataInStore(userData);
+  store.dispatch(userActions.setLoggedIn(true));
+  toast.success(`Welcome, ${data.firstName}! Continuing as guest.`);
+  return data;
 };
 
 const logoutUser = async () => {
-  await auth.signOut().catch((e) => {
-    console.error('Error in signing out user:Auth.js ' + e);
-  });
-};
-
-const forgotPassword = async () => {
-  await auth.sendPasswordResetEmail(auth.currentUser.email);
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  store.dispatch(userActions.setLoggedIn(false));
+  buildUserDataInStore({ uid: '', firstName: '', emailId: '', userType: '' });
+  toast.success('Logged out successfully.');
 };
 
 export { loginUser, createGuest, createUser, logoutUser };

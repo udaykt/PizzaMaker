@@ -5,6 +5,7 @@ const menuSlice = createSlice({
   initialState: {
     showLoginPage: false,
     showMenuPage: false,
+    sizePricing: { R: 8, M: 12, L: 16 },
   },
   reducers: {
     toggleLoginPage(state) {
@@ -12,6 +13,9 @@ const menuSlice = createSlice({
     },
     toggleMenuPage(state) {
       state.showMenuPage = !state.showMenuPage;
+    },
+    setSizePricing(state, action) {
+      state.sizePricing = action.payload;
     },
   },
 });
