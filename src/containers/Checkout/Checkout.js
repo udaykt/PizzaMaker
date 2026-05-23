@@ -6,7 +6,7 @@ import Pizza from '../Pizza/Pizza';
 import './checkout.css';
 import { useHistory } from 'react-router-dom';
 import { CONFIRM_PATH, HOME_PATH } from '../../components/Utils/Constants';
-import { auth, createOrder } from '../Firebase/Firebase';
+import { createOrder } from '../Firebase/Firebase';
 import { orderActions } from '../../store/orderSlice';
 import { uiActions } from '../../store/uiSlice';
 
@@ -39,7 +39,7 @@ const Checkout = (props) => {
   };
 
   const orderHandler = (e) => {
-    createOrder(auth.currentUser, orderState)
+    createOrder(null, orderState)
       .then((order) => {
         console.log(order);
         history.push(CONFIRM_PATH + '?orderId=' + order.orderId);
