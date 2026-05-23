@@ -539,7 +539,7 @@ React starts on **http://localhost:3000**
 
 ## Database Setup (Neon)
 
-1. Go to [neon.tech](https://neon.tech) → sign up free → **New Project** → name it `pizza-maker`
+1. Go to [neon.tech](https://neon.tech) → sign up free → **New Project** → name it `pizzamaker`
 2. Copy the connection string:
    ```
    postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
