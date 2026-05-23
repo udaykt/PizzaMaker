@@ -37,6 +37,7 @@ class OrderControllerTest {
     private OrderResponse sampleOrder() {
         return new OrderResponse(
                 UUID.randomUUID().toString(),
+                "test@example.com",
                 new OrderResponse.Ingredients(true, true, false, true, false,
                         false, false, false, false, false, false),
                 PizzaSize.M,
