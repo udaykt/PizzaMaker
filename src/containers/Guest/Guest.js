@@ -7,7 +7,6 @@ import {
   LOGIN_PATH,
   SIGNUP_PATH,
 } from '../../components/Utils/Constants';
-import { pizzahubActions } from '../../store/pizzahubSlice';
 import { uiActions } from '../../store/uiSlice';
 import { createGuest } from '../Firebase/Auth';
 import './guest.css';

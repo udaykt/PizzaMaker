@@ -1,6 +1,5 @@
 import { useDispatch } from 'react-redux';
 import { useHistory, withRouter } from 'react-router-dom';
-import { pizzahubActions } from '../../../../store/pizzahubSlice';
 import { uiActions } from '../../../../store/uiSlice';
 import { HOME_PATH, MENU_PATH } from '../../../Utils/Constants';
 import './menuIcon.css';

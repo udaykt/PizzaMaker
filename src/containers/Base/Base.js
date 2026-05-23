@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PIZZASIZES } from '../../components/Utils/Utility';
 import { pizzahubActions } from '../../store/pizzahubSlice';
@@ -9,48 +9,13 @@ const Base = (props) => {
   const bases = useSelector((state) => state.pizzahub.base);
   const size = useSelector((state) => state.pizza.size);
   const dispatch = useDispatch();
-  const [color, setColor] = useState();
-
   const onChangeHandler = (e, key) => {
     let base = bases[key];
-    setColor(base.color);
     base = { ...base, checked: e.target.checked };
     dispatch(pizzahubActions.toggleBase(base));
   };
   const sizeHandler = (e) => {
     dispatch(pizzaActions.setSize(e.target.value));
-  };
-
-  const onBaseClick = (e, key) => {
-    let base = bases[key];
-    console.log(base.color);
-    e.target.style.color = base.color;
-  };
-  const onHoverColor = (e, key) => {
-    switch (key) {
-      case 'sauce':
-        return (e.target.style.color = 'var(--sauce-color)');
-      case 'mozzarella':
-        return (e.target.style.color = 'var(--mozzarella-color)');
-      case 'cheese':
-        return (e.target.style.color = 'var(--cheese-color)');
-      default:
-        return (e.target.style.color = 'white');
-    }
-  };
-
-  const baseColor = (e, key) => {
-    switch (key) {
-      case 'sauce':
-        setColor('var(--sauce-color)');
-        break;
-      case 'mozzarella':
-        return 'var(--mozzarella-color)';
-      case 'cheese':
-        return 'var(--cheese-color)';
-      default:
-        return 'white';
-    }
   };
 
   return (

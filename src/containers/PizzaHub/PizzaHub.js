@@ -19,7 +19,6 @@ import { fetchMenuPricing } from '../Firebase/Firebase';
 import Base from '../Base/Base';
 import Guest from '../Guest/Guest';
 import LoginPage from '../LoginPage/LoginPage';
-import MainPizza from '../MainPizza/MainPizza';
 import Menu from '../Menu/Menu';
 import Pizza from '../Pizza/Pizza';
 import SignUp from '../SignUp/SignUp';

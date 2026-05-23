@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { initialPizzaState, pizzahubActions } from '../../store/pizzahubSlice';
+import { initialPizzaState } from '../../store/pizzahubSlice';
 import Button from '../../components/UI/Buttons/Button';
 import Pizza from '../Pizza/Pizza';
 import './checkout.css';

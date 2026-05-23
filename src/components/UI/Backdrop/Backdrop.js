@@ -1,7 +1,6 @@
 import { Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { pizzahubActions } from '../../../store/pizzahubSlice';
 import { uiActions } from '../../../store/uiSlice';
 import { HOME_PATH } from '../../Utils/Constants';
 import './backdrop.css';
