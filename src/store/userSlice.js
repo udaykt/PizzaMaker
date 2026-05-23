@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { auth } from '../containers/Firebase/Firebase';
 
 const userSlice = createSlice({
   name: 'user',
@@ -11,8 +10,8 @@ const userSlice = createSlice({
     userType: '',
   },
   reducers: {
-    setLoggedIn(state) {
-      state.loggedIn = auth.currentUser ? true : false;
+    setLoggedIn(state, action) {
+      state.loggedIn = action.payload;
     },
     setUid(state, action) {
       state.uid = action.payload;
