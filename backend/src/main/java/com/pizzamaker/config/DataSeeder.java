@@ -30,7 +30,7 @@ public class DataSeeder implements CommandLineRunner {
                 .firstName("Admin")
                 .emailId("admin@pizzamaker.com")
                 .passwordHash(passwordEncoder.encode("admin123"))
-                .userType(UserType.STANDARD)
+                .userType(UserType.ADMIN)
                 .role(Role.ROLE_ADMIN)
                 .build();
         userRepository.save(admin);

@@ -25,6 +25,13 @@ const userSlice = createSlice({
     setUserType(state, action) {
       state.userType = action.payload;
     },
+    reset(state) {
+      state.loggedIn = false;
+      state.uid = '';
+      state.firstName = '';
+      state.emailId = '';
+      state.userType = '';
+    },
   },
 });
 
