@@ -14,7 +14,7 @@
   bottom: 50%;
   border-radius: 100% 0 0 0;
   border: 1px solid #000;
-  /* animation: pull 3s ease-in-out infinite; */
+  /* animation: pull 3s ease-in-out infinite */
 }
 .slice {
   background-color: var(--slice-color);

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { NavLink, useHistory, withRouter } from 'react-router-dom';
 import Button from '../../components/UI/Buttons/Button';
@@ -25,16 +26,13 @@ const Guest = (props) => {
     })
       .then((user) => {
         if (user) {
-          if (guestEmail && guestEmail) {
-            history.push(HOME_PATH);
-            dispatch(uiActions.setBackdrop(false));
-          }
-        } else {
-          console.error('Guest SignUp unsuccessfull ' + e);
+          history.push(HOME_PATH);
+          dispatch(uiActions.setBackdrop(false));
         }
       })
       .catch((error) => {
-        console.log('Error while Logging in guest user ' + error.message);
+        const msg = error.response?.data?.error || 'Guest sign-in failed. Try again.';
+        toast.error(msg);
       });
   };
 

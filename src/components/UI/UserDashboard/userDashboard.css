@@ -3,7 +3,10 @@
   position: fixed;
   justify-content: space-evenly;
   align-items: stretch;
-  background-color: var(--slice-color);
+  background: rgba(10, 9, 8, 0.93);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   width: 88%;
   max-width: 1000px;
   min-width: 320px;
@@ -15,6 +18,7 @@
   border-radius: 20px;
   z-index: 100;
   overflow: hidden;
+  animation: formFadeIn 0.22s ease-out;
 }
 
 @media screen and (max-width: 700px) {
