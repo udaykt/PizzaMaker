@@ -59,7 +59,7 @@ class OrderServiceTest {
             return o;
         });
 
-        OrderResponse resp = orderService.placeOrder("bob@example.com", testOrderRequest());
+        OrderResponse resp = orderService.placeOrder("bob@example.com", testOrderRequest(), null);
 
         assertThat(resp.pizzaSize()).isEqualTo(PizzaSize.M);
         assertThat(resp.status()).isEqualTo(OrderStatus.PENDING);
@@ -70,7 +70,7 @@ class OrderServiceTest {
     void placeOrder_userNotFound_throws() {
         when(userRepository.findByEmailId("nobody@example.com")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderService.placeOrder("nobody@example.com", testOrderRequest()))
+        assertThatThrownBy(() -> orderService.placeOrder("nobody@example.com", testOrderRequest(), null))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
