@@ -7,15 +7,19 @@
   left: 1%;
   width: 38%;
   height: 90%;
-  border-radius: 10px;
-  background: rgba(10, 8, 7, 0.7);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  background: rgba(12, 10, 9, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid var(--glass-border-subtle);
   z-index: 100;
 }
 
 .dashBoardLogo {
-  font-size: 0.8rem;
-  font-family: monospace;
+  font-size: 0.72rem;
+  font-family: var(--font);
+  font-weight: 600;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
 }
