@@ -3,7 +3,7 @@ package com.pizzamaker.service;
 import com.pizzamaker.dto.request.OrderRequest;
 import com.pizzamaker.dto.request.UpdateStatusRequest;
 import com.pizzamaker.dto.response.OrderResponse;
-import com.pizzamaker.dto.response.OrderStatusUpdate;
+import com.pizzamaker.dto.response.OrderStatusUpdateResponse;
 import com.pizzamaker.dto.response.PageResponse;
 import com.pizzamaker.entity.Order;
 import com.pizzamaker.entity.User;
@@ -107,7 +107,7 @@ public class OrderService {
         // Broadcast real-time status update to all subscribers on /topic/orders
         messagingTemplate.convertAndSend(
                 "/topic/orders",
-                new OrderStatusUpdate(saved.getOid(), saved.getUser().getUid(), saved.getStatus())
+                new OrderStatusUpdateResponse(saved.getOid(), saved.getUser().getUid(), saved.getStatus())
         );
 
         return OrderMapper.toResponse(saved);
