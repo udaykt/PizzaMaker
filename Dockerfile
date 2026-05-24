@@ -1,8 +1,8 @@
 # Stage 1 — build the Vite SPA
 FROM node:20-alpine AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --silent
+COPY package*.json .npmrc ./
+RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
 
