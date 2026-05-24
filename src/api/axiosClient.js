@@ -1,6 +1,6 @@
-import axios from 'axios';
-import store from '../store';
-import { userActions } from '../store/userSlice';
+﻿import axios from 'axios';
+import store from '@/store';
+import { userActions } from '@/store/userSlice';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
@@ -15,7 +15,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auto-logout on 401 — clears both localStorage and Redux state
+// Auto-logout on 401 â€” clears both localStorage and Redux state
 api.interceptors.response.use(
   (res) => res,
   (err) => {
