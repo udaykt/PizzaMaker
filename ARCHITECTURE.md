@@ -1,4 +1,4 @@
-# PizzaMaker — Architecture, Flow & Usage Guide
+# PizzaMaker — Architecture & Flow Guide
 
 > Full-stack pizza ordering app: React 18 + Spring Boot 3 + PostgreSQL + WebSocket real-time tracking.
 
@@ -10,17 +10,14 @@
 3. [Auth Flow](#auth-flow)
 4. [Order Placement Flow](#order-placement-flow)
 5. [WebSocket Real-Time Flow](#websocket-real-time-flow)
-6. [Known Bugs & Issues](#known-bugs--issues)
-7. [Feature Inventory](#feature-inventory)
-8. [Project Structure](#project-structure)
-9. [First-Time Setup](#first-time-setup)
-10. [How to Run — All Environments](#how-to-run--all-environments)
-11. [Deployment Strategy (Branches)](#deployment-strategy-branches)
-12. [How to Use the App](#how-to-use-the-app)
-13. [API Reference](#api-reference)
-14. [Database Setup (Neon)](#database-setup-neon)
-15. [Environment Variables](#environment-variables)
-16. [Commit History](#commit-history)
+6. [Feature Inventory](#feature-inventory)
+7. [Project Structure](#project-structure)
+8. [First-Time Setup](#first-time-setup)
+9. [How to Run — All Environments](#how-to-run--all-environments)
+10. [Deployment Strategy (Branches)](#deployment-strategy-branches)
+11. [API Reference](#api-reference)
+12. [Database Setup (Neon)](#database-setup-neon)
+13. [Environment Variables](#environment-variables)
 
 ---
 
@@ -148,7 +145,7 @@ Controller receives @AuthenticationPrincipal UserDetails
 
 ─── Token expiry / 401 ─────────────────────────────────────────────
 Axios response interceptor catches 401
-Clears localStorage → window.location.href = '/login'
+Clears localStorage + resets Redux store → window.location.replace('/login')
 ```
 
 ---
@@ -181,7 +178,7 @@ buildOrderPayload(orderState) maps Redux → OrderRequest:
     sausage, sausageMedium,
     peppers, peppersMedium,
     olives, olivesMedium,
-    pizzaSize: <from Redux state> }   ← ⚠ BUG: currently hardcoded "M"
+    pizzaSize: <from Redux state> }
          │
          ▼
 POST /api/v1/orders  (Bearer token attached by interceptor)
@@ -250,50 +247,9 @@ Admin Panel: PUT /api/v1/orders/{oid}/status  { status: "PREPARING" }
          ))
                     │
                     ▼
-         Status badge updates: PENDING → 👨‍🍳 PREPARING  (no refresh)
-         toast: "👨‍🍳 Order #abc123… is now PREPARING"
+         Status badge updates: PENDING → PREPARING  (no refresh)
+         toast: "Order #abc123… is now PREPARING"
 ```
-
----
-
-## Known Bugs & Issues
-
-### CRITICAL — Fix before users hit these
-
-| # | Bug | File | Impact |
-|---|-----|------|--------|
-| 1 | **Pizza size hardcoded to `"M"`** — `pizzaSize: 'M'` in `buildOrderPayload()` ignores the user's R/L selection entirely | `src/containers/Firebase/Firebase.js` | Every order is size Medium regardless of what was picked; price shown is wrong |
-| 2 | **Hardcoded secrets in docker-compose.yml** — `POSTGRES_PASSWORD` and `JWT_SECRET` are committed in plaintext | `docker-compose.yml` | Secret exposure if repo is public |
-| 3 | **WebSocket CORS hardcoded** — `WebSocketConfig.java` hardcodes `localhost:3000` and `*.pages.dev`; any new deploy domain breaks WebSocket | `backend/.../config/WebSocketConfig.java` | Real-time updates fail on new deployments |
-
-### HIGH — Visible production bugs
-
-| # | Bug | File | Impact |
-|---|-----|------|--------|
-| 4 | **Admin Customer column always shows `—`** — `OrderMapper.toResponse()` never populates `userEmail`, but `AdminPanel.js` reads `order.userEmail` | `OrderMapper.java`, `AdminPanel.js` | Admin can't see which customer placed which order |
-| 5 | **CORS `allowedHeaders: "*"`** too permissive | `SecurityConfig.java` | Security exposure; should be `["Content-Type", "Authorization"]` |
-| 6 | **Admin seeder logs plaintext credentials** on every startup | `DataSeeder.java` | Credentials visible in Render's log dashboard |
-| 7 | **`window.location.href` on 401 doesn't clear Redux state** — stale user data can leak to next session | `src/api/axiosClient.js` | Dirty state after session expiry |
-
-### MEDIUM — Silent failures or bad UX
-
-| # | Issue | File |
-|---|-------|------|
-| 8 | Redux `serializableCheck: false` disables crash protection and breaks DevTools time-travel | `src/store/index.js` |
-| 9 | WebSocket parse errors silently swallowed with `catch (_) {}` | `src/hooks/useOrderUpdates.js` |
-| 10 | No rate limiting on `/api/v1/auth/*` — brute-force logins are unchecked | `SecurityConfig.java` |
-| 11 | Admin orders list capped at 50, no pagination UI | `AdminPanel.js` |
-| 12 | Price calculator silently defaults to M size if none selected | `PizzaHub.js` |
-
-### LOW — Nice to fix
-
-| # | Issue |
-|---|-------|
-| 13 | JWT stored in `localStorage` (XSS risk); httpOnly cookies would be safer |
-| 14 | No HTTPS enforcement in prod Spring profile |
-| 15 | Email regex accepts `foo@bar.c` (no TLD length check) |
-| 16 | No idempotency key on order placement — double-submit creates duplicate orders |
-| 17 | Material-UI v4 is unmaintained; upgrade to MUI v5 |
 
 ---
 
@@ -306,7 +262,7 @@ Admin Panel: PUT /api/v1/orders/{oid}/status  { status: "PREPARING" }
 | JWT filter (stateless) | `JwtAuthenticationFilter` |
 | Order CRUD (paginated) | `OrderService`, `OrderController`, `OrderRepository` |
 | Admin-only endpoints | `SecurityConfig` (`hasRole("ADMIN")`) |
-| Admin seed on startup | `DataSeeder` (admin@pizzamaker.com / admin123) |
+| Admin seed on startup | `DataSeeder` (creates admin on first boot) |
 | Async notification | `NotificationService` (`@Async`) |
 | Menu/pricing API | `MenuService`, `MenuController` |
 | User profile API | `UserController` |
@@ -350,25 +306,25 @@ PizzaMaker/
 │       ├── java/com/pizzamaker/
 │       │   ├── config/
 │       │   │   ├── AsyncConfig.java
-│       │   │   ├── DataSeeder.java   ← seeds admin user on startup
+│       │   │   ├── DataSeeder.java
 │       │   │   ├── OpenApiConfig.java
-│       │   │   ├── SecurityConfig.java   ← JWT + CORS + role rules
-│       │   │   └── WebSocketConfig.java  ← STOMP broker (⚠ hardcoded CORS)
+│       │   │   ├── SecurityConfig.java
+│       │   │   └── WebSocketConfig.java
 │       │   ├── controller/
 │       │   │   ├── AuthController.java
 │       │   │   ├── MenuController.java
 │       │   │   ├── OrderController.java
 │       │   │   └── UserController.java
 │       │   ├── dto/
-│       │   │   ├── request/          ← LoginRequest, RegisterRequest, OrderRequest …
-│       │   │   └── response/         ← AuthResponse, OrderResponse, OrderStatusUpdate …
+│       │   │   ├── request/
+│       │   │   └── response/
 │       │   ├── entity/
 │       │   │   ├── Order.java
 │       │   │   ├── OrderStatus.java  ← PENDING→CONFIRMED→PREPARING→READY→DELIVERED
 │       │   │   ├── User.java
 │       │   │   └── UserType.java     ← STANDARD | GUEST | ADMIN
 │       │   ├── mapper/
-│       │   │   ├── OrderMapper.java  ← ⚠ missing userEmail field
+│       │   │   ├── OrderMapper.java
 │       │   │   └── UserMapper.java
 │       │   ├── repository/
 │       │   │   ├── OrderRepository.java
@@ -390,35 +346,35 @@ PizzaMaker/
 │               └── V2__create_orders_table.sql
 │
 ├── src/                              ← React 18 frontend
-│   ├── api/axiosClient.js            ← Axios + JWT interceptor (⚠ dirty logout)
+│   ├── api/axiosClient.js
 │   ├── hooks/useOrderUpdates.js      ← STOMP WebSocket hook
 │   ├── store/                        ← Redux Toolkit slices
-│   │   ├── index.js                  ← ⚠ serializableCheck disabled
-│   │   ├── menuSlice.js              ← pricing state
+│   │   ├── index.js
+│   │   ├── menuSlice.js
 │   │   ├── orderSlice.js
-│   │   ├── pizzahubSlice.js          ← pizza customisation state
+│   │   ├── pizzahubSlice.js
 │   │   ├── uiSlice.js
 │   │   └── userSlice.js
 │   ├── containers/
-│   │   ├── Admin/AdminPanel.js       ← admin dashboard (⚠ userEmail always '—')
+│   │   ├── Admin/AdminPanel.js
 │   │   ├── Checkout/Checkout.js
 │   │   ├── Firebase/
-│   │   │   ├── Auth.js              ← login/signup/guest/logout
-│   │   │   └── Firebase.js          ← ⚠ pizzaSize hardcoded 'M' in buildOrderPayload
+│   │   │   ├── Auth.js
+│   │   │   └── Firebase.js
 │   │   ├── LoginPage/LoginPage.js
-│   │   ├── Orders/Orders.js          ← live WebSocket updates
-│   │   ├── PizzaHub/PizzaHub.js      ← live price calculator
+│   │   ├── Orders/Orders.js
+│   │   ├── PizzaHub/PizzaHub.js
 │   │   ├── Profile/Profile.js
 │   │   └── SignUp/SignUp.js
 │   └── components/UI/
-│       ├── Modal/Modal.js            ← receipt confirmation
-│       ├── DashboardMenu/            ← admin link for ADMIN users
-│       └── UserDashboard/            ← routes all dashboard pages
+│       ├── Modal/Modal.js
+│       ├── DashboardMenu/
+│       └── UserDashboard/
 │
-├── ARCHITECTURE.md                   ← this file
-├── docker-compose.yml                ← ⚠ hardcoded secrets — use .env instead
+├── ARCHITECTURE.md
+├── docker-compose.yml
 ├── .env.example                      ← template — copy to .env and fill in values
-├── .npmrc                            ← legacy-peer-deps=true
+├── .npmrc
 ├── package.json
 └── README.md
 ```
@@ -432,7 +388,6 @@ PizzaMaker/
 | Tool | Version | How to check |
 |------|---------|--------------|
 | Java (Temurin) | 21 | `java -version` |
-| Maven | 3.9+ | `mvn -version` |
 | Node.js | 18+ | `node -v` |
 | npm | 8+ | `npm -v` |
 
@@ -448,26 +403,26 @@ This file is gitignored. For local dev with H2 this one line is all you need.
 
 ### Step 2 — Install frontend dependencies
 
-```powershell
-cd C:\Projects\PizzaMaker
+```bash
 npm install
 ```
 
 If this fails with peer-dep errors, run:
-```powershell
+```bash
 npm install --legacy-peer-deps
 ```
 
 ### Step 3 — Start the backend
 
-```powershell
-cd C:\Projects\PizzaMaker\backend
-C:\tools\apache-maven-3.9.9\bin\mvn.cmd spring-boot:run
+```bash
+cd backend
+./mvnw spring-boot:run       # macOS/Linux
+.\mvnw.cmd spring-boot:run   # Windows
 ```
 
 Wait for `Started PizzaMakerApplication`. On first boot:
 - Flyway runs V1 + V2 migrations
-- `DataSeeder` creates: `admin@pizzamaker.com` / `admin123` (ROLE_ADMIN)
+- `DataSeeder` creates the initial admin user (ROLE_ADMIN)
 
 Verify:
 ```
@@ -482,22 +437,21 @@ H2 console connection:
 
 ### Step 4 — Start the frontend
 
-```powershell
-cd C:\Projects\PizzaMaker
+```bash
 npm start
 ```
 
-Opens `http://localhost:3000`. The `cross-env NODE_OPTIONS=--openssl-legacy-provider` is baked into `package.json` — do not set it manually.
+Opens `http://localhost:3000`. The `cross-env NODE_OPTIONS=--openssl-legacy-provider` is baked into `package.json`.
 
 ### Common first-run problems
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Backend fails: "DDL mismatch" or Flyway checksum error | Stale `target/` folder from a previous run | Delete `backend/target` and rerun |
+| Backend fails: "DDL mismatch" or Flyway checksum error | Stale `target/` folder | Delete `backend/target` and rerun |
 | `npm install` peer dep errors | MUI v4 / React 18 version mismatch | Run `npm install --legacy-peer-deps` |
 | Frontend shows "Network Error" on login | Backend not running, or wrong API URL | Check `.env`, confirm backend is on `:8080` |
-| WebSocket "Live" dot grey/red | CORS mismatch | On localhost this should work; on deployed URLs see Bug #3 above |
-| H2 console: table not found | Wrong JDBC URL | Use exactly `jdbc:h2:mem:pizzadb` — it's in-memory and tied to the app's process |
+| WebSocket "Live" dot grey/red | CORS mismatch | Verify `ALLOWED_ORIGINS` env var matches the frontend URL |
+| H2 console: table not found | Wrong JDBC URL | Use exactly `jdbc:h2:mem:pizzadb` |
 | Render free tier: first request hangs ~30s | Backend spun down after 15 min idle | Wait for cold start; subsequent requests are fast |
 
 ---
@@ -506,54 +460,60 @@ Opens `http://localhost:3000`. The `cross-env NODE_OPTIONS=--openssl-legacy-prov
 
 ### Local Dev — H2 (default, no cloud DB)
 
-```powershell
+```bash
 # Terminal 1 — backend
-cd C:\Projects\PizzaMaker\backend
-C:\tools\apache-maven-3.9.9\bin\mvn.cmd spring-boot:run
+cd backend
+./mvnw spring-boot:run       # macOS/Linux
+.\mvnw.cmd spring-boot:run   # Windows
 
 # Terminal 2 — frontend
-cd C:\Projects\PizzaMaker
 npm start
 ```
 
-H2 data resets on every backend restart. No env vars required beyond `.env`.
+H2 data resets on every backend restart.
 
 ---
 
 ### Local Dev — Neon PostgreSQL (persistent data)
 
+Set env vars before starting the backend:
+
+```bash
+# macOS/Linux
+export SPRING_PROFILES_ACTIVE=prod
+export DATABASE_URL=jdbc:postgresql://ep-xxx.neon.tech/neondb?sslmode=require
+export DATABASE_USERNAME=your-neon-user
+export DATABASE_PASSWORD=your-neon-password
+export JWT_SECRET=your-base64-256bit-secret
+export ALLOWED_ORIGINS=http://localhost:3000
+```
+
 ```powershell
-# Set env vars in PowerShell session before starting backend
+# Windows PowerShell
 $env:SPRING_PROFILES_ACTIVE = "prod"
 $env:DATABASE_URL           = "jdbc:postgresql://ep-xxx.neon.tech/neondb?sslmode=require"
 $env:DATABASE_USERNAME      = "your-neon-user"
 $env:DATABASE_PASSWORD      = "your-neon-password"
 $env:JWT_SECRET             = "your-base64-256bit-secret"
-$env:JWT_EXPIRATION_MS      = "86400000"
 $env:ALLOWED_ORIGINS        = "http://localhost:3000"
-
-cd C:\Projects\PizzaMaker\backend
-C:\tools\apache-maven-3.9.9\bin\mvn.cmd spring-boot:run
 ```
 
-Frontend is unchanged — `npm start` as normal. Flyway migrations run once on first boot, then skip.
+Then start the backend as normal. Frontend is unchanged — `npm start`.
 
 ---
 
 ### Docker (local PostgreSQL, no cloud needed)
 
-Fix `docker-compose.yml` secrets before using it — move hardcoded values to a `.env` file at project root:
+Create a `.env` file at project root (gitignored):
 
 ```
-# .env (gitignored)
 POSTGRES_PASSWORD=yourpassword
 JWT_SECRET=yourbase64secret
 ALLOWED_ORIGINS=http://localhost:3000
 ```
 
 Then:
-```powershell
-cd C:\Projects\PizzaMaker
+```bash
 docker-compose up --build
 ```
 
@@ -573,7 +533,7 @@ Set these in Render → Service → Environment:
 | `DATABASE_URL` | Neon JDBC URL (`jdbc:postgresql://...`) |
 | `DATABASE_USERNAME` | Neon username |
 | `DATABASE_PASSWORD` | Neon password |
-| `JWT_SECRET` | base64-encoded 256-bit secret (generate with `openssl rand -base64 32`) |
+| `JWT_SECRET` | base64-encoded 256-bit secret (`openssl rand -base64 32`) |
 | `JWT_EXPIRATION_MS` | `86400000` |
 | `ALLOWED_ORIGINS` | `https://your-app.pages.dev,https://your-custom-domain.com` |
 
@@ -584,22 +544,20 @@ Build settings:
 - Output directory: `build`
 - Node version: 18
 
-Environment variable (Settings → Environment Variables):
+Environment variable:
 
 | Key | Value |
 |-----|-------|
 | `REACT_APP_API_URL` | `https://your-render-service.onrender.com` |
 
-**Important notes for production:**
-- Render free tier spins down after 15 minutes of inactivity — first request after idle takes ~30 seconds cold start. WebSocket disconnects during spin-down and reconnects automatically (5s delay configured in `useOrderUpdates.js`).
-- `ALLOWED_ORIGINS` must include every domain the frontend is served from, or CORS will block all API calls.
-- WebSocket CORS (Bug #3) is currently hardcoded — until fixed, add your exact Pages domain to `WebSocketConfig.java` if it's not `*.pages.dev`.
+**Notes:**
+- Render free tier spins down after 15 minutes idle — first request takes ~30s cold start.
+- `ALLOWED_ORIGINS` must include every domain the frontend is served from.
+- WebSocket CORS is driven by the same `ALLOWED_ORIGINS` env var.
 
 ---
 
 ## Deployment Strategy (Branches)
-
-**Branch model to avoid uncontrolled production deployments:**
 
 ```
 master          ← production only — Pages + Render auto-deploy from here
@@ -615,88 +573,9 @@ master          ← production only — Pages + Render auto-deploy from here
 5. Review the diff carefully, then merge — triggers one deliberate production deploy
 6. **Never push directly to `master`**
 
-**Cloudflare Pages setup:**
-- Production branch: `master`
-- Preview branch: `develop` (gets its own `xxx.pages.dev` subdomain for QA before promoting)
+**Cloudflare Pages:** production branch `master`, preview branch `develop`.
 
-**Render setup:**
-- Auto-Deploy: enabled, branch: `master` only
-- For manual control: disable auto-deploy and trigger from the Render dashboard after reviewing
-
-This gives you: `feature → develop (preview/test) → manual promote to master (production)`.
-
----
-
-## How to Use the App
-
-### As a New Customer
-
-**1. Sign Up**
-- Click **Sign Up** (top right)
-- Enter your name, email, password (min 6 chars)
-- Inline errors appear if any field fails validation
-- On success: toast "Account created! Welcome, {name}!" and redirected home
-
-**2. Build Your Pizza**
-- **Crust Size** (bottom left): choose Regular / Medium / Large
-- **Base Topping** (bottom left): toggle Sauce, Mozzarella, Cheese
-- **Toppings** (right panel): toggle Pepperoni / Sausage / Peppers / Olives
-  - Choose **regular** or **medium** portion per topping
-  - Topping cards highlight with a pop animation when selected
-- **Estimated Total** (top left, below welcome): updates live as you customise
-
-**3. Place Your Order**
-- Click **Order** button (centre bottom)
-  - Button is disabled if nothing is selected or you are not logged in
-- Checkout page shows: pizza preview + ingredient summary
-- Click **Order** on checkout → receipt modal appears:
-  ```
-  ✓ Order Placed!
-  Order ID  #abc-123-...
-  Size      M         ← ⚠ currently always M due to Bug #1
-  Toppings  Pepperoni, Peppers
-  Status    🕐 PENDING
-  ```
-- Choose **View Orders** or **Back to Menu**
-
-**4. Track Your Order (Live)**
-- Go to **Dashboard → Orders**
-- Green pulsing **Live** dot in the header = WebSocket connected
-- When admin updates your order status, the badge changes instantly:
-  ```
-  🕐 PENDING  →  ✅ CONFIRMED  →  👨‍🍳 PREPARING  →  📦 READY  →  🎉 DELIVERED
-  ```
-- A toast notification fires each time status changes
-
----
-
-### As a Guest
-
-- Click **Continue as Guest?** on the Login/Signup page
-- Enter a name and email (no password required)
-- You get a guest JWT token and can place orders just like a full user
-- `userType` is shown as **Guest** (orange badge) on profile
-
----
-
-### As an Admin
-
-**Credentials:** `admin@pizzamaker.com` / `admin123`
-
-**1.** Log in with admin credentials
-**2.** Dashboard shows an extra **⚙ Admin** link in the sidebar
-**3.** Admin Panel shows all orders across all users:
-
-| Column | Description |
-|--------|-------------|
-| Order ID | Short UUID |
-| Customer | Email — ⚠ currently always `—` due to Bug #4 |
-| Size | R / M / L |
-| Placed | Timestamp |
-| Status | Coloured badge |
-| Update | Dropdown to change status |
-
-**4.** Change status via the dropdown — saves instantly, customer's browser updates live via WebSocket
+**Render:** auto-deploy on `master` only.
 
 ---
 
@@ -752,7 +631,7 @@ This gives you: `feature → develop (preview/test) → manual promote to master
    ```
    jdbc:postgresql://ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
    ```
-4. Set environment variables (Render dashboard or local shell) with `prod` profile active
+4. Set environment variables with `SPRING_PROFILES_ACTIVE=prod`
 5. Flyway runs V1 + V2 migrations automatically on first boot
 
 ---
@@ -768,30 +647,17 @@ This gives you: `feature → develop (preview/test) → manual promote to master
 | `JWT_SECRET` | hardcoded dev key | Base64-encoded HMAC secret (min 32 bytes) — generate: `openssl rand -base64 32` |
 | `JWT_EXPIRATION_MS` | `86400000` | Token lifetime (24 hours) |
 | `SPRING_PROFILES_ACTIVE` | default | Set to `prod` for PostgreSQL |
-| `ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated allowed origins for CORS |
+| `ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated allowed origins for CORS and WebSocket |
 
 ### Frontend
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `REACT_APP_API_URL` | `http://localhost:8080` | Backend base URL — must be set in Cloudflare Pages environment for production builds |
+| `REACT_APP_API_URL` | `http://localhost:8080` | Backend base URL |
 
 Set in a `.env` file at project root (gitignored):
 ```
 REACT_APP_API_URL=http://localhost:8080
 ```
-
----
-
-## Commit History
-
-| Commit | Description |
-|--------|-------------|
-| `dc0086f` | Real-time order tracking via WebSocket (STOMP + SockJS) |
-| `7172c6c` | Upgrade to React 18 with createRoot API |
-| `0a95269` | UI enhancements — toasts, price calc, orders, admin panel, animations |
-| `b573aff` | Fix npm start — cross-env for OpenSSL compatibility |
-| `ecc3062` | Wire React frontend to Spring Boot (Firebase → Axios) |
-| `c32047a` | Add production-grade Spring Boot backend (45+ files) |
 
 ---
 

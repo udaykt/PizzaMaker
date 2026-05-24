@@ -18,7 +18,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +32,18 @@ public class OrderService {
     private final NotificationService notificationService;
     private final SimpMessagingTemplate messagingTemplate;
 
+    private record CachedOrder(OrderResponse response, Instant expiresAt) {}
+    private static final Duration IDEMPOTENCY_TTL = Duration.ofHours(24);
+    private final ConcurrentHashMap<String, CachedOrder> idempotencyCache = new ConcurrentHashMap<>();
+
     @Transactional
-    public OrderResponse placeOrder(String email, OrderRequest request) {
+    public OrderResponse placeOrder(String email, OrderRequest request, String idempotencyKey) {
+        if (idempotencyKey != null) {
+            CachedOrder cached = idempotencyCache.get(idempotencyKey);
+            if (cached != null && Instant.now().isBefore(cached.expiresAt())) {
+                return cached.response();
+            }
+        }
         User user = userRepository.findByEmailId(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
@@ -53,7 +66,11 @@ public class OrderService {
 
         Order saved = orderRepository.save(order);
         notificationService.sendOrderConfirmation(email, saved.getOid());
-        return OrderMapper.toResponse(saved);
+        OrderResponse response = OrderMapper.toResponse(saved);
+        if (idempotencyKey != null) {
+            idempotencyCache.put(idempotencyKey, new CachedOrder(response, Instant.now().plus(IDEMPOTENCY_TTL)));
+        }
+        return response;
     }
 
     @Transactional(readOnly = true)
