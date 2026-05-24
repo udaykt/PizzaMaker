@@ -1,6 +1,6 @@
 # PizzaMaker
 
-Full-stack pizza ordering app — React + Firebase frontend, production-grade Spring Boot REST backend.
+Full-stack pizza ordering app — React + Vite frontend, Spring Boot REST backend.
 
 ---
 
@@ -9,7 +9,7 @@ Full-stack pizza ordering app — React + Firebase frontend, production-grade Sp
 ```
 Browser
   │
-  └── React UI (Redux Toolkit · Material-UI · Firebase Auth)
+  └── React 18 (Redux Toolkit · Vite · react-hot-toast)
         │
         ▼  HTTP / REST
   ┌─────────────────────────────────────────────────────┐
@@ -41,7 +41,9 @@ Browser
 
 | Layer | Technology |
 |---|---|
-| Language | Java 21 |
+| Frontend | React 18 + Redux Toolkit + React Router v5 |
+| Build tool | Vite 5 |
+| Language (backend) | Java 21 |
 | Framework | Spring Boot 3.3.5 |
 | Security | Spring Security 6 + JWT (jjwt 0.12.3) |
 | Persistence | Spring Data JPA + Hibernate |
@@ -54,39 +56,72 @@ Browser
 | Build | Maven + Maven Wrapper |
 | Tests | JUnit 5 + Mockito + MockMvc |
 | CI | GitHub Actions |
-| Containers | Docker + Docker Compose |
+| Containers | Docker |
+
+---
+
+## Prerequisites
+
+- **Java 21** — [Eclipse Temurin](https://adoptium.net/) recommended
+- **Node.js 18+** — [nodejs.org](https://nodejs.org/)
+- Maven is bundled via the wrapper (`mvnw.cmd`) — no install needed
 
 ---
 
 ## How to Run Locally
 
-### Option 1 — Dev mode (H2, no Docker)
+### 1. Clone and set up env
 
 ```bash
-cd backend
-./mvnw spring-boot:run          # Windows: .\mvnw.cmd spring-boot:run
+git clone https://github.com/udaykt/PizzaMaker.git
+cd PizzaMaker
+cp .env.example .env          # already pre-filled for local dev
 ```
 
+### 2. Start the backend (Spring Boot + H2)
+
+Open a terminal in the `backend/` folder:
+
+```bash
+# Windows
+cd backend
+mvnw.cmd spring-boot:run
+
+# macOS / Linux
+cd backend
+./mvnw spring-boot:run
+```
+
+Wait for the line:
+```
+Started PizzaMakerApplication in X seconds
+```
+
+Available at:
 - API: http://localhost:8080
 - Swagger UI: http://localhost:8080/swagger-ui.html
 - H2 Console: http://localhost:8080/h2-console  (JDBC URL: `jdbc:h2:mem:pizzadb`)
-- Actuator: http://localhost:8080/actuator/health
+- Health: http://localhost:8080/actuator/health
 
-### Option 2 — Full stack with PostgreSQL (Docker Compose)
+### 3. Start the frontend (Vite dev server)
+
+Open a **second** terminal in the project root:
 
 ```bash
-# Build the jar first
-cd backend && ./mvnw package -DskipTests && cd ..
-
-# Start everything
-docker-compose up --build
+npm install
+npm run dev
 ```
 
-### Run tests
+App opens at **http://localhost:3000**
+
+---
+
+## Run tests
 
 ```bash
 cd backend
-./mvnw test
+mvnw.cmd test       # Windows
+./mvnw test         # macOS / Linux
 ```
 
 ---
