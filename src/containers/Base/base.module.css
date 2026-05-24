@@ -8,11 +8,13 @@
   grid-template-areas: 'crust pizzaSizeContainer base baseDiv';
   grid-template-columns: 1fr;
   grid-template-rows: 50px 100px 50px 1fr;
-  color: white;
-  border-radius: 20px;
+  color: var(--text);
+  border-radius: var(--radius-xl);
   user-select: none;
-  box-shadow: -15px -15px 15px rgba(255, 255, 255, 0.05),
-    15px 15px 15px rgba(0, 0, 0, 0.25);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
 }
 
 .baseDiv {
@@ -33,7 +35,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-muted);
 }
+
 .baseRoot h3 {
   grid-area: crust;
   grid-column: 1/1;
@@ -41,7 +50,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  font-family: var(--font);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-muted);
 }
+
 .pizzaSizeContainer {
   grid-area: pizzaSizeContainer;
   grid-column: 1/1;
@@ -62,8 +78,8 @@
   width: 80%;
   height: 50px;
   border-radius: 25px;
-  box-shadow: inset 10px 10px 15px rgba(255, 255, 255, 0.05),
-    inset -10px -10px 15px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border-subtle);
 }
 
 .sizeSlider input {
@@ -75,20 +91,21 @@
   appearance: none;
   outline: none;
   cursor: pointer;
-  font-size: medium;
-  font-weight: bold;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font);
   text-transform: capitalize;
+  color: var(--text-muted);
   border-radius: 25px;
-  transition: all 100ms linear;
+  transition: all 0.18s ease;
 }
 
 .sizeSlider input:checked {
-  background-image: linear-gradient(
-    180deg,
-    var(--slice-color),
-    var(--sauce-color)
-  );
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 107, 0, 0.45);
 }
+
 .sizeSlider input:before {
   content: attr(label);
   display: inline-block;
@@ -97,20 +114,29 @@
 }
 
 .sizeSlider input:hover {
-  color: orange;
+  color: var(--accent);
 }
+
 .base {
   width: 25%;
   height: 75%;
   display: flex;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   justify-content: space-evenly;
-  font-weight: bold;
+  font-weight: 600;
+  font-family: var(--font);
+  font-size: 0.8rem;
   text-transform: capitalize;
   align-items: center;
-  box-shadow: -10px -10px 15px rgba(255, 255, 255, 0.05),
-    10px 10px 15px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border-subtle);
+  transition: border-color 0.18s ease, background 0.18s ease;
   cursor: pointer;
+}
+
+.base:hover {
+  border-color: rgba(255, 107, 0, 0.3);
+  background: rgba(255, 107, 0, 0.06);
 }
 
 .base label {
@@ -136,12 +162,10 @@
 }
 
 .base label input:checked + span {
-  border-radius: 10px;
-  box-shadow: 10px 10px 15px rgba(255, 255, 255, 0.05),
-    -10px -10px 15px rgba(0, 0, 0, 0.25),
-    inset -15px -15px 15px rgba(255, 255, 255, 0.05),
-    inset 15px 15px 15px rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
 }
+
 .base label input[name='sauce']:checked + span {
   color: var(--sauce-color);
 }

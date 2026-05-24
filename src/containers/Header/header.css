@@ -3,76 +3,86 @@
   grid-template-areas: 'menu logo loginButton';
   grid-template-columns: 1fr 1fr 1fr;
   justify-items: center;
-  align-content: space-between;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   align-items: center;
-  min-height: 10vh;
-  height: 80px;
-  z-index: 1;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  background-color: transparent;
-  box-shadow: 15px 15px 30px rgba(0, 0, 0, 0.25);
+  height: 72px;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(13, 12, 11, 0.7);
+  border-bottom: 1px solid rgba(255, 107, 0, 0.15);
   transition: height 0.2s ease;
 }
 
 .logo {
   position: fixed;
   grid-area: logo;
-  top: 20px;
+  top: 50%;
+  transform: translateY(-50%);
   white-space: nowrap;
-  filter: drop-shadow(2px 2px 2px black)
-    drop-shadow(2px 2px 2px var(--sauce-color));
 }
 
 .logo a {
   display: flex;
+  align-items: center;
   text-decoration: none;
+  gap: 8px;
 }
 
 .logo img {
-  height: 50px;
-  width: 50px;
-  margin-right: 8px;
+  height: 36px;
+  width: 36px;
+  filter: drop-shadow(0 0 8px rgba(255, 107, 0, 0.45));
 }
 
 .logo h1 {
-  color: #eda828;
-  font-weight: lighter;
-  text-shadow: 2px 2px 2px rgb(26, 26, 26);
-  font-family: lobster;
-  font-size: 2rem;
+  color: #ffffff;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.4rem;
+  letter-spacing: -0.5px;
+  font-family: var(--font);
 }
 
 .hamburgerMenu {
   display: block;
   position: fixed;
   grid-area: menu;
-  top: 20px;
-  left: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 24px;
 }
 
 .avatar {
   display: block;
   position: fixed;
   grid-area: loginButton;
-  top: 20px;
-  right: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 24px;
 }
 
 #avatar {
   display: inline-block;
-  height: 45px;
-  width: 45px;
+  height: 38px;
+  width: 38px;
   border-radius: 50%;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+#avatar:hover {
+  box-shadow: 0 0 22px rgba(255, 107, 0, 0.55);
 }
 
 .loginSignupDiv {
   display: flex;
-  gap: 20px;
+  gap: 10px;
 }
 
 @media screen and (max-width: 780px) {
@@ -80,22 +90,13 @@
     display: none;
   }
   .header {
-    height: 60px;
-  }
-  .logo {
-    top: 12px;
-  }
-  .hamburgerMenu {
-    top: 12px;
-  }
-  .avatar {
-    top: 12px;
+    height: 58px;
   }
   .logo h1 {
-    font-size: 1.4rem;
+    font-size: 1.15rem;
   }
   .logo img {
-    height: 38px;
-    width: 38px;
+    height: 28px;
+    width: 28px;
   }
 }

@@ -1,11 +1,40 @@
+:root {
+  --accent: #ff6b00;
+  --accent-dim: rgba(255, 107, 0, 0.18);
+  --accent-glow: rgba(255, 107, 0, 0.35);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-modal: rgba(14, 13, 12, 0.88);
+  --glass-border: rgba(255, 107, 0, 0.22);
+  --glass-border-subtle: rgba(255, 255, 255, 0.07);
+  --text: rgba(255, 255, 255, 0.92);
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --text-dim: rgba(255, 255, 255, 0.28);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --font: 'Inter', system-ui, sans-serif;
+
+  --sauce-color: red;
+  --cheese-color: #f7a100;
+  --pepper-color: #078407;
+  --sausage-color: #b0926d;
+  --pepperoni-color: #a94100;
+  --olives-color: #353535;
+  --mozzarella-color: #dedec9;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
   user-select: none;
-  background: radial-gradient(rgb(70, 64, 64), #111110);
+  background: radial-gradient(ellipse at top, #1c1410 0%, #0d0c0b 65%);
+  background-attachment: fixed;
   overscroll-behavior: none;
+  font-family: var(--font);
+  color: var(--text);
 }
 
 ::-webkit-scrollbar {
@@ -14,23 +43,11 @@ body {
   background: transparent;
 }
 
-:root {
-  --slice-color: #cca156;
-  --sauce-color: red;
-  --cheese-color: #f7a100;
-  --pepper-color: #078407;
-  --sausage-color: #b0926d;
-  --pineapple-color: #ffffa2;
-  --pepperoni-color: #a94100;
-  --olives-color: #353535;
-  --mozzarella-color: #dedec9;
-}
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Kanit', sans-serif;
+  font-family: var(--font);
 }
 
 .void {
@@ -41,6 +58,7 @@ body {
 
 @media screen and (max-width: 1300px) {
   body {
-    background: linear-gradient(90deg, #111110, rgb(70, 64, 64), #111110);
+    background: radial-gradient(ellipse at top, #1c1410 0%, #0d0c0b 70%);
+    background-attachment: fixed;
   }
 }
