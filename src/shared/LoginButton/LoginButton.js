@@ -3,7 +3,7 @@ import { useHistory, withRouter } from 'react-router-dom';
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH, LOGIN_PATH, SIGNUP_PATH } from '@/utils/routes';
 import Button from '@/shared/Button/Button';
-import './loginButton.css';
+import styles from './loginButton.module.css';
 
 const LoginButton = (props) => {
   const dispatch = useDispatch();
@@ -29,11 +29,11 @@ const LoginButton = (props) => {
   };
   const items = {
     login: {
-      buttonStyle: 'loginButton',
+      buttonStyle: styles.loginButton,
       handler: toggleLoginPageHandler,
     },
     signup: {
-      buttonStyle: 'signupButton',
+      buttonStyle: styles.signupButton,
       handler: toggleSignupPageHandler,
     },
   };

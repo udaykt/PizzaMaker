@@ -2,8 +2,8 @@
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import useOrderUpdates from '@/hooks/useOrderUpdates';
-import { fetchUserOrders } from '@/api/pizzaApi';
-import './orders.css';
+import { fetchUserOrders } from '@/api/appApi';
+import styles from './orders.module.css';
 
 const STATUS_COLORS = {
   PENDING:    { bg: '#fff3cd', color: '#856404' },
@@ -31,7 +31,7 @@ const formatIngredients = (ingredients) => {
 
 const Orders = () => {
   const reduxOrders = useSelector((state) => state.order.userOrders);
-  const currentUserUid = useSelector((state) => state.user.uid);
+  const currentUserUid = useSelector((state) => state.auth.uid);
 
   // Local copy so we can update status live without re-fetching
   const [orders, setOrders] = useState([]);
@@ -66,10 +66,10 @@ const Orders = () => {
 
   if (loading) {
     return (
-      <div className='orders'>
+      <div className={styles.orders}>
         <h1>My Orders</h1>
-        <div className='ordersLoading'>
-          <div className='spinner' />
+        <div className={styles.ordersLoading}>
+          <div className={styles.spinner} />
           <p>Loading your orders...</p>
         </div>
       </div>
@@ -77,47 +77,47 @@ const Orders = () => {
   }
 
   return (
-    <div className='orders'>
-      <div className='ordersHeader'>
+    <div className={styles.orders}>
+      <div className={styles.ordersHeader}>
         <h1>My Orders</h1>
-        <span className='liveIndicator'>
-          <span className='liveDot' />
+        <span className={styles.liveIndicator}>
+          <span className={styles.liveDot} />
           Live
         </span>
       </div>
       {orders.length === 0 ? (
-        <div className='ordersEmpty'>
-          <span className='ordersEmptyIcon'>ðŸ•</span>
+        <div className={styles.ordersEmpty}>
+          <span className={styles.ordersEmptyIcon}>ðŸ•</span>
           <p>No orders yet! Go make your first pizza.</p>
         </div>
       ) : (
-        <ul className='ordersList'>
+        <ul className={styles.ordersList}>
           {orders.map((order) => {
             const statusStyle = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
             const emoji = STATUS_EMOJI[order.status] || 'ðŸ•';
             return (
-              <li key={order.oid} className='orderCard'>
-                <div className='orderCardHeader'>
-                  <span className='orderOid'>#{order.oid}</span>
+              <li key={order.oid} className={styles.orderCard}>
+                <div className={styles.orderCardHeader}>
+                  <span className={styles.orderOid}>#{order.oid}</span>
                   <span
-                    className='orderStatus'
+                    className={styles.orderStatus}
                     style={{ background: statusStyle.bg, color: statusStyle.color }}
                   >
                     {emoji} {order.status}
                   </span>
                 </div>
-                <div className='orderCardBody'>
-                  <div className='orderDetail'>
-                    <span className='orderDetailLabel'>Size</span>
-                    <span className='orderDetailValue'>{order.pizzaSize || 'M'}</span>
+                <div className={styles.orderCardBody}>
+                  <div className={styles.orderDetail}>
+                    <span className={styles.orderDetailLabel}>Size</span>
+                    <span className={styles.orderDetailValue}>{order.pizzaSize || 'M'}</span>
                   </div>
-                  <div className='orderDetail'>
-                    <span className='orderDetailLabel'>Toppings</span>
-                    <span className='orderDetailValue'>{formatIngredients(order.ingredients)}</span>
+                  <div className={styles.orderDetail}>
+                    <span className={styles.orderDetailLabel}>Toppings</span>
+                    <span className={styles.orderDetailValue}>{formatIngredients(order.ingredients)}</span>
                   </div>
-                  <div className='orderDetail'>
-                    <span className='orderDetailLabel'>Placed</span>
-                    <span className='orderDetailValue'>
+                  <div className={styles.orderDetail}>
+                    <span className={styles.orderDetailLabel}>Placed</span>
+                    <span className={styles.orderDetailValue}>
                       {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'â€”'}
                     </span>
                   </div>

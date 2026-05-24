@@ -1,9 +1,9 @@
 ﻿import { useDispatch, useSelector } from 'react-redux';
-import { pizzahubActions } from '@/store/pizzahubSlice';
+import { pizzaHubActions } from '@/store/pizzaHubSlice';
 import styles from './toppingsMenu.module.css';
 
 const ToppingsMenu = (props) => {
-  const toppings = useSelector((state) => state.pizzahub.toppings);
+  const toppings = useSelector((state) => state.pizzaHub.toppings);
 
   const dispatch = useDispatch();
 
@@ -25,13 +25,13 @@ const ToppingsMenu = (props) => {
   const checkboxChangeHandler = (e, key) => {
     let topping = toppings[key];
     topping = { ...topping, checked: e.target.checked };
-    dispatch(pizzahubActions.toggleTopping(topping));
+    dispatch(pizzaHubActions.toggleTopping(topping));
   };
 
   const radioChangeHandler = (e, key) => {
     let topping = toppings[key];
     topping = { ...topping, medium: e.target.value };
-    dispatch(pizzahubActions.toggleToppingQuantity(topping));
+    dispatch(pizzaHubActions.toggleToppingQuantity(topping));
   };
 
   return (

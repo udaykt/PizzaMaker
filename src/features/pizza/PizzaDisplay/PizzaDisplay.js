@@ -10,7 +10,7 @@ const MEDIUM = '12';
 const LARGE = '5';
 
 const Pizza = (props) => {
-  const userState = useSelector((state) => state.user);
+  const userState = useSelector((state) => state.auth);
   const size = useSelector((state) => state.pizza.size);
   const loggedIn = userState.loggedIn;
 

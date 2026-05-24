@@ -1,14 +1,14 @@
-import React from 'react';
+﻿import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { headerActions } from '@/store/headerSlice';
+import { navigationActions } from '@/store/navigationSlice';
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH } from '@/utils/routes';
 import Button from '@/shared/Button/Button';
-import './avatar.css';
+import styles from './avatar.module.css';
 
 const Avatar = (props) => {
-  const headerState = useSelector((state) => state.header);
+  const headerState = useSelector((state) => state.navigation);
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -18,12 +18,12 @@ const Avatar = (props) => {
         history.push(HOME_PATH);
         dispatch(uiActions.setBackdrop(false));
       }
-      dispatch(headerActions.toggleProfileMenu(false));
-    } else dispatch(headerActions.toggleProfileMenu(true));
+      dispatch(navigationActions.toggleProfileMenu(false));
+    } else dispatch(navigationActions.toggleProfileMenu(true));
   };
 
   return (
-    <Button className={'avatarIcon'} onClick={toggleAvatarButtonHandler}>
+    <Button className={styles.avatarIcon} onClick={toggleAvatarButtonHandler}>
       {props.children}
     </Button>
   );

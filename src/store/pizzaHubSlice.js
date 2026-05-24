@@ -1,7 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+﻿import { createSlice } from '@reduxjs/toolkit';
 
-const pizzahubSlice = createSlice({
-  name: 'pizzahub',
+const pizzaHubSlice = createSlice({
+  name: 'pizzaHub',
   initialState: {
     base: {
       sauce: {
@@ -59,7 +59,7 @@ const pizzahubSlice = createSlice({
   },
 });
 
-export const pizzahubActions = pizzahubSlice.actions;
+export const pizzaHubActions = pizzaHubSlice.actions;
 
 export const initialPizzaState = {
   base: {
@@ -100,4 +100,4 @@ export const initialPizzaState = {
   },
 };
 
-export default pizzahubSlice;
+export default pizzaHubSlice;

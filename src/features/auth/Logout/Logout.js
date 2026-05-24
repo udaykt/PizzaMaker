@@ -1,6 +1,6 @@
 ﻿import Button from '@/shared/Button/Button';
 import { logoutUser } from '@/api/authApi';
-import { buildUserDataInStore } from '@/features/auth/User/User';
+import { buildUserDataInStore } from '@/utils/userState';
 
 const Logout = (props) => {
   const signout = async () => {

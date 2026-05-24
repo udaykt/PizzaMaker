@@ -10,7 +10,7 @@ import {
 } from '@/utils/routes';
 import { uiActions } from '@/store/uiSlice';
 import { createGuest } from '@/api/authApi';
-import './guest.css';
+import styles from './guest.module.css';
 
 const Guest = (props) => {
   const [guestFirstName, setGuestFirstName] = useState('');
@@ -37,15 +37,15 @@ const Guest = (props) => {
   };
 
   return (
-    <div className={true ? 'guestPage' : 'hideGuestPage'}>
+    <div className={styles.guestPage}>
       <form onSubmit={registerGuest}>
         <div>
           <h1>Guest</h1>
         </div>
-        <div className='formInputTextDiv'>
-          <div className='labelInputDiv'>
+        <div className={styles.formInputTextDiv}>
+          <div className={styles.labelInputDiv}>
             <label htmlFor='firstName'>Name</label>
-            <div className={'inputField'}>
+            <div className={styles.inputField}>
               <input
                 id='name'
                 name='firstName'
@@ -57,9 +57,9 @@ const Guest = (props) => {
               />
             </div>
           </div>
-          <div className='labelInputDiv'>
+          <div className={styles.labelInputDiv}>
             <label htmlFor='email'> Email</label>
-            <div className={'inputField'}>
+            <div className={styles.inputField}>
               <input
                 id='email'
                 name='email'
@@ -71,17 +71,17 @@ const Guest = (props) => {
             </div>
           </div>
         </div>
-        <Button className={'loginSubmitButton'} type='submit'>
+        <Button className={styles.loginSubmitButton} type='submit'>
           Continue
         </Button>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <div className='formLink'>
+          <div className={styles.formLink}>
             <NavLink to={SIGNUP_PATH} style={{ textDecoration: 'none' }}>
               Create an account?
             </NavLink>
           </div>
           /
-          <div className='formLink'>
+          <div className={styles.formLink}>
             <NavLink to={LOGIN_PATH} style={{ textDecoration: 'none' }}>
               Login Instead?
             </NavLink>

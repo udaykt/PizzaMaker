@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const menuSlice = createSlice({
-  name: 'menu',
+const navSlice = createSlice({
+  name: 'nav',
   initialState: {
     showLoginPage: false,
     showMenuPage: false,
@@ -20,6 +20,6 @@ const menuSlice = createSlice({
   },
 });
 
-export const menuActions = menuSlice.actions;
+export const navActions = navSlice.actions;
 
-export default menuSlice;
+export default navSlice;

@@ -1,14 +1,14 @@
 ﻿import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { initialPizzaState } from '@/store/pizzahubSlice';
+import { initialPizzaState } from '@/store/pizzaHubSlice';
 import { pizzaActions } from '@/store/pizzaSlice';
 import { CHECKOUT_PATH } from '@/utils/routes';
 import Button from '@/shared/Button/Button';
 import styles from './orderButton.module.css';
 
 const OrderButton = (props) => {
-  const pizzahubState = useSelector((state) => state.pizzahub);
-  const loggedIn = useSelector((state) => state.user.loggedIn);
+  const pizzahubState = useSelector((state) => state.pizzaHub);
+  const loggedIn = useSelector((state) => state.auth.loggedIn);
   const baseState = pizzahubState.base;
   const toppingsState = pizzahubState.toppings;
   const orderState = { base: baseState, toppings: toppingsState };

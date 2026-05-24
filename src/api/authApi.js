@@ -1,15 +1,15 @@
 ﻿import toast from 'react-hot-toast';
 import api from '@/api/axiosClient';
 import store from '@/store';
-import { userActions } from '@/store/userSlice';
-import { buildUserDataInStore } from '@/features/auth/User/User';
+import { authActions } from '@/store/authSlice';
+import { buildUserDataInStore } from '@/utils/userState';
 
 const storedUser = localStorage.getItem('user');
 if (storedUser) {
   try {
     const userData = JSON.parse(storedUser);
     buildUserDataInStore(userData);
-    store.dispatch(userActions.setLoggedIn(true));
+    store.dispatch(authActions.setLoggedIn(true));
   } catch (_) {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
@@ -26,7 +26,7 @@ const loginUser = async (loginDetails) => {
   const userData = { uid: data.uid, firstName: data.firstName, emailId: loginEmail, userType: data.userType };
   localStorage.setItem('user', JSON.stringify(userData));
   buildUserDataInStore(userData);
-  store.dispatch(userActions.setLoggedIn(true));
+  store.dispatch(authActions.setLoggedIn(true));
   toast.success(`Welcome back, ${data.firstName}!`);
   return data;
 };
@@ -42,7 +42,7 @@ const createUser = async (userDetails) => {
   const userData = { uid: data.uid, firstName: data.firstName, emailId: registerEmail, userType: data.userType };
   localStorage.setItem('user', JSON.stringify(userData));
   buildUserDataInStore(userData);
-  store.dispatch(userActions.setLoggedIn(true));
+  store.dispatch(authActions.setLoggedIn(true));
   toast.success(`Account created! Welcome, ${data.firstName}!`);
   return data;
 };
@@ -57,7 +57,7 @@ const createGuest = async (guestDetails) => {
   const userData = { uid: data.uid, firstName: data.firstName, emailId: guestEmail, userType: data.userType };
   localStorage.setItem('user', JSON.stringify(userData));
   buildUserDataInStore(userData);
-  store.dispatch(userActions.setLoggedIn(true));
+  store.dispatch(authActions.setLoggedIn(true));
   toast.success(`Welcome, ${data.firstName}! Continuing as guest.`);
   return data;
 };
@@ -65,7 +65,7 @@ const createGuest = async (guestDetails) => {
 const logoutUser = async () => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  store.dispatch(userActions.setLoggedIn(false));
+  store.dispatch(authActions.setLoggedIn(false));
   buildUserDataInStore({ uid: '', firstName: '', emailId: '', userType: '' });
   toast.success('Logged out successfully.');
 };
