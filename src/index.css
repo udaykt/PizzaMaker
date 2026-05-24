@@ -15,7 +15,8 @@
   --radius-xl: 20px;
   --font: 'Inter', system-ui, sans-serif;
 
-  --sauce-color: red;
+  --slice-color: #c8883a;
+  --sauce-color: #c0392b;
   --cheese-color: #f7a100;
   --pepper-color: #078407;
   --sausage-color: #b0926d;

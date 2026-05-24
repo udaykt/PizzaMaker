@@ -3,8 +3,9 @@
   justify-content: center;
   align-items: center;
   position: fixed;
-  right: 0;
-  z-index: 100;
+  top: 72px;
+  right: 16px;
+  z-index: 200;
 }
 
 .hideProfileMenuDiv {
@@ -26,8 +27,11 @@
   width: 95%;
   height: 100%;
   user-select: none;
-  border-radius: 10px;
-  background-color: var(--slice-color);
+  border-radius: var(--radius-md);
+  background: var(--glass-modal);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .profileMenuButton {

@@ -67,19 +67,23 @@ const PizzaHub = (props) => {
 
   return (
     <div className={styles.pizzahub}>
-      <div className={styles.description}>
-        <strong>
-          <h1>Welcome {`${userName ? userName : 'User'}`}!,</h1>
-        </strong>
-        <p>Make your own pizza. Customize and Order.</p>
-        <div className={styles.priceTag}>
-          <span className={styles.priceLabel}>Estimated Total</span>
-          <span className={styles.priceValue}>${computePrice()}</span>
+      <div className={styles.descBase}>
+        <div className={styles.description}>
+          <strong>
+            <h1>Welcome {`${userName ? userName : 'User'}`}!,</h1>
+          </strong>
+          <p>Make your own pizza. Customize and Order.</p>
+          <div className={styles.priceTag}>
+            <span className={styles.priceLabel}>Estimated Total</span>
+            <span className={styles.priceValue}>${computePrice()}</span>
+          </div>
+        </div>
+        <div className={styles.baseWrapper}>
+          <Base />
         </div>
       </div>
-      <PizzaDisplay {...state} />
-      <div className={styles.base}>
-        <Base />
+      <div className={styles.pizzaDiv}>
+        <PizzaDisplay {...state} />
       </div>
       <div className={styles.toppingsMenu}>
         <ToppingsMenu {...state} />

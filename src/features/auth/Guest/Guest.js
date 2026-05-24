@@ -83,7 +83,7 @@ const Guest = (props) => {
             </div>
           </div>
         </div>
-        <Button className={styles.loginSubmitButton} type='submit'>
+        <Button className={styles.guestSubmitButton} type='submit'>
           Continue
         </Button>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>

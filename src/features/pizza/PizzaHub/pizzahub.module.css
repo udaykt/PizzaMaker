@@ -51,11 +51,11 @@
   font-size: larger;
 }
 
-.base {
+.baseWrapper {
   display: flex;
   justify-content: center;
   align-items: baseline;
-  grid-column: 1/1;
+  width: 100%;
 }
 
 .orderButton {

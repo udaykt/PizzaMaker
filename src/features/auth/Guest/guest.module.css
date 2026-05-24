@@ -1,3 +1,8 @@
+@keyframes formFadeIn {
+  from { opacity: 0; transform: translate(-50%, -46%); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
 .guestPage,
 .hideGuestPage {
   display: flex;
@@ -20,6 +25,9 @@
   transition: transform 0.5s ease, opacity 0.3s ease;
   z-index: 10;
   padding: 36px 0;
+}
+
+.guestPage {
   animation: formFadeIn 0.22s ease-out;
 }
 
@@ -47,6 +55,77 @@
   gap: 20px;
   width: 90%;
   user-select: none;
+}
+
+.formLink {
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-muted);
+}
+
+.formLink a {
+  color: inherit;
+  transition: color 0.15s ease;
+}
+
+.formLink a:hover {
+  color: var(--accent);
+}
+
+.formInputTextDiv {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  align-items: center;
+}
+
+.formInputTextDiv label {
+  font-family: var(--font);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: var(--text-muted);
+}
+
+.formInputTextDiv input {
+  width: 95%;
+  height: 40px;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--text);
+  caret-color: var(--accent);
+  margin-left: 12px;
+}
+
+.formInputTextDiv .labelInputDiv {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 90%;
+}
+
+.formInputTextDiv .inputField {
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.formInputTextDiv .inputField:focus-within {
+  border-color: rgba(255, 107, 0, 0.5);
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+.formInputTextDiv .inputField:hover {
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .guestSubmitButton {
