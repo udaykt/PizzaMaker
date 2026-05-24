@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 public record OrderResponse(
         String oid,
+        String userEmail,
         Ingredients ingredients,
         PizzaSize pizzaSize,
         OrderStatus status,

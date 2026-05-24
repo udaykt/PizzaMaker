@@ -165,3 +165,12 @@
 .base label input[name='cheese']:hover + span {
   color: var(--cheese-color);
 }
+
+@media screen and (max-width: 768px) {
+  .baseRoot {
+    width: 92vw;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+  }
+}

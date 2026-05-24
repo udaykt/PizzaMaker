@@ -8,12 +8,13 @@ import com.pizzamaker.entity.Role;
 import com.pizzamaker.entity.User;
 import com.pizzamaker.entity.UserType;
 import com.pizzamaker.exception.DuplicateResourceException;
-import com.pizzamaker.exception.ResourceNotFoundException;
+import com.pizzamaker.exception.InvalidCredentialsException;
 import com.pizzamaker.repository.UserRepository;
 import com.pizzamaker.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -25,9 +26,10 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmailId(request.emailId())) {
-            throw new DuplicateResourceException("Email already registered: " + request.emailId());
+            throw new DuplicateResourceException("Email already registered");
         }
         User user = User.builder()
                 .uid(UUID.randomUUID().toString())
@@ -44,17 +46,20 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmailId(request.emailId())
-                .orElseThrow(() -> new ResourceNotFoundException("Invalid credentials"));
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
-            throw new ResourceNotFoundException("Invalid credentials");
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
+        // Guest users have no password hash — reject login attempt before BCrypt call
+        if (user.getPasswordHash() == null
+                || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            throw new InvalidCredentialsException("Invalid credentials");
         }
         String token = jwtTokenProvider.generateToken(user.getEmailId());
         return new AuthResponse(token, user.getUid(), user.getFirstName(), user.getUserType());
     }
 
+    @Transactional
     public AuthResponse guestRegister(GuestRegisterRequest request) {
         if (userRepository.existsByEmailId(request.emailId())) {
-            throw new DuplicateResourceException("Email already registered: " + request.emailId());
+            throw new DuplicateResourceException("Email already registered");
         }
         User user = User.builder()
                 .uid(UUID.randomUUID().toString())

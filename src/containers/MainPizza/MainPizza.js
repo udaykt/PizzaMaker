@@ -128,7 +128,6 @@ const MainPizza = (props) => {
   return (
     <div className='mainPizza'>
       {sliceSizes.regular.map((slice) => {
-        console.log(slice);
         return (
           <Fragment key={slice.rotate + slice.skew}>
             <div

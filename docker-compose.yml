@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: pizzadb
       POSTGRES_USER: pizzauser
-      POSTGRES_PASSWORD: pizzapass
+      POSTGRES_PASSWORD: ${DOCKER_DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -25,8 +25,9 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       DATABASE_URL: jdbc:postgresql://db:5432/pizzadb
       DATABASE_USERNAME: pizzauser
-      DATABASE_PASSWORD: pizzapass
-      JWT_SECRET: bXktc3VwZXItc2VjcmV0LWtleS1mb3ItcGl6emEtbWFrZXItYXBwLTIwMjQ=
+      DATABASE_PASSWORD: ${DOCKER_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
     depends_on:
       db:
         condition: service_healthy

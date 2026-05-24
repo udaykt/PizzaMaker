@@ -7,15 +7,15 @@
   right: 1%;
   width: 60%;
   height: 95%;
-  background-color: chocolate;
+  background: rgba(18, 16, 15, 0.6);
   border-radius: 20px;
-  box-shadow: inset -5px -5px 5px rgba(255, 255, 255, 0.25),
+  box-shadow: inset -5px -5px 5px rgba(255, 255, 255, 0.03),
     inset 5px 5px 5px rgba(0, 0, 0, 0.25);
   overflow: auto;
 }
 
 .dashboard p {
-  color: black;
+  color: rgba(255, 255, 255, 0.8);
   font-family: monospace;
   font-size: 1rem;
 }

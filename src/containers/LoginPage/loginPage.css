@@ -1,3 +1,8 @@
+@keyframes formFadeIn {
+  from { opacity: 0; transform: translate(-50%, -46%); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
 .loginPage,
 .hideLoginPage {
   display: flex;
@@ -5,28 +10,39 @@
   justify-content: center;
   align-items: center;
   position: fixed;
-  height: 450px;
-  width: 60%;
-  min-width: 400px;
-  min-height: 450px;
-  max-height: 450px;
-  max-width: 600px;
-  background: #cca156;
-  border-radius: 10px;
+  width: min(90vw, 480px);
+  height: fit-content;
+  max-height: 90dvh;
+  overflow-y: auto;
+  background: rgba(14, 13, 12, 0.9);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 107, 0, 0.22);
+  border-radius: 16px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  transition: transform 0.5s ease;
+  transition: transform 0.5s ease, opacity 0.3s ease;
   z-index: 10;
+  padding: 32px 0;
 }
+
+.loginPage {
+  animation: formFadeIn 0.22s ease-out;
+}
+
 .loginPage h1,
 .hideLoginPage h1 {
   text-transform: uppercase;
   font-family: monospace;
   font-size: 2rem;
+  color: #fff;
 }
+
 .hideLoginPage {
   transform: translateX(300%);
+  opacity: 0;
+  animation: none;
 }
 
 .loginPage form,
@@ -35,25 +51,35 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  height: 90%;
+  gap: 20px;
   width: 90%;
   user-select: none;
 }
 
+/* Shared form input styles — used by login, signup, guest */
 .formLink {
   font-family: monospace;
   font-size: 1em;
   font-weight: bold;
   text-decoration: none;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.formLink a {
+  color: inherit;
+  transition: color 0.15s ease;
+}
+
+.formLink a:hover {
+  color: #ff6b00;
 }
 
 .formInputTextDiv {
   width: 100%;
-  height: 60%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
+  gap: 14px;
   align-items: center;
 }
 
@@ -61,8 +87,10 @@
   font-family: monospace;
   width: 80px;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.75);
 }
+
 .formInputTextDiv input {
   width: 95%;
   height: 40px;
@@ -71,24 +99,35 @@
   border: none;
   outline: none;
   background: none;
+  color: rgba(255, 255, 255, 0.9);
+  caret-color: #ff6b00;
   margin-left: 15px;
 }
+
 .formInputTextDiv .labelInputDiv {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   width: 90%;
 }
+
 .formInputTextDiv .inputField {
   border-radius: 10px;
-  background-color: transparent;
-  box-shadow: inset -5px -5px 5px rgba(255, 255, 255, 0.15),
-    inset 5px 5px 5px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.04);
+  box-shadow: inset -3px -3px 6px rgba(255, 255, 255, 0.04),
+    inset 3px 3px 6px rgba(0, 0, 0, 0.45);
+  transition: box-shadow 0.2s ease;
 }
+
+.formInputTextDiv .inputField:focus-within {
+  box-shadow: inset -3px -3px 6px rgba(255, 255, 255, 0.04),
+    inset 3px 3px 6px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 107, 0, 0.4);
+}
+
 .formInputTextDiv .inputField:hover {
-  border-radius: 10px;
-  box-shadow: inset -4px -4px 4px rgba(255, 255, 255, 0.15),
-    inset 4px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: inset -2px -2px 4px rgba(255, 255, 255, 0.04),
+    inset 2px 2px 4px rgba(0, 0, 0, 0.38);
 }
 
 .formInputTextDiv input:focus {
@@ -100,12 +139,8 @@
   height: 50px;
 }
 
-.navLinkStyle a:hover {
-  color: bisque;
-}
-
 .fieldError {
-  color: #c0392b;
+  color: #ff5252;
   font-size: 0.78rem;
   font-family: monospace;
   font-weight: bold;

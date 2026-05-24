@@ -8,11 +8,14 @@
   width: 38%;
   height: 90%;
   border-radius: 10px;
-  background-color: var(--slice-color);
+  background: rgba(10, 8, 7, 0.7);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
   z-index: 100;
 }
+
 .dashBoardLogo {
   font-size: 0.8rem;
   font-family: monospace;
   text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
 }

@@ -2,7 +2,7 @@ import { Client } from '@stomp/stompjs';
 import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 
-const WS_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8080') + '/ws';
+const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080') + '/ws';
 
 /**
  * Subscribes to /topic/orders over STOMP/SockJS.
@@ -25,7 +25,9 @@ const useOrderUpdates = (onUpdate) => {
           try {
             const update = JSON.parse(message.body);
             onUpdateRef.current(update);
-          } catch (_) {}
+          } catch (e) {
+            console.error('WS parse error', e);
+          }
         });
       },
       onStompError: (frame) => {

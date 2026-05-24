@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import dashboardSlice from './dashboardSlice';
 import headerSlice from './headerSlice';
+import menuSlice from './menuSlice';
 import orderSlice from './orderSlice';
 import pizzahubSlice from './pizzahubSlice';
 import pizzaSlice from './pizzaSlice';
@@ -10,6 +11,7 @@ import userSlice from './userSlice';
 const store = configureStore({
   reducer: {
     header: headerSlice.reducer,
+    menu: menuSlice.reducer,
     pizzahub: pizzahubSlice.reducer,
     pizza: pizzaSlice.reducer,
     user: userSlice.reducer,
@@ -18,9 +20,7 @@ const store = configureStore({
     ui: uiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-    }),
+    getDefaultMiddleware(),
 });
 
 export default store;

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +32,9 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Place a new order")
     public OrderResponse placeOrder(@AuthenticationPrincipal UserDetails user,
-                                    @Valid @RequestBody OrderRequest request) {
-        return orderService.placeOrder(user.getUsername(), request);
+                                    @Valid @RequestBody OrderRequest request,
+                                    @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        return orderService.placeOrder(user.getUsername(), request, idempotencyKey);
     }
 
     @GetMapping("/my")
@@ -51,6 +53,7 @@ public class OrderController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all orders — ADMIN only")
     public PageResponse<OrderResponse> getAllOrders(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -58,6 +61,7 @@ public class OrderController {
     }
 
     @PutMapping("/{oid}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update order status — ADMIN only")
     public OrderResponse updateStatus(@PathVariable String oid,
                                       @Valid @RequestBody UpdateStatusRequest request) {
