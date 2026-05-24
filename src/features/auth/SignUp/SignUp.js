@@ -6,7 +6,7 @@ import Button from '@/shared/Button/Button';
 import { GUEST_PATH, HOME_PATH, LOGIN_PATH } from '@/utils/routes';
 import { uiActions } from '@/store/uiSlice';
 import { createUser } from '@/api/authApi';
-import './signUp.css';
+import styles from './signUp.module.css';
 
 const SignUp = (props) => {
   const [registerFirstName, setRegisterFirstName] = useState('');
@@ -50,13 +50,13 @@ const SignUp = (props) => {
   const clearError = (field) => setErrors((p) => ({ ...p, [field]: '' }));
 
   return (
-    <div className='signUp'>
+    <div className={styles.signUp}>
       <form onSubmit={registerUser} noValidate>
         <div><h1>Sign Up</h1></div>
-        <div className='formInputTextDiv'>
-          <div className='labelInputDiv'>
+        <div className={styles.formInputTextDiv}>
+          <div className={styles.labelInputDiv}>
             <label htmlFor='firstName'>Name</label>
-            <div className='inputField'>
+            <div className={styles.inputField}>
               <input
                 id='name'
                 name='firstName'
@@ -66,11 +66,11 @@ const SignUp = (props) => {
                 autoFocus
               />
             </div>
-            {errors.firstName && <span className='fieldError'>{errors.firstName}</span>}
+            {errors.firstName && <span className={styles.fieldError}>{errors.firstName}</span>}
           </div>
-          <div className='labelInputDiv'>
+          <div className={styles.labelInputDiv}>
             <label htmlFor='email'>Email</label>
-            <div className='inputField'>
+            <div className={styles.inputField}>
               <input
                 id='email'
                 name='email'
@@ -79,11 +79,11 @@ const SignUp = (props) => {
                 onChange={(e) => { setRegisterEmail(e.target.value); clearError('email'); }}
               />
             </div>
-            {errors.email && <span className='fieldError'>{errors.email}</span>}
+            {errors.email && <span className={styles.fieldError}>{errors.email}</span>}
           </div>
-          <div className='labelInputDiv'>
+          <div className={styles.labelInputDiv}>
             <label htmlFor='password'>Password</label>
-            <div className='inputField'>
+            <div className={styles.inputField}>
               <input
                 id='password'
                 name='password'
@@ -92,18 +92,18 @@ const SignUp = (props) => {
                 onChange={(e) => { setRegisterPassword(e.target.value); clearError('password'); }}
               />
             </div>
-            {errors.password && <span className='fieldError'>{errors.password}</span>}
+            {errors.password && <span className={styles.fieldError}>{errors.password}</span>}
           </div>
         </div>
-        <Button className='signUpSubmitButton' type='submit' disabled={loading}>
+        <Button className={styles.signUpSubmitButton} type='submit' disabled={loading}>
           {loading ? 'Creating account...' : 'Sign Up'}
         </Button>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <div className='formLink'>
+          <div className={styles.formLink}>
             <NavLink to={LOGIN_PATH} style={{ textDecoration: 'none' }}>Login Instead?</NavLink>
           </div>
           /
-          <div className='formLink'>
+          <div className={styles.formLink}>
             <NavLink to={GUEST_PATH} style={{ textDecoration: 'none' }}>Continue as Guest?</NavLink>
           </div>
         </div>

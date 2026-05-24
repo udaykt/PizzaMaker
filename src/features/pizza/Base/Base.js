@@ -1,18 +1,18 @@
 ﻿import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PIZZASIZES } from '@/utils/helpers';
-import { pizzahubActions } from '@/store/pizzahubSlice';
+import { pizzaHubActions } from '@/store/pizzaHubSlice';
 import { pizzaActions } from '@/store/pizzaSlice';
 import styles from './base.module.css';
 
 const Base = (props) => {
-  const bases = useSelector((state) => state.pizzahub.base);
+  const bases = useSelector((state) => state.pizzaHub.base);
   const size = useSelector((state) => state.pizza.size);
   const dispatch = useDispatch();
   const onChangeHandler = (e, key) => {
     let base = bases[key];
     base = { ...base, checked: e.target.checked };
-    dispatch(pizzahubActions.toggleBase(base));
+    dispatch(pizzaHubActions.toggleBase(base));
   };
   const sizeHandler = (e) => {
     dispatch(pizzaActions.setSize(e.target.value));

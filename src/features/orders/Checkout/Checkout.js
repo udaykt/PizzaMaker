@@ -1,12 +1,12 @@
 ﻿import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { initialPizzaState } from '@/store/pizzahubSlice';
+import { initialPizzaState } from '@/store/pizzaHubSlice';
 import Button from '@/shared/Button/Button';
 import Pizza from '@/features/pizza/PizzaDisplay/PizzaDisplay';
-import './checkout.css';
+import styles from './checkout.module.css';
 import { useHistory } from 'react-router-dom';
 import { CONFIRM_PATH, HOME_PATH } from '@/utils/routes';
-import { createOrder } from '@/api/pizzaApi';
+import { createOrder } from '@/api/appApi';
 import { orderActions } from '@/store/orderSlice';
 import { uiActions } from '@/store/uiSlice';
 
@@ -16,7 +16,7 @@ const REGULAR = 'regular';
 const MEDIUM = 'medium';
 
 const Checkout = (props) => {
-  const orderState = useSelector((state) => state.pizzahub);
+  const orderState = useSelector((state) => state.pizzaHub);
   const baseState = orderState.base;
   const toppingsState = orderState.toppings;
   const order = { base: baseState, toppings: toppingsState };
@@ -52,11 +52,11 @@ const Checkout = (props) => {
 
   return (
     (JSON.stringify(initialPizzaState) !== JSON.stringify(order) && (
-      <div className='checkout'>
-        <div className='pizzaCheckoutDiv'>
+      <div className={styles.checkout}>
+        <div className={styles.pizzaCheckoutDiv}>
           <Pizza {...state} />
         </div>
-        <table className='ingredients'>
+        <table className={styles.ingredients}>
           <thead>
             <tr>
               <td colSpan={2}>
@@ -93,18 +93,18 @@ const Checkout = (props) => {
             })}
           </tbody>
         </table>
-        <div className='checkoutButtons'>
-          <Button className='customizeButton' onClick={customizeHandler}>
+        <div className={styles.checkoutButtons}>
+          <Button className={styles.customizeButton} onClick={customizeHandler}>
             Customize
           </Button>
-          <Button className='checkoutOrderButton' onClick={orderHandler}>
+          <Button className={styles.checkoutOrderButton} onClick={orderHandler}>
             Order
           </Button>
         </div>
       </div>
     )) ||
     (JSON.stringify(initialPizzaState) === JSON.stringify(order) && (
-      <p className='emptyCheckout'>
+      <p className={styles.emptyCheckout}>
         Nothing to checkout! Customize and click order to checkout!
       </p>
     ))

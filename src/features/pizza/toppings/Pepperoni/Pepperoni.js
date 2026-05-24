@@ -1,9 +1,9 @@
-import { Fragment } from 'react';
+﻿import { Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import './pepperoni.css';
 
 const Pepperoni = (props) => {
-  const quantity = useSelector((state) => state.pizzahub.toppings.pepperoni);
+  const quantity = useSelector((state) => state.pizzaHub.toppings.pepperoni);
 
   return (
     <Fragment>

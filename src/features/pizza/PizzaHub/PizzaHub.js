@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
+﻿import { Suspense, lazy, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import Backdrop from '@/shared/Backdrop/Backdrop';
@@ -13,14 +13,14 @@ import {
   MENU_PATH,
   SIGNUP_PATH,
 } from '@/utils/routes';
-import { fetchMenuPricing } from '@/api/pizzaApi';
+import { fetchMenuPricing } from '@/api/appApi';
 import Base from '@/features/pizza/Base/Base';
 import PizzaDisplay from '@/features/pizza/PizzaDisplay/PizzaDisplay';
 import ToppingsMenu from '@/features/pizza/ToppingsMenu/ToppingsMenu';
 import styles from './pizzahub.module.css';
 
-const Menu = lazy(() => import('@/shared/Menu/Menu'));
-const LoginPage = lazy(() => import('@/features/auth/LoginPage/LoginPage'));
+const Menu = lazy(() => import('@/shared/NavOverlay/NavOverlay'));
+const LoginPage = lazy(() => import('@/features/auth/Login/Login'));
 const SignUp = lazy(() => import('@/features/auth/SignUp/SignUp'));
 const Guest = lazy(() => import('@/features/auth/Guest/Guest'));
 const UserDashboard = lazy(() => import('@/shared/UserDashboard/UserDashboard'));
@@ -31,10 +31,10 @@ const TOPPING_PRICE_MEDIUM = 2.0;
 const BASE_ITEM_PRICE = 0.5;
 
 const PizzaHub = (props) => {
-  const userState = useSelector((state) => state.user);
+  const userState = useSelector((state) => state.auth);
   const uiState = useSelector((state) => state.ui);
-  const pizzahubState = useSelector((state) => state.pizzahub);
-  const sizePricing = useSelector((state) => state.menu.sizePricing);
+  const pizzahubState = useSelector((state) => state.pizzaHub);
+  const sizePricing = useSelector((state) => state.nav.sizePricing);
   const pizzaSize = useSelector((state) => state.pizza.size);
 
   const [userName, setUserName] = useState('');

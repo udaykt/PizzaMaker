@@ -10,10 +10,10 @@ import {
   PROFILE_PATH,
 } from '@/utils/routes';
 import Button from '@/shared/Button/Button';
-import './dashboardMenu.css';
+import styles from './dashboardMenu.module.css';
 
 const DashboardMenu = (props) => {
-  const userType = useSelector((state) => state.user.userType);
+  const userType = useSelector((state) => state.auth.userType);
   const isAdmin = userType === 'ADMIN';
 
   const menuItems = [
@@ -27,17 +27,17 @@ const DashboardMenu = (props) => {
 
   return (
     <Fragment>
-      <div className='dashboardMenu'>
-        <div className='dashBoardLogo'>
+      <div className={styles.dashboardMenu}>
+        <div className={styles.dashboardLogo}>
           <h1>Dashboard</h1>
         </div>
-        <div className='menuLinks'>
+        <div className={styles.menuLinks}>
           <nav>
             <ul>
               {menuItems.map((i) => (
                 <li key={i.name}>
                   <NavLink to={i.path} style={{ textDecoration: 'none' }}>
-                    <Button className={`linkButton${i.name.includes('Admin') ? ' adminLink' : ''}`}>
+                    <Button className={i.name.includes('Admin') ? `${styles.linkButton} ${styles.adminLink}` : styles.linkButton}>
                       {i.name}
                     </Button>
                   </NavLink>

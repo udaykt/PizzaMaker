@@ -1,6 +1,6 @@
 ﻿import axios from 'axios';
 import store from '@/store';
-import { userActions } from '@/store/userSlice';
+import { authActions } from '@/store/authSlice';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
@@ -22,7 +22,7 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      store.dispatch(userActions.reset());
+      store.dispatch(authActions.reset());
       window.location.replace('/login');
     }
     return Promise.reject(err);
