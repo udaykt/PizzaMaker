@@ -2,7 +2,7 @@ import { Client } from '@stomp/stompjs';
 import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 
-const WS_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8080') + '/ws';
+const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080') + '/ws';
 
 /**
  * Subscribes to /topic/orders over STOMP/SockJS.

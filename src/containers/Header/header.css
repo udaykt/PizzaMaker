@@ -9,19 +9,20 @@
   left: 0;
   right: 0;
   align-items: center;
-  min-width: 720px;
   min-height: 10vh;
-  height: 100px;
+  height: 80px;
   z-index: 1;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   background-color: transparent;
   box-shadow: 15px 15px 30px rgba(0, 0, 0, 0.25);
+  transition: height 0.2s ease;
 }
 
 .logo {
   position: fixed;
   grid-area: logo;
-  top: 30px;
+  top: 20px;
   white-space: nowrap;
   filter: drop-shadow(2px 2px 2px black)
     drop-shadow(2px 2px 2px var(--sauce-color));
@@ -31,6 +32,7 @@
   display: flex;
   text-decoration: none;
 }
+
 .logo img {
   height: 50px;
   width: 50px;
@@ -49,7 +51,7 @@
   display: block;
   position: fixed;
   grid-area: menu;
-  top: 25px;
+  top: 20px;
   left: 25px;
 }
 
@@ -57,7 +59,7 @@
   display: block;
   position: fixed;
   grid-area: loginButton;
-  top: 25px;
+  top: 20px;
   right: 25px;
 }
 
@@ -67,6 +69,7 @@
   width: 45px;
   border-radius: 50%;
 }
+
 .loginSignupDiv {
   display: flex;
   gap: 20px;
@@ -77,9 +80,22 @@
     display: none;
   }
   .header {
-    min-width: 320px;
+    height: 60px;
+  }
+  .logo {
+    top: 12px;
+  }
+  .hamburgerMenu {
+    top: 12px;
+  }
+  .avatar {
+    top: 12px;
   }
   .logo h1 {
     font-size: 1.4rem;
+  }
+  .logo img {
+    height: 38px;
+    width: 38px;
   }
 }

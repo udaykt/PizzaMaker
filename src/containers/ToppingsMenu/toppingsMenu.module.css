@@ -4,7 +4,7 @@
   min-width: 30vw;
   min-height: 70vh;
   height: 500px;
-  width: 500px;
+  width: clamp(320px, 40vw, 500px);
   border-radius: 20px;
   grid-template-rows: 15% repeat(1, 1fr);
   background-color: transparent;
@@ -200,4 +200,14 @@
 .radio label:hover {
   color: lightsalmon;
   background-color: transparent;
+}
+
+@media screen and (max-width: 768px) {
+  .toppingsMenu {
+    width: 92vw;
+    max-width: 100%;
+    height: auto;
+    min-height: unset;
+    min-width: unset;
+  }
 }
