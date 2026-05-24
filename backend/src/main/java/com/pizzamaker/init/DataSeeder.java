@@ -1,4 +1,4 @@
-package com.pizzamaker.config;
+package com.pizzamaker.init;
 
 import com.pizzamaker.entity.Role;
 import com.pizzamaker.entity.User;

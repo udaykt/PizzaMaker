@@ -3,13 +3,13 @@ import { useSelector } from 'react-redux';
 import { SLICESSIZES } from '@/utils/helpers';
 import PizzaPreview from '@/features/pizza/PizzaPreview/PizzaPreview';
 import Slice from '@/features/pizza/Slice/Slice';
-import './pizzaDisplay.css';
+import styles from './pizzaDisplay.module.css';
 
 const REGULAR = '6';
 const MEDIUM = '12';
 const LARGE = '5';
 
-const Pizza = (props) => {
+const PizzaDisplay = (props) => {
   const userState = useSelector((state) => state.auth);
   const size = useSelector((state) => state.pizza.size);
   const loggedIn = userState.loggedIn;
@@ -50,7 +50,7 @@ const Pizza = (props) => {
 
   return (
     <Fragment>
-      <div className={'pizza'}>
+      <div className={styles.pizza}>
         {(state.loggedIn &&
           slicesSizes[size].map((slice) => {
             return (

@@ -15,6 +15,7 @@ const navigationSlice = createSlice({
     showSignUpPage: false,
     showGuestPage: false,
     showProfileMenu: false,
+    sizePricing: { R: 8, M: 12, L: 16 },
     menuPath: MENU_PATH,
     loginPath: LOGIN_PATH,
     signupPath: SIGNUP_PATH,
@@ -45,6 +46,9 @@ const navigationSlice = createSlice({
     },
     toggleProfileMenu(state, action) {
       state.showProfileMenu = action.payload;
+    },
+    setSizePricing(state, action) {
+      state.sizePricing = action.payload;
     },
   },
 });

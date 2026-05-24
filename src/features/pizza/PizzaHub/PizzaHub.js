@@ -34,7 +34,7 @@ const PizzaHub = (props) => {
   const userState = useSelector((state) => state.auth);
   const uiState = useSelector((state) => state.ui);
   const pizzahubState = useSelector((state) => state.pizzaHub);
-  const sizePricing = useSelector((state) => state.nav.sizePricing);
+  const sizePricing = useSelector((state) => state.navigation.sizePricing);
   const pizzaSize = useSelector((state) => state.pizza.size);
 
   const [userName, setUserName] = useState('');

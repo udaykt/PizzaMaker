@@ -1,5 +1,6 @@
 package com.pizzamaker.config;
 
+import com.pizzamaker.security.AuthRateLimitFilter;
 import com.pizzamaker.security.JwtAuthenticationFilter;
 import com.pizzamaker.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
