@@ -1,7 +1,7 @@
 ﻿import toast from 'react-hot-toast';
 import api from '@/api/axiosClient';
 import store from '@/store';
-import { navActions } from '@/store/navSlice';
+import { navigationActions } from '@/store/navigationSlice';
 import { orderActions } from '@/store/orderSlice';
 import { buildUserDataInStore } from '@/utils/userState';
 
@@ -48,7 +48,7 @@ const fetchLoggedInUser = async () => {
 const fetchMenuPricing = async () => {
   try {
     const { data } = await api.get('/api/v1/menu/sizes');
-    store.dispatch(navActions.setSizePricing(data));
+    store.dispatch(navigationActions.setSizePricing(data));
   } catch (_) {
     // fallback defaults already in slice
   }

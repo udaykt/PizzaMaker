@@ -1,5 +1,5 @@
 ﻿import { Fragment } from 'react';
-import './pizzaCanvas.css';
+import styles from './pizzaCanvas.module.css';
 import olive from '@/assets/images/toppings/olive.png';
 
 const PizzaCanvas = (props) => {
@@ -126,24 +126,24 @@ const PizzaCanvas = (props) => {
     ],
   };
   return (
-    <div className='mainPizza'>
+    <div className={styles.mainPizza}>
       {sliceSizes.regular.map((slice) => {
         return (
           <Fragment key={slice.rotate + slice.skew}>
             <div
-              className='slice'
+              className={styles.slice}
               style={{
                 transform: `rotate(${slice.rotate}deg) skew(${slice.skew}deg)`,
               }}
             ></div>
             <div
-              className='sauceSlice'
+              className={styles.sauceSlice}
               style={{
                 transform: `rotate(${slice.rotate}deg) skew(${slice.skew}deg)`,
               }}
             ></div>
             <div
-              className='cheeseSlice'
+              className={styles.cheeseSlice}
               style={{
                 transform: `rotate(${slice.rotate}deg) skew(${slice.skew}deg)`,
               }}
