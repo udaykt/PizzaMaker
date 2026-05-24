@@ -1,6 +1,6 @@
-﻿import { Fragment, useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH } from '@/utils/routes';
 import styles from './backdrop.module.css';
@@ -9,12 +9,13 @@ const Backdrop = (props) => {
   const uiState = useSelector((state) => state.ui);
   const dispatch = useDispatch();
   const history = useHistory();
+  const location = useLocation();
 
   useEffect(() => {
-    if (window.location.pathname !== HOME_PATH)
+    if (location.pathname !== HOME_PATH) {
       dispatch(uiActions.setBackdrop(true));
-    console.log(window.location.pathname);
-  });
+    }
+  }, [location.pathname, dispatch]);
 
   const handleClick = (e) => {
     history.push(HOME_PATH);

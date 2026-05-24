@@ -1,20 +1,8 @@
-﻿import toast from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import api from '@/api/axiosClient';
 import store from '@/store';
 import { authActions } from '@/store/authSlice';
 import { buildUserDataInStore } from '@/utils/userState';
-
-const storedUser = localStorage.getItem('user');
-if (storedUser) {
-  try {
-    const userData = JSON.parse(storedUser);
-    buildUserDataInStore(userData);
-    store.dispatch(authActions.setLoggedIn(true));
-  } catch (_) {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-  }
-}
 
 const loginUser = async (loginDetails) => {
   const { loginEmail, loginPassword } = loginDetails;

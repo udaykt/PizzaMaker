@@ -1,5 +1,6 @@
 package com.pizzamaker.service;
 
+import com.pizzamaker.dto.request.GuestRegisterRequest;
 import com.pizzamaker.dto.request.LoginRequest;
 import com.pizzamaker.dto.request.RegisterRequest;
 import com.pizzamaker.dto.response.AuthResponse;
@@ -7,7 +8,7 @@ import com.pizzamaker.entity.Role;
 import com.pizzamaker.entity.User;
 import com.pizzamaker.entity.UserType;
 import com.pizzamaker.exception.DuplicateResourceException;
-import com.pizzamaker.exception.ResourceNotFoundException;
+import com.pizzamaker.exception.InvalidCredentialsException;
 import com.pizzamaker.repository.UserRepository;
 import com.pizzamaker.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
@@ -51,12 +52,12 @@ class AuthServiceTest {
 
     @Test
     void register_duplicateEmail_throwsConflict() {
-        var req = new RegisterRequest("Alice", "alice@example.com", "secret123");
+        var req = new RegisterRequest("Alice", "Alice@Example.com", "secret123");
+        // Email is normalized to lowercase before the lookup
         when(userRepository.existsByEmailId("alice@example.com")).thenReturn(true);
 
         assertThatThrownBy(() -> authService.register(req))
-                .isInstanceOf(DuplicateResourceException.class)
-                .hasMessageContaining("alice@example.com");
+                .isInstanceOf(DuplicateResourceException.class);
     }
 
     @Test
@@ -79,6 +80,25 @@ class AuthServiceTest {
     }
 
     @Test
+    void login_normalizesEmail() {
+        User user = User.builder()
+                .uid(UUID.randomUUID().toString())
+                .firstName("Alice")
+                .emailId("alice@example.com")
+                .passwordHash("hashed")
+                .userType(UserType.STANDARD)
+                .role(Role.ROLE_USER)
+                .build();
+        // User stored with lowercase; login sent with mixed case
+        when(userRepository.findByEmailId("alice@example.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("secret123", "hashed")).thenReturn(true);
+        when(jwtTokenProvider.generateToken("alice@example.com")).thenReturn("tok");
+
+        assertThat(authService.login(new LoginRequest("Alice@Example.COM", "secret123")).token())
+                .isEqualTo("tok");
+    }
+
+    @Test
     void login_wrongPassword_throws() {
         User user = User.builder()
                 .uid(UUID.randomUUID().toString())
@@ -91,7 +111,30 @@ class AuthServiceTest {
         when(userRepository.findByEmailId("alice@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("wrong", "hashed")).thenReturn(false);
 
+        // AuthService throws InvalidCredentialsException (not ResourceNotFoundException)
         assertThatThrownBy(() -> authService.login(new LoginRequest("alice@example.com", "wrong")))
-                .isInstanceOf(ResourceNotFoundException.class);
+                .isInstanceOf(InvalidCredentialsException.class);
+    }
+
+    @Test
+    void guestRegister_success() {
+        when(userRepository.existsByEmailId("guest@example.com")).thenReturn(false);
+        when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(jwtTokenProvider.generateToken("guest@example.com")).thenReturn("guestToken");
+
+        AuthResponse resp = authService.guestRegister(
+                new GuestRegisterRequest("Guest", "guest@example.com"));
+
+        assertThat(resp.token()).isEqualTo("guestToken");
+        assertThat(resp.userType()).isEqualTo(UserType.GUEST);
+    }
+
+    @Test
+    void guestRegister_duplicateEmail_throwsConflict() {
+        when(userRepository.existsByEmailId("guest@example.com")).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.guestRegister(
+                new GuestRegisterRequest("Guest", "guest@example.com")))
+                .isInstanceOf(DuplicateResourceException.class);
     }
 }

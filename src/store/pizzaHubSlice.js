@@ -1,4 +1,4 @@
-﻿import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const pizzaHubSlice = createSlice({
   name: 'pizzaHub',
@@ -48,9 +48,14 @@ const pizzaHubSlice = createSlice({
       state.toppings[action.payload.title].checked =
         !state.toppings[action.payload.title].checked;
     },
+    // Kept for any existing callers that rely on the toggle behaviour.
     toggleToppingQuantity(state, action) {
       state.toppings[action.payload.title].medium =
         !state.toppings[action.payload.title].medium;
+    },
+    // Sets quantity explicitly: medium=true for medium, medium=false for regular.
+    setToppingMedium(state, action) {
+      state.toppings[action.payload.title].medium = action.payload.medium;
     },
     toggleBase(state, action) {
       state.base[action.payload.title].checked =
@@ -61,43 +66,12 @@ const pizzaHubSlice = createSlice({
 
 export const pizzaHubActions = pizzaHubSlice.actions;
 
-export const initialPizzaState = {
-  base: {
-    sauce: {
-      title: 'sauce',
-      checked: false,
-    },
-    mozzarella: {
-      title: 'mozzarella',
-      checked: false,
-    },
-    cheese: {
-      title: 'cheese',
-      checked: false,
-    },
-  },
-  toppings: {
-    pepperoni: {
-      title: 'pepperoni',
-      checked: false,
-      medium: false,
-    },
-    sausage: {
-      title: 'sausage',
-      checked: false,
-      medium: false,
-    },
-    peppers: {
-      title: 'peppers',
-      checked: false,
-      medium: false,
-    },
-    olives: {
-      title: 'olives',
-      checked: false,
-      medium: false,
-    },
-  },
+// Checks whether the pizza has any selection at all (no base, no toppings).
+// Uses field-level comparison so shape differences (e.g. color) don't matter.
+export const isPizzaEmpty = (state) => {
+  const noBase = Object.values(state.base).every((b) => !b.checked);
+  const noToppings = Object.values(state.toppings).every((t) => !t.checked);
+  return noBase && noToppings;
 };
 
 export default pizzaHubSlice;

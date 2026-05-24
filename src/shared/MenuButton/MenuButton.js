@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import { useHistory, withRouter } from 'react-router-dom';
+import { useHistory, useLocation, withRouter } from 'react-router-dom';
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH, MENU_PATH } from '@/utils/routes';
 import styles from './menuButton.module.css';
@@ -7,10 +7,11 @@ import styles from './menuButton.module.css';
 const MenuButton = (props) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const open = window.location.pathname === MENU_PATH;
+  const location = useLocation();
+  const open = location.pathname === MENU_PATH;
 
   const handleClick = () => {
-    if (window.location.pathname === HOME_PATH) {
+    if (location.pathname === HOME_PATH) {
       history.push(MENU_PATH);
       dispatch(uiActions.setBackdrop(true));
     } else {

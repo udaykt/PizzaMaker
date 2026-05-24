@@ -1,4 +1,4 @@
-﻿import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { pizzaHubActions } from '@/store/pizzaHubSlice';
 import styles from './toppingsMenu.module.css';
 
@@ -28,10 +28,14 @@ const ToppingsMenu = (props) => {
     dispatch(pizzaHubActions.toggleTopping(topping));
   };
 
-  const radioChangeHandler = (e, key) => {
-    let topping = toppings[key];
-    topping = { ...topping, medium: e.target.value };
-    dispatch(pizzaHubActions.toggleToppingQuantity(topping));
+  // Explicitly set medium to true/false rather than toggling, so that selecting
+  // "regular" always means regular and "medium" always means medium.
+  const regularHandler = (key) => {
+    dispatch(pizzaHubActions.setToppingMedium({ title: key, medium: false }));
+  };
+
+  const mediumHandler = (key) => {
+    dispatch(pizzaHubActions.setToppingMedium({ title: key, medium: true }));
   };
 
   return (
@@ -71,25 +75,21 @@ const ToppingsMenu = (props) => {
                 <input
                   type='radio'
                   id={key + '_small'}
-                  value={key}
+                  value='regular'
                   name={key}
-                  key={key + value + 'checkbox'}
+                  key={key + value + 'small'}
                   defaultChecked
-                  onChange={(e) => {
-                    radioChangeHandler(e, key);
-                  }}
+                  onChange={() => regularHandler(key)}
                   disabled={!toppings[key].checked}
                 />
                 <label htmlFor={key + '_small'}>regular</label>
                 <input
                   type='radio'
                   id={key + '_medium'}
-                  value={key}
+                  value='medium'
                   name={key}
                   key={key + value + 'radio'}
-                  onChange={(e) => {
-                    radioChangeHandler(e, key);
-                  }}
+                  onChange={() => mediumHandler(key)}
                   disabled={!toppings[key].checked}
                 />
                 <label htmlFor={key + '_medium'}>medium</label>

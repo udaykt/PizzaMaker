@@ -1,4 +1,4 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 import store from '@/store';
 import { authActions } from '@/store/authSlice';
 
@@ -15,11 +15,15 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auto-logout on 401 â€” clears both localStorage and Redux state
+// Auto-logout on 401 for expired sessions only.
+// Auth endpoints manage their own 401s (bad credentials); let the form's catch handle them.
+// Skip redirect when there is no token — the call was already unauthenticated.
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    const url = err.config?.url || '';
+    const hasToken = !!localStorage.getItem('token');
+    if (err.response?.status === 401 && !url.includes('/api/v1/auth/') && hasToken) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       store.dispatch(authActions.reset());

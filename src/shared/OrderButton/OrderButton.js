@@ -1,6 +1,6 @@
-﻿import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { initialPizzaState } from '@/store/pizzaHubSlice';
+import { isPizzaEmpty } from '@/store/pizzaHubSlice';
 import { pizzaActions } from '@/store/pizzaSlice';
 import { CHECKOUT_PATH } from '@/utils/routes';
 import Button from '@/shared/Button/Button';
@@ -25,10 +25,7 @@ const OrderButton = (props) => {
       type='submit'
       value='Order'
       onClick={OrderSubmitHandler}
-      disabled={
-        !loggedIn ||
-        JSON.stringify(initialPizzaState) === JSON.stringify(orderState)
-      }
+      disabled={!loggedIn || isPizzaEmpty(orderState)}
     >
       Order
     </Button>

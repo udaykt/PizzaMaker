@@ -5,23 +5,25 @@ import SockJS from 'sockjs-client';
 const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080') + '/ws';
 
 /**
- * Subscribes to /topic/orders over STOMP/SockJS.
- * Calls onUpdate({ oid, userUid, status }) whenever the backend broadcasts a status change.
+ * Subscribes to /user/queue/orders over STOMP/SockJS.
+ * The JWT is sent in the CONNECT headers so the server can establish a
+ * user principal and route only this user's status updates here.
  * Automatically reconnects on disconnect.
  */
 const useOrderUpdates = (onUpdate) => {
-  const clientRef = useRef(null);
   const onUpdateRef = useRef(onUpdate);
 
-  // Keep callback ref current without restarting the socket
   useEffect(() => { onUpdateRef.current = onUpdate; }, [onUpdate]);
 
   useEffect(() => {
     const client = new Client({
       webSocketFactory: () => new SockJS(WS_URL),
       reconnectDelay: 5000,
+      connectHeaders: {
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+      },
       onConnect: () => {
-        client.subscribe('/topic/orders', (message) => {
+        client.subscribe('/user/queue/orders', (message) => {
           try {
             const update = JSON.parse(message.body);
             onUpdateRef.current(update);
@@ -36,7 +38,6 @@ const useOrderUpdates = (onUpdate) => {
     });
 
     client.activate();
-    clientRef.current = client;
 
     return () => { client.deactivate(); };
   }, []); // connect once on mount

@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import useOrderUpdates from '@/hooks/useOrderUpdates';
@@ -14,15 +14,15 @@ const STATUS_COLORS = {
 };
 
 const STATUS_EMOJI = {
-  PENDING:   'ðŸ•',
-  CONFIRMED: 'âœ…',
-  PREPARING: 'ðŸ‘¨â€ðŸ³',
-  READY:     'ðŸ“¦',
-  DELIVERED: 'ðŸŽ‰',
+  PENDING:   '🍕',
+  CONFIRMED: '✅',
+  PREPARING: '👨‍🍳',
+  READY:     '📦',
+  DELIVERED: '🎉',
 };
 
 const formatIngredients = (ingredients) => {
-  if (!ingredients) return 'â€”';
+  if (!ingredients) return '—';
   return Object.entries(ingredients)
     .filter(([k, v]) => v === true && !k.toLowerCase().includes('medium'))
     .map(([k]) => k.charAt(0).toUpperCase() + k.slice(1))
@@ -33,11 +33,9 @@ const Orders = () => {
   const reduxOrders = useSelector((state) => state.order.userOrders);
   const currentUserUid = useSelector((state) => state.auth.uid);
 
-  // Local copy so we can update status live without re-fetching
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Sync from Redux on mount / when reduxOrders changes
   useEffect(() => { setOrders(reduxOrders); }, [reduxOrders]);
 
   useEffect(() => {
@@ -47,7 +45,6 @@ const Orders = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Live WebSocket handler â€” only apply updates that belong to this user
   const handleLiveUpdate = useCallback((update) => {
     if (update.userUid !== currentUserUid) return;
     setOrders((prev) =>
@@ -55,8 +52,8 @@ const Orders = () => {
         o.oid === update.oid ? { ...o, status: update.status } : o
       )
     );
-    const emoji = STATUS_EMOJI[update.status] || 'ðŸ•';
-    toast(`${emoji} Order #${update.oid.slice(0, 8)}â€¦ is now ${update.status}`, {
+    const emoji = STATUS_EMOJI[update.status] || '🍕';
+    toast(`${emoji} Order #${update.oid.slice(0, 8)}… is now ${update.status}`, {
       duration: 4000,
       icon: null,
     });
@@ -87,14 +84,14 @@ const Orders = () => {
       </div>
       {orders.length === 0 ? (
         <div className={styles.ordersEmpty}>
-          <span className={styles.ordersEmptyIcon}>ðŸ•</span>
+          <span className={styles.ordersEmptyIcon}>🍕</span>
           <p>No orders yet! Go make your first pizza.</p>
         </div>
       ) : (
         <ul className={styles.ordersList}>
           {orders.map((order) => {
             const statusStyle = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
-            const emoji = STATUS_EMOJI[order.status] || 'ðŸ•';
+            const emoji = STATUS_EMOJI[order.status] || '🍕';
             return (
               <li key={order.oid} className={styles.orderCard}>
                 <div className={styles.orderCardHeader}>
@@ -118,7 +115,7 @@ const Orders = () => {
                   <div className={styles.orderDetail}>
                     <span className={styles.orderDetailLabel}>Placed</span>
                     <span className={styles.orderDetailValue}>
-                      {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'â€”'}
+                      {order.createdAt ? new Date(order.createdAt).toLocaleString() : '—'}
                     </span>
                   </div>
                 </div>

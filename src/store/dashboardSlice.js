@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const dashboardSlice = createSlice({
   name: 'dashboard',
-  initialState: { showProfile: false, showMenuPage: false },
+  initialState: { showProfile: false, showMenuPage: false, showLoginPage: false },
   reducers: {
     toggleLoginPage(state) {
       state.showLoginPage = !state.showLoginPage;

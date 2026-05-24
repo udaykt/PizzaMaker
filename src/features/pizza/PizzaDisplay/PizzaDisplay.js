@@ -1,4 +1,4 @@
-﻿import { Fragment } from 'react';
+import { Fragment, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { SLICESSIZES } from '@/utils/helpers';
 import PizzaPreview from '@/features/pizza/PizzaPreview/PizzaPreview';
@@ -27,26 +27,23 @@ const PizzaDisplay = (props) => {
     loggedIn,
   };
 
-  const getRand = () => {
-    return Math.floor(Math.random().toFixed(2) * 45 + 2);
-  };
+  // Pre-generate 50 stable positions; recompute only when pizza size changes.
+  // Using plain Math.random() (not .toFixed()) to avoid string-coercion arithmetic.
+  const positions = useMemo(() => {
+    const diff = 85;
+    return Array.from({ length: 50 }, () => {
+      const val = Math.floor(Math.random() * 45 + 2);
+      return Math.floor(Math.random() * 2) === 0
+        ? { right: `${val}%`, bottom: `${val}%` }
+        : { left: `${diff - val}%`, top: `${diff - val}%` };
+    });
+  }, [size]);
 
-  const toppingSprinkler = (max, min) => {
-    var toggler = Math.floor(Math.random().toFixed(2) * 2);
-    var diff = 85;
-    var ret =
-      toggler === 0
-        ? {
-            right: `${getRand()}%`,
-            bottom: `${getRand()}%`,
-          }
-        : {
-            left: `${diff - getRand()}%`,
-            top: `${diff - getRand()}%`,
-          };
-    console.log(ret);
-    return ret;
-  };
+  // Reset before each render so topping components read positions in the same
+  // order every time, giving stable layout across re-renders.
+  const cursor = useRef(0);
+  cursor.current = 0;
+  const toppingSprinkler = () => positions[cursor.current++ % positions.length];
 
   return (
     <Fragment>

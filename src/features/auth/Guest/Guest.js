@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { NavLink, useHistory, withRouter } from 'react-router-dom';
@@ -12,6 +12,8 @@ import { uiActions } from '@/store/uiSlice';
 import { createGuest } from '@/api/authApi';
 import styles from './guest.module.css';
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const Guest = (props) => {
   const [guestFirstName, setGuestFirstName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
@@ -20,9 +22,19 @@ const Guest = (props) => {
 
   const registerGuest = async (e) => {
     e.preventDefault();
+    const trimmedName = guestFirstName.trim();
+    const trimmedEmail = guestEmail.trim();
+    if (!trimmedName) {
+      toast.error('Name is required.');
+      return;
+    }
+    if (!EMAIL_RE.test(trimmedEmail)) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
     createGuest({
-      guestFirstName,
-      guestEmail,
+      guestFirstName: trimmedName,
+      guestEmail: trimmedEmail,
     })
       .then((user) => {
         if (user) {

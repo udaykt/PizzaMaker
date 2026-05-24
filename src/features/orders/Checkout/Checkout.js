@@ -1,13 +1,12 @@
-﻿import React from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { initialPizzaState } from '@/store/pizzaHubSlice';
+import { isPizzaEmpty } from '@/store/pizzaHubSlice';
 import Button from '@/shared/Button/Button';
 import Pizza from '@/features/pizza/PizzaDisplay/PizzaDisplay';
 import styles from './checkout.module.css';
 import { useHistory } from 'react-router-dom';
 import { CONFIRM_PATH, HOME_PATH } from '@/utils/routes';
 import { createOrder } from '@/api/appApi';
-import { orderActions } from '@/store/orderSlice';
 import { uiActions } from '@/store/uiSlice';
 
 const SELECTED = 'selected';
@@ -41,17 +40,18 @@ const Checkout = (props) => {
   const orderHandler = (e) => {
     createOrder(null, orderState)
       .then((order) => {
-        console.log(order);
-        history.push(CONFIRM_PATH + '?orderId=' + order.orderId);
-        dispatch(orderActions.setCurrentOrder(order));
+        // setCurrentOrder is already dispatched inside createOrder (appApi)
+        history.push(CONFIRM_PATH + '?orderId=' + order.oid);
       })
       .catch((e) => {
         console.error('Error in creating order' + e);
       });
   };
 
+  const empty = isPizzaEmpty(order);
+
   return (
-    (JSON.stringify(initialPizzaState) !== JSON.stringify(order) && (
+    (!empty && (
       <div className={styles.checkout}>
         <div className={styles.pizzaCheckoutDiv}>
           <Pizza {...state} />
@@ -103,7 +103,7 @@ const Checkout = (props) => {
         </div>
       </div>
     )) ||
-    (JSON.stringify(initialPizzaState) === JSON.stringify(order) && (
+    (empty && (
       <p className={styles.emptyCheckout}>
         Nothing to checkout! Customize and click order to checkout!
       </p>

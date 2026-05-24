@@ -1,16 +1,11 @@
-﻿import Button from '@/shared/Button/Button';
+import Button from '@/shared/Button/Button';
 import { logoutUser } from '@/api/authApi';
-import { buildUserDataInStore } from '@/utils/userState';
 
 const Logout = (props) => {
   const signout = async () => {
-    logoutUser()
-      .then((user) => {
-        buildUserDataInStore({ loggedIn: false, firstName: '', emailId: '' });
-      })
-      .catch((e) => {
-        console.error('Error in signing out user' + e);
-      });
+    logoutUser().catch((e) => {
+      console.error('Error in signing out user' + e);
+    });
   };
   return (
     <Button className={props.className} onClick={signout}>

@@ -35,7 +35,9 @@ management:
 
 app:
   jwt:
-    secret: bXktc3VwZXItc2VjcmV0LWtleS1mb3ItcGl6emEtbWFrZXItYXBwLTIwMjQ=
+    # Dev fallback only — set JWT_SECRET in the environment for any real deployment.
+    # Must decode to >= 32 bytes (Base64-encoded); generate with: openssl rand -base64 32
+    secret: ${JWT_SECRET:bXktc3VwZXItc2VjcmV0LWtleS1mb3ItcGl6emEtbWFrZXItYXBwLTIwMjQ=}
     expiration-ms: 86400000
 
 server:

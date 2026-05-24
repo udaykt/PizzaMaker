@@ -34,7 +34,6 @@ const Base = (props) => {
                 value={v}
                 defaultChecked={v === PIZZASIZES.R}
                 onChange={(e) => sizeHandler(e)}
-                style={size !== { v } ? { color: 'white' } : {}}
               />
             );
           })}
@@ -45,7 +44,6 @@ const Base = (props) => {
         {Object.entries(bases).map(([key, value]) => {
           return (
             <div key={'_' + key} className={styles.base}>
-              {console.log(key)}
               <label>
                 <input
                   type='checkbox'

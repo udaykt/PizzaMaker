@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '@/api/axiosClient';
 import styles from './adminPanel.module.css';
@@ -39,7 +39,7 @@ const AdminPanel = () => {
       setOrders((prev) =>
         prev.map((o) => (o.oid === oid ? { ...o, status: newStatus } : o))
       );
-      toast.success(`Order #${oid} â†’ ${newStatus}`);
+      toast.success(`Order #${oid} → ${newStatus}`);
     } catch (err) {
       toast.error('Status update failed.');
     } finally {
@@ -50,7 +50,7 @@ const AdminPanel = () => {
   if (loading) {
     return (
       <div className={styles.adminPanel}>
-        <h1>Admin â€” All Orders</h1>
+        <h1>Admin — All Orders</h1>
         <div className={styles.adminLoading}>
           <div className={styles.adminSpinner} />
           <p>Loading orders...</p>
@@ -62,8 +62,8 @@ const AdminPanel = () => {
   return (
     <div className={styles.adminPanel}>
       <div className={styles.adminHeader}>
-        <h1>Admin â€” All Orders</h1>
-        <button className={styles.adminRefresh} onClick={fetchAllOrders}>â†» Refresh</button>
+        <h1>Admin — All Orders</h1>
+        <button className={styles.adminRefresh} onClick={fetchAllOrders}>↻ Refresh</button>
       </div>
       <p className={styles.adminCount}>{orders.length} order{orders.length !== 1 ? 's' : ''} total</p>
       {orders.length === 0 ? (
@@ -83,10 +83,10 @@ const AdminPanel = () => {
             return (
               <div className={styles.adminTableRow} key={order.oid}>
                 <span className={styles.adminOid}>#{order.oid}</span>
-                <span className={styles.adminCell}>{order.userEmail || 'â€”'}</span>
+                <span className={styles.adminCell}>{order.userEmail || '—'}</span>
                 <span className={styles.adminCell}>{order.pizzaSize || 'M'}</span>
                 <span className={`${styles.adminCell} ${styles.adminDate}`}>
-                  {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'â€”'}
+                  {order.createdAt ? new Date(order.createdAt).toLocaleString() : '—'}
                 </span>
                 <span>
                   <span

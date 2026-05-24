@@ -28,13 +28,14 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmailId(request.emailId())) {
+        String email = normalizeEmail(request.emailId());
+        if (userRepository.existsByEmailId(email)) {
             throw new DuplicateResourceException("Email already registered");
         }
         User user = User.builder()
                 .uid(UUID.randomUUID().toString())
-                .firstName(request.firstName())
-                .emailId(request.emailId())
+                .firstName(request.firstName().trim())
+                .emailId(email)
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .userType(UserType.STANDARD)
                 .role(Role.ROLE_USER)
@@ -45,7 +46,8 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmailId(request.emailId())
+        String email = normalizeEmail(request.emailId());
+        User user = userRepository.findByEmailId(email)
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
         // Guest users have no password hash — reject login attempt before BCrypt call
         if (user.getPasswordHash() == null
@@ -58,18 +60,23 @@ public class AuthService {
 
     @Transactional
     public AuthResponse guestRegister(GuestRegisterRequest request) {
-        if (userRepository.existsByEmailId(request.emailId())) {
+        String email = normalizeEmail(request.emailId());
+        if (userRepository.existsByEmailId(email)) {
             throw new DuplicateResourceException("Email already registered");
         }
         User user = User.builder()
                 .uid(UUID.randomUUID().toString())
-                .firstName(request.firstName())
-                .emailId(request.emailId())
+                .firstName(request.firstName().trim())
+                .emailId(email)
                 .userType(UserType.GUEST)
                 .role(Role.ROLE_USER)
                 .build();
         userRepository.save(user);
         String token = jwtTokenProvider.generateToken(user.getEmailId());
         return new AuthResponse(token, user.getUid(), user.getFirstName(), user.getUserType());
+    }
+
+    private static String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
     }
 }

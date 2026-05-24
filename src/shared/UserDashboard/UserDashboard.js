@@ -1,5 +1,6 @@
-﻿import React from 'react';
+import React from 'react';
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import AdminPanel from '@/features/admin/AdminPanel/AdminPanel';
 import About from '@/pages/About/About';
 import Checkout from '@/features/orders/Checkout/Checkout';
@@ -20,6 +21,9 @@ import DashboardMenu from '@/shared/DashboardMenu/DashboardMenu';
 import styles from './userDashboard.module.css';
 
 const UserDashboard = (props) => {
+  const userType = useSelector((state) => state.auth.userType);
+  const isAdmin = userType === 'ADMIN';
+
   return (
     <div className={styles.userDashboard}>
       <DashboardMenu />
@@ -31,7 +35,10 @@ const UserDashboard = (props) => {
           <Route path={CHECKOUT_PATH} component={Checkout} />
           <Route path={CONTACT_PATH} component={Contact} />
           <Route path={ABOUT_PATH} component={About} />
-          <Route path={ADMIN_PATH} component={AdminPanel} />
+          <Route
+            path={ADMIN_PATH}
+            render={() => (isAdmin ? <AdminPanel /> : <Redirect to={ORDERS_PATH} />)}
+          />
         </Switch>
       </Dashboard>
     </div>
