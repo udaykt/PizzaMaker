@@ -1,5 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { PIZZASIZES } from '../components/Utils/Utility';
+﻿import { createSlice } from '@reduxjs/toolkit';
+import { PIZZASIZES } from '@/utils/helpers';
 
 const pizzaSlice = createSlice({
   name: 'pizza',
