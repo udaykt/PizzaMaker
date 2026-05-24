@@ -83,9 +83,9 @@ cp .env.example .env          # already pre-filled for local dev
 Open a terminal in the `backend/` folder:
 
 ```bash
-# Windows
+# Windows (PowerShell)
 cd backend
-mvnw.cmd spring-boot:run
+.\mvnw.cmd spring-boot:run
 
 # macOS / Linux
 cd backend
@@ -120,7 +120,7 @@ App opens at **http://localhost:3000**
 
 ```bash
 cd backend
-mvnw.cmd test       # Windows
+.\mvnw.cmd test     # Windows (PowerShell)
 ./mvnw test         # macOS / Linux
 ```
 
