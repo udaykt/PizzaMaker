@@ -51,7 +51,7 @@ class OrderControllerTest {
     void placeOrder_authenticated_returns201() throws Exception {
         var req = new OrderRequest(true, true, false, true, false,
                 false, false, false, false, false, false, PizzaSize.M);
-        when(orderService.placeOrder(eq("alice@example.com"), any())).thenReturn(sampleOrder());
+        when(orderService.placeOrder(eq("alice@example.com"), any(), any())).thenReturn(sampleOrder());
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
