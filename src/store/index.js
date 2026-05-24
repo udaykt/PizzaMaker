@@ -1,20 +1,20 @@
 import { configureStore } from '@reduxjs/toolkit';
 import dashboardSlice from './dashboardSlice';
-import headerSlice from './headerSlice';
-import menuSlice from './menuSlice';
+import navigationSlice from './navigationSlice';
+import navSlice from './navSlice';
 import orderSlice from './orderSlice';
-import pizzahubSlice from './pizzahubSlice';
+import pizzaHubSlice from './pizzaHubSlice';
 import pizzaSlice from './pizzaSlice';
 import uiSlice from './uiSlice';
-import userSlice from './userSlice';
+import authSlice from './authSlice';
 
 const store = configureStore({
   reducer: {
-    header: headerSlice.reducer,
-    menu: menuSlice.reducer,
-    pizzahub: pizzahubSlice.reducer,
+    navigation: navigationSlice.reducer,
+    nav: navSlice.reducer,
+    pizzaHub: pizzaHubSlice.reducer,
     pizza: pizzaSlice.reducer,
-    user: userSlice.reducer,
+    auth: authSlice.reducer,
     dashboard: dashboardSlice.reducer,
     order: orderSlice.reducer,
     ui: uiSlice.reducer,

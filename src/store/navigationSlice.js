@@ -7,8 +7,8 @@ const MENU_PATH = '/menu';
 const PROFILE_PATH = '/profile';
 const HOME_PATH = '/';
 
-const headerSlice = createSlice({
-  name: 'header',
+const navigationSlice = createSlice({
+  name: 'navigation',
   initialState: {
     showLoginPage: false,
     showMenuPage: false,
@@ -49,6 +49,6 @@ const headerSlice = createSlice({
   },
 });
 
-export const headerActions = headerSlice.actions;
+export const navigationActions = navigationSlice.actions;
 
-export default headerSlice;
+export default navigationSlice;

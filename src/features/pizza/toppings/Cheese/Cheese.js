@@ -1,9 +1,9 @@
-import { Fragment } from 'react';
+﻿import { Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import styles from './cheese.module.css';
 
 const Cheese = (props) => {
-  const quantity = useSelector((state) => state.pizzahub.base.cheese);
+  const quantity = useSelector((state) => state.pizzaHub.base.cheese);
   const sliced = useSelector((state) => state.pizza.isSliced);
 
   return (

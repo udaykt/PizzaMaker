@@ -6,10 +6,10 @@ import Button from '@/shared/Button/Button';
 import { GUEST_PATH, HOME_PATH, SIGNUP_PATH } from '@/utils/routes';
 import { uiActions } from '@/store/uiSlice';
 import { loginUser } from '@/api/authApi';
-import { fetchLoggedInUser, fetchUserOrders } from '@/api/pizzaApi';
-import './loginPage.css';
+import { fetchLoggedInUser, fetchUserOrders } from '@/api/appApi';
+import styles from './login.module.css';
 
-const LoginPage = (props) => {
+const Login = (props) => {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -49,13 +49,13 @@ const LoginPage = (props) => {
   };
 
   return (
-    <div className='loginPage'>
+    <div className={styles.loginPage}>
       <form onSubmit={handleLoginUser} noValidate>
         <div><h1>Login</h1></div>
-        <div className='formInputTextDiv'>
-          <div className='labelInputDiv'>
+        <div className={styles.formInputTextDiv}>
+          <div className={styles.labelInputDiv}>
             <label htmlFor='email'>Email</label>
-            <div className='inputField'>
+            <div className={styles.inputField}>
               <input
                 id='email'
                 name='email'
@@ -65,11 +65,11 @@ const LoginPage = (props) => {
                 onChange={(e) => { setLoginEmail(e.target.value); setErrors((p) => ({ ...p, email: '' })); }}
               />
             </div>
-            {errors.email && <span className='fieldError'>{errors.email}</span>}
+            {errors.email && <span className={styles.fieldError}>{errors.email}</span>}
           </div>
-          <div className='labelInputDiv'>
+          <div className={styles.labelInputDiv}>
             <label htmlFor='password'>Password</label>
-            <div className='inputField'>
+            <div className={styles.inputField}>
               <input
                 id='password'
                 name='password'
@@ -78,18 +78,18 @@ const LoginPage = (props) => {
                 onChange={(e) => { setLoginPassword(e.target.value); setErrors((p) => ({ ...p, password: '' })); }}
               />
             </div>
-            {errors.password && <span className='fieldError'>{errors.password}</span>}
+            {errors.password && <span className={styles.fieldError}>{errors.password}</span>}
           </div>
         </div>
-        <Button className='loginSubmitButton' type='submit' disabled={loading}>
+        <Button className={styles.loginSubmitButton} type='submit' disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </Button>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-          <div className='formLink'>
+          <div className={styles.formLink}>
             <NavLink to={SIGNUP_PATH} style={{ textDecoration: 'none' }}>Create an account?</NavLink>
           </div>
           /
-          <div className='formLink'>
+          <div className={styles.formLink}>
             <NavLink to={GUEST_PATH} style={{ textDecoration: 'none' }}>Continue as Guest?</NavLink>
           </div>
         </div>
@@ -98,4 +98,4 @@ const LoginPage = (props) => {
   );
 };
 
-export default withRouter(LoginPage);
+export default withRouter(Login);

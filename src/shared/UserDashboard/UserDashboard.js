@@ -17,11 +17,11 @@ import {
 } from '@/utils/routes';
 import Dashboard from '@/shared/Dashboard/Dashboard';
 import DashboardMenu from '@/shared/DashboardMenu/DashboardMenu';
-import './userDashboard.css';
+import styles from './userDashboard.module.css';
 
 const UserDashboard = (props) => {
   return (
-    <div className='userDashboard'>
+    <div className={styles.userDashboard}>
       <DashboardMenu />
       <Dashboard>
         <Switch>

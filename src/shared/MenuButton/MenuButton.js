@@ -1,15 +1,15 @@
-﻿import { useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useHistory, withRouter } from 'react-router-dom';
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH, MENU_PATH } from '@/utils/routes';
-import './navMenu.css';
+import styles from './menuButton.module.css';
 
-const MenuIcon = (props) => {
+const MenuButton = (props) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  var open = window.location.pathname === MENU_PATH;
+  const open = window.location.pathname === MENU_PATH;
 
-  const toggleMenuIconHandler = () => {
+  const handleClick = () => {
     if (window.location.pathname === HOME_PATH) {
       history.push(MENU_PATH);
       dispatch(uiActions.setBackdrop(true));
@@ -18,11 +18,12 @@ const MenuIcon = (props) => {
       dispatch(uiActions.setBackdrop(false));
     }
   };
+
   return (
     <div
       title='Menu'
-      className={`menuIcon ${open ? 'open' : ''}`}
-      onClick={toggleMenuIconHandler}
+      className={`${styles.menuButton} ${open ? styles.open : ''}`}
+      onClick={handleClick}
     >
       <span></span>
       <span></span>
@@ -31,4 +32,4 @@ const MenuIcon = (props) => {
   );
 };
 
-export default withRouter(MenuIcon);
+export default withRouter(MenuButton);

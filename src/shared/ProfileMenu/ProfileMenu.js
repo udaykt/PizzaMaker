@@ -2,18 +2,18 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, withRouter } from 'react-router-dom';
 import Logout from '@/features/auth/Logout/Logout';
-import { headerActions } from '@/store/headerSlice';
+import { navigationActions } from '@/store/navigationSlice';
 import { LOGIN_PATH, PROFILE_PATH } from '@/utils/routes';
 import Button from '@/shared/Button/Button';
-import './profileMenu.css';
+import styles from './profileMenu.module.css';
 
 const ProfileMenu = (props) => {
-  const headerState = useSelector((state) => state.header);
+  const headerState = useSelector((state) => state.navigation);
   const dispatch = useDispatch();
 
   const collapseMenu = (e) => {
     if (headerState.showProfileMenu)
-      dispatch(headerActions.toggleProfileMenu(false));
+      dispatch(navigationActions.toggleProfileMenu(false));
   };
   const logoutButtonHandler = (e) => {
     collapseMenu();
@@ -22,10 +22,10 @@ const ProfileMenu = (props) => {
   return (
     <div
       className={
-        headerState.showProfileMenu ? 'profileMenuDiv' : 'hideProfileMenuDiv'
+        headerState.showProfileMenu ? styles.profileMenuDiv : styles.hideProfileMenuDiv
       }
     >
-      <div className='profileMenu'>
+      <div className={styles.profileMenu}>
         <nav>
           <ul>
             <li>
@@ -34,7 +34,7 @@ const ProfileMenu = (props) => {
                 style={{ textDecoration: 'none' }}
                 onClick={collapseMenu}
               >
-                <Button className={'profileMenuButton'}>My Profile</Button>
+                <Button className={styles.profileMenuButton}>My Profile</Button>
               </NavLink>
             </li>
             <li>
@@ -43,7 +43,7 @@ const ProfileMenu = (props) => {
                 style={{ textDecoration: 'none' }}
                 onClick={logoutButtonHandler}
               >
-                <Logout className={'profileMenuButton'} />
+                <Logout className={styles.profileMenuButton} />
               </NavLink>
             </li>
           </ul>

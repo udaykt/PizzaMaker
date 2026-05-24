@@ -1,9 +1,9 @@
 ﻿import toast from 'react-hot-toast';
 import api from '@/api/axiosClient';
 import store from '@/store';
-import { menuActions } from '@/store/menuSlice';
+import { navActions } from '@/store/navSlice';
 import { orderActions } from '@/store/orderSlice';
-import { buildUserDataInStore } from '@/features/auth/User/User';
+import { buildUserDataInStore } from '@/utils/userState';
 
 const SIZE_TO_ENUM = { regular: 'R', medium: 'M', large: 'L' };
 
@@ -48,7 +48,7 @@ const fetchLoggedInUser = async () => {
 const fetchMenuPricing = async () => {
   try {
     const { data } = await api.get('/api/v1/menu/sizes');
-    store.dispatch(menuActions.setSizePricing(data));
+    store.dispatch(navActions.setSizePricing(data));
   } catch (_) {
     // fallback defaults already in slice
   }

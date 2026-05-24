@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '@/api/axiosClient';
-import './adminPanel.css';
+import styles from './adminPanel.module.css';
 
 const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERED'];
 
@@ -49,10 +49,10 @@ const AdminPanel = () => {
 
   if (loading) {
     return (
-      <div className='adminPanel'>
+      <div className={styles.adminPanel}>
         <h1>Admin â€” All Orders</h1>
-        <div className='adminLoading'>
-          <div className='adminSpinner' />
+        <div className={styles.adminLoading}>
+          <div className={styles.adminSpinner} />
           <p>Loading orders...</p>
         </div>
       </div>
@@ -60,17 +60,17 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className='adminPanel'>
-      <div className='adminHeader'>
+    <div className={styles.adminPanel}>
+      <div className={styles.adminHeader}>
         <h1>Admin â€” All Orders</h1>
-        <button className='adminRefresh' onClick={fetchAllOrders}>â†» Refresh</button>
+        <button className={styles.adminRefresh} onClick={fetchAllOrders}>â†» Refresh</button>
       </div>
-      <p className='adminCount'>{orders.length} order{orders.length !== 1 ? 's' : ''} total</p>
+      <p className={styles.adminCount}>{orders.length} order{orders.length !== 1 ? 's' : ''} total</p>
       {orders.length === 0 ? (
-        <p className='adminEmpty'>No orders found.</p>
+        <p className={styles.adminEmpty}>No orders found.</p>
       ) : (
-        <div className='adminTable'>
-          <div className='adminTableHead'>
+        <div className={styles.adminTable}>
+          <div className={styles.adminTableHead}>
             <span>Order ID</span>
             <span>Customer</span>
             <span>Size</span>
@@ -81,16 +81,16 @@ const AdminPanel = () => {
           {orders.map((order) => {
             const statusStyle = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
             return (
-              <div className='adminTableRow' key={order.oid}>
-                <span className='adminOid'>#{order.oid}</span>
-                <span className='adminCell'>{order.userEmail || 'â€”'}</span>
-                <span className='adminCell'>{order.pizzaSize || 'M'}</span>
-                <span className='adminCell adminDate'>
+              <div className={styles.adminTableRow} key={order.oid}>
+                <span className={styles.adminOid}>#{order.oid}</span>
+                <span className={styles.adminCell}>{order.userEmail || 'â€”'}</span>
+                <span className={styles.adminCell}>{order.pizzaSize || 'M'}</span>
+                <span className={`${styles.adminCell} ${styles.adminDate}`}>
                   {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'â€”'}
                 </span>
                 <span>
                   <span
-                    className='adminStatus'
+                    className={styles.adminStatus}
                     style={{ background: statusStyle.bg, color: statusStyle.color }}
                   >
                     {order.status}
@@ -98,7 +98,7 @@ const AdminPanel = () => {
                 </span>
                 <span>
                   <select
-                    className='adminSelect'
+                    className={styles.adminSelect}
                     value={order.status}
                     disabled={updatingOid === order.oid}
                     onChange={(e) => handleStatusChange(order.oid, e.target.value)}

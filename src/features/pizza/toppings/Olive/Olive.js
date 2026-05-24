@@ -1,9 +1,9 @@
-import { Fragment } from 'react';
+﻿import { Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import './olive.css';
 
 const Olive = (props) => {
-  const quantity = useSelector((state) => state.pizzahub.toppings.olives);
+  const quantity = useSelector((state) => state.pizzaHub.toppings.olives);
 
   return (
     <Fragment>

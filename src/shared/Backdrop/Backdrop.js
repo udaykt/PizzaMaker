@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH } from '@/utils/routes';
-import './backdrop.css';
+import styles from './backdrop.module.css';
 
 const Backdrop = (props) => {
   const uiState = useSelector((state) => state.ui);
@@ -24,7 +24,7 @@ const Backdrop = (props) => {
   return (
     <Fragment>
       {uiState.backdrop && (
-        <div className='backdrop' onClick={handleClick}>
+        <div className={styles.backdrop} onClick={handleClick}>
           {props.children}
         </div>
       )}
