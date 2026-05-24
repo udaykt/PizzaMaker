@@ -5,22 +5,27 @@
   min-height: 70vh;
   height: 500px;
   width: clamp(320px, 40vw, 500px);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   grid-template-rows: 15% repeat(1, 1fr);
-  background-color: transparent;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
   user-select: none;
-  box-shadow: -15px -15px 15px rgba(255, 255, 255, 0.05),
-    15px 15px 15px rgba(0, 0, 0, 0.25);
 }
 
 .toppingsMenu h1 {
   grid-row: 1/2;
-  color: white;
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  font-weight: bold;
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: var(--font);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 1px solid var(--glass-border-subtle);
 }
 
 .toppings {
@@ -37,34 +42,35 @@
   height: 20%;
   grid-template-columns: 35% 1fr;
   grid-template-rows: 40% 1fr;
-  color: white;
-  border-radius: 10px;
+  color: var(--text);
+  border-radius: var(--radius-sm);
   padding: 5px;
-  box-shadow: -10px -10px 10px rgba(255, 255, 255, 0.05),
-    10px 10px 10px rgba(0, 0, 0, 0.25);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .topping:hover {
-  transform: scale(1.015);
-  box-shadow: -10px -10px 14px rgba(255, 255, 255, 0.07),
-    10px 10px 14px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 107, 0, 0.06);
+  border-color: rgba(255, 107, 0, 0.2);
 }
 
 .toppingActive {
-  border: 1px solid rgba(186, 218, 85, 0.4);
+  border-color: rgba(255, 107, 0, 0.35);
+  background: rgba(255, 107, 0, 0.08);
   animation: toppingPop 0.25s ease;
 }
 
 @keyframes toppingPop {
   0%   { transform: scale(1); }
-  50%  { transform: scale(1.03); }
+  50%  { transform: scale(1.02); }
   100% { transform: scale(1); }
 }
 
 .topping h3 {
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font);
   text-align: center;
   text-transform: capitalize;
   padding: 5px;
@@ -89,14 +95,14 @@
 .topping .checkbox label {
   cursor: pointer;
   text-indent: -9999px;
-  width: 60px;
-  height: 30px;
-  background: grey;
+  width: 56px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.12);
   display: block;
-  border-radius: 80px;
+  border-radius: 28px;
   position: relative;
-  box-shadow: inset -2px -2px 3px rgba(255, 255, 255, 0.05),
-    inset 2px 2px 3px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .topping .checkbox label:after {
@@ -108,27 +114,30 @@
   height: 80%;
   border-radius: 80px;
   transition: 0.3s;
-  filter: drop-shadow(1px 1px 5px #000);
+  filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 0.5));
 }
+
 .topping .checkbox label[for='pepperoni']:after {
   background: transparent url(../../assets/Logos/pepperoni.png) no-repeat center;
-  background-size: 20px;
+  background-size: 18px;
 }
 .topping .checkbox label[for='peppers']:after {
   background: transparent url(../../assets/Logos/peppers.png) no-repeat center;
-  background-size: 25px;
+  background-size: 22px;
 }
 .topping .checkbox label[for='sausage']:after {
   background: transparent url(../../assets/Logos/sausage.png) no-repeat center;
-  background-size: 30px;
+  background-size: 28px;
 }
 .topping .checkbox label[for='olives']:after {
   background: transparent url(../../assets/Logos/olive.png) no-repeat center;
-  background-size: 25px;
+  background-size: 22px;
 }
 
 .topping .checkbox input:checked + label {
-  background: #bada55;
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 0 10px rgba(255, 107, 0, 0.4);
 }
 
 .topping .checkbox input:checked + label:after {
@@ -148,7 +157,7 @@
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   padding: 5px;
 }
 
@@ -156,15 +165,19 @@
   width: 40%;
   height: 80%;
   display: flex;
-  font-weight: bold;
+  font-weight: 600;
+  font-family: var(--font);
+  font-size: 0.8rem;
   position: relative;
   cursor: pointer;
   justify-content: center;
   align-items: center;
-  border-radius: 10px;
-  box-shadow: -10px -10px 10px rgba(255, 255, 255, 0.05),
-    10px 10px 10px rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: all 0.18s ease;
 }
+
 .topping .radio label:after {
   content: '';
   position: absolute;
@@ -174,7 +187,7 @@
   height: 80%;
   background: transparent;
   transition: 0.3s;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
 }
 
 .topping .radio input[type='radio'] {
@@ -184,22 +197,22 @@
 }
 
 .radio input:checked + label {
-  color: lightsalmon;
-  border-radius: inherit;
-  box-shadow: 5px 5px 5px rgba(255, 255, 255, 0.05),
-    -5px -5px 5px rgba(0, 0, 0, 0.25),
-    inset -5px -5px 10px rgba(255, 255, 255, 0.05),
-    inset 5px 5px 10px rgba(0, 0, 0, 0.25);
+  color: var(--accent);
+  border-color: rgba(255, 107, 0, 0.45);
+  background: rgba(255, 107, 0, 0.1);
+  box-shadow: 0 0 10px rgba(255, 107, 0, 0.2);
 }
+
 .radio input:disabled + label {
-  color: grey;
-  filter: grayscale(1);
+  color: var(--text-dim);
   cursor: not-allowed;
+  opacity: 0.4;
 }
 
 .radio label:hover {
-  color: lightsalmon;
-  background-color: transparent;
+  color: var(--accent);
+  border-color: rgba(255, 107, 0, 0.3);
+  background: rgba(255, 107, 0, 0.06);
 }
 
 @media screen and (max-width: 768px) {

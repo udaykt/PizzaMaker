@@ -29,12 +29,12 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: white;
+  color: var(--text);
   font-size: 1rem;
-  font-weight: 900;
+  font-weight: 700;
+  font-family: var(--font);
   letter-spacing: 2px;
   text-transform: capitalize;
-  text-shadow: none;
 }
 
 .descBase {
