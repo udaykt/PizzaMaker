@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    global: 'globalThis',
+  },
   esbuild: {
     loader: 'jsx',
     include: /src\/.*\.js$/,
@@ -15,5 +18,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: 'localhost',
+    open: true,
   },
 });
