@@ -1,6 +1,5 @@
 package com.pizzamaker.controller;
 
-import com.pizzamaker.dto.response.MenuToppingResponse;
 import com.pizzamaker.entity.PizzaSize;
 import com.pizzamaker.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -20,12 +18,6 @@ import java.util.Map;
 public class MenuController {
 
     private final MenuService menuService;
-
-    @GetMapping("/toppings")
-    @Operation(summary = "List available toppings with pricing")
-    public List<MenuToppingResponse> getToppings() {
-        return menuService.getToppings();
-    }
 
     @GetMapping("/sizes")
     @Operation(summary = "List pizza sizes with pricing")
