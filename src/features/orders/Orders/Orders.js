@@ -1,10 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import useOrderUpdates from '@/hooks/useOrderUpdates';
 import { fetchUserOrders } from '@/api/appApi';
 import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
-import { pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
+import { applyOrderToBuilder, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
+import { uiActions } from '@/store/uiSlice';
+import { HOME_PATH } from '@/utils/routes';
+import Button from '@/shared/Button/Button';
+import LazyMount from '@/shared/LazyMount/LazyMount';
 import styles from './orders.module.css';
 
 const STATUS_COLORS = {
@@ -34,9 +39,18 @@ const formatIngredients = (ingredients) => {
 const Orders = () => {
   const reduxOrders = useSelector((state) => state.order.userOrders);
   const currentUserUid = useSelector((state) => state.auth.uid);
+  const dispatch = useDispatch();
+  const history = useHistory();
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const handleOrderAgain = (order) => {
+    applyOrderToBuilder(order, dispatch);
+    history.push(HOME_PATH);
+    dispatch(uiActions.setBackdrop(false));
+    toast.success('Loaded into the builder — tweak it or order as-is!');
+  };
 
   useEffect(() => { setOrders(reduxOrders); }, [reduxOrders]);
 
@@ -107,7 +121,9 @@ const Orders = () => {
                 </div>
                 <div className={styles.orderCardBody}>
                   <div className={styles.orderThumb}>
-                    <PizzaCanvas {...pizzaPropsFromOrder(order)} textured={false} />
+                    <LazyMount placeholder={<div className={styles.thumbPlaceholder} />}>
+                      <PizzaCanvas {...pizzaPropsFromOrder(order)} textured={false} />
+                    </LazyMount>
                   </div>
                   <div className={styles.orderDetails}>
                     <div className={styles.orderDetail}>
@@ -126,6 +142,9 @@ const Orders = () => {
                     </div>
                   </div>
                 </div>
+                <Button className={styles.orderAgainBtn} onClick={() => handleOrderAgain(order)}>
+                  Order Again
+                </Button>
               </li>
             );
           })}

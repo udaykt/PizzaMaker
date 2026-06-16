@@ -38,4 +38,11 @@ describe('pizzaPropsFromOrder', () => {
     expect(props.base.sauce.checked).toBe(false);
     expect(props.toppings.sausage).toEqual({ checked: false, medium: false });
   });
+
+  it('maps crust style and bake level enums, defaulting when missing', () => {
+    expect(pizzaPropsFromOrder({ crustStyle: 'STUFFED' }).crustStyle).toBe('stuffed');
+    expect(pizzaPropsFromOrder({ bakeLevel: 'WELL_DONE' }).bakeLevel).toBe('well-done');
+    expect(pizzaPropsFromOrder({}).crustStyle).toBe('classic');
+    expect(pizzaPropsFromOrder({}).bakeLevel).toBe('golden');
+  });
 });

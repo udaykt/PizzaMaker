@@ -36,4 +36,18 @@ describe('pizzaHub reducers', () => {
     const state = reducer(undefined, actions.toggleBase({ title: 'cheese' }));
     expect(state.base.cheese.checked).toBe(true);
   });
+
+  it('restorePizza bulk-sets base and topping selections (Order Again)', () => {
+    const state = reducer(undefined, actions.restorePizza({
+      base: { sauce: { checked: true }, cheese: { checked: true } },
+      toppings: { pepperoni: { checked: true, medium: true }, olives: { checked: false, medium: false } },
+    }));
+    expect(state.base.sauce.checked).toBe(true);
+    expect(state.base.cheese.checked).toBe(true);
+    expect(state.base.mozzarella.checked).toBe(false);
+    expect(state.toppings.pepperoni).toMatchObject({ checked: true, medium: true });
+    expect(state.toppings.olives).toMatchObject({ checked: false, medium: false });
+    // unrelated fields (title) survive the bulk restore
+    expect(state.base.sauce.title).toBe('sauce');
+  });
 });

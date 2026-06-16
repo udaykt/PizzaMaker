@@ -51,6 +51,16 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
+    private CrustStyle crustStyle = CrustStyle.CLASSIC;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private BakeLevel bakeLevel = BakeLevel.GOLDEN;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
 
     @CreatedDate

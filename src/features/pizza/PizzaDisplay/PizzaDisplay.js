@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
 import styles from './pizzaDisplay.module.css';
@@ -16,13 +17,34 @@ const DEMO_TOPPINGS = {
   olives: { checked: true, medium: true },
 };
 
+const HINT_DISMISSED_KEY = 'pizzamaker_drag_hint_dismissed';
+
 const PizzaDisplay = () => {
   const loggedIn = useSelector((state) => state.auth.loggedIn);
+  const [showHint, setShowHint] = useState(false);
+
+  useEffect(() => {
+    if (loggedIn && !localStorage.getItem(HINT_DISMISSED_KEY)) {
+      setShowHint(true);
+    }
+  }, [loggedIn]);
+
+  const dismissHint = () => {
+    localStorage.setItem(HINT_DISMISSED_KEY, '1');
+    setShowHint(false);
+  };
 
   return (
     <div className={styles.pizza}>
       {loggedIn ? (
-        <PizzaCanvas />
+        <>
+          <PizzaCanvas editable />
+          {showHint && (
+            <button className={styles.dragHint} onClick={dismissHint}>
+              Drag any topping to place it exactly where you want
+            </button>
+          )}
+        </>
       ) : (
         <PizzaCanvas base={DEMO_BASE} toppings={DEMO_TOPPINGS} size='medium' idle />
       )}

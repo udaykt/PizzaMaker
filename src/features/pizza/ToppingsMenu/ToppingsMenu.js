@@ -1,16 +1,20 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { pizzaHubActions } from '@/store/pizzaHubSlice';
+import usePizzaSound from '@/hooks/usePizzaSound';
 import styles from './toppingsMenu.module.css';
 
 const ToppingsMenu = (props) => {
   const toppings = useSelector((state) => state.pizzaHub.toppings);
 
   const dispatch = useDispatch();
+  const playPlop = usePizzaSound();
 
   const checkboxChangeHandler = (e, key) => {
     let topping = toppings[key];
     topping = { ...topping, checked: e.target.checked };
     dispatch(pizzaHubActions.toggleTopping(topping));
+    // Only on add, not remove — a sound on every uncheck gets noisy fast.
+    if (e.target.checked) playPlop();
   };
 
   // Explicitly set medium to true/false rather than toggling, so that selecting

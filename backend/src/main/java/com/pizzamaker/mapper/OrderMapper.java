@@ -26,6 +26,8 @@ public final class OrderMapper {
                 order.getUser().getEmailId(),
                 ingredients,
                 order.getPizzaSize(),
+                order.getCrustStyle(),
+                order.getBakeLevel(),
                 order.getStatus(),
                 order.getCreatedAt()
         );

@@ -61,6 +61,20 @@ const pizzaHubSlice = createSlice({
       state.base[action.payload.title].checked =
         !state.base[action.payload.title].checked;
     },
+    // Bulk-restore checked/medium flags (e.g. "Order Again"), keeping each
+    // item's own title/color so unrelated shape fields aren't disturbed.
+    restorePizza(state, action) {
+      const { base, toppings } = action.payload;
+      Object.entries(base || {}).forEach(([key, value]) => {
+        if (state.base[key]) state.base[key].checked = !!value.checked;
+      });
+      Object.entries(toppings || {}).forEach(([key, value]) => {
+        if (state.toppings[key]) {
+          state.toppings[key].checked = !!value.checked;
+          state.toppings[key].medium = !!value.medium;
+        }
+      });
+    },
   },
 });
 

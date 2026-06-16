@@ -91,6 +91,9 @@
 }
 
 .priceLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -102,6 +105,10 @@
   font-weight: 900;
   color: #ff6b00;
   letter-spacing: 1px;
+}
+
+.stickyPriceBar {
+  display: none;
 }
 
 @media screen and (max-width: 1360px) {
@@ -132,6 +139,41 @@
   .description {
     margin-top: 80px;
     padding: 0 16px;
+  }
+
+  .stickyPriceBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    padding: 10px 20px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    background: var(--glass-modal);
+    border-top: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .stickyPriceLabel {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .stickyPriceValue {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #ff6b00;
+  }
+
+  /* leave room so the sticky bar never covers the order button */
+  .orderButton {
+    margin-bottom: 64px;
   }
 }
 

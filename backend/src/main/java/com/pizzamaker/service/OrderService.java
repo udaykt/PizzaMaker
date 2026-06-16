@@ -5,6 +5,8 @@ import com.pizzamaker.dto.request.UpdateStatusRequest;
 import com.pizzamaker.dto.response.OrderResponse;
 import com.pizzamaker.dto.response.OrderStatusUpdateResponse;
 import com.pizzamaker.dto.response.PageResponse;
+import com.pizzamaker.entity.BakeLevel;
+import com.pizzamaker.entity.CrustStyle;
 import com.pizzamaker.entity.Order;
 import com.pizzamaker.entity.OrderStatus;
 import com.pizzamaker.entity.User;
@@ -80,6 +82,8 @@ public class OrderService {
                 .olives(request.olives())
                 .olivesMedium(request.olivesMedium())
                 .pizzaSize(request.pizzaSize())
+                .crustStyle(request.crustStyle() != null ? request.crustStyle() : CrustStyle.CLASSIC)
+                .bakeLevel(request.bakeLevel() != null ? request.bakeLevel() : BakeLevel.GOLDEN)
                 .build();
 
         Order saved = orderRepository.save(order);

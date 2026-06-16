@@ -1,5 +1,7 @@
 package com.pizzamaker.dto.response;
 
+import com.pizzamaker.entity.BakeLevel;
+import com.pizzamaker.entity.CrustStyle;
 import com.pizzamaker.entity.OrderStatus;
 import com.pizzamaker.entity.PizzaSize;
 
@@ -10,6 +12,8 @@ public record OrderResponse(
         String userEmail,
         Ingredients ingredients,
         PizzaSize pizzaSize,
+        CrustStyle crustStyle,
+        BakeLevel bakeLevel,
         OrderStatus status,
         LocalDateTime createdAt
 ) {

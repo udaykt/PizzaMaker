@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pizzamaker.dto.request.OrderRequest;
 import com.pizzamaker.dto.response.OrderResponse;
 import com.pizzamaker.dto.response.PageResponse;
+import com.pizzamaker.entity.BakeLevel;
+import com.pizzamaker.entity.CrustStyle;
 import com.pizzamaker.entity.OrderStatus;
 import com.pizzamaker.entity.PizzaSize;
 import com.pizzamaker.service.OrderService;
@@ -41,6 +43,8 @@ class OrderControllerTest {
                 new OrderResponse.Ingredients(true, true, false, true, false,
                         false, false, false, false, false, false),
                 PizzaSize.M,
+                CrustStyle.CLASSIC,
+                BakeLevel.GOLDEN,
                 OrderStatus.PENDING,
                 LocalDateTime.now()
         );
@@ -50,7 +54,8 @@ class OrderControllerTest {
     @WithMockUser(username = "alice@example.com", roles = "USER")
     void placeOrder_authenticated_returns201() throws Exception {
         var req = new OrderRequest(true, true, false, true, false,
-                false, false, false, false, false, false, PizzaSize.M);
+                false, false, false, false, false, false, PizzaSize.M,
+                CrustStyle.CLASSIC, BakeLevel.GOLDEN);
         when(orderService.placeOrder(eq("alice@example.com"), any(), any())).thenReturn(sampleOrder());
 
         mockMvc.perform(post("/api/v1/orders")
@@ -63,7 +68,8 @@ class OrderControllerTest {
     @Test
     void placeOrder_unauthenticated_returns401() throws Exception {
         var req = new OrderRequest(true, true, false, false, false,
-                false, false, false, false, false, false, PizzaSize.R);
+                false, false, false, false, false, false, PizzaSize.R,
+                CrustStyle.CLASSIC, BakeLevel.GOLDEN);
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)

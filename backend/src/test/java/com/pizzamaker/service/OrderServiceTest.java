@@ -51,7 +51,8 @@ class OrderServiceTest {
 
     private OrderRequest testOrderRequest() {
         return new OrderRequest(true, true, false, true, false,
-                false, false, false, false, false, false, PizzaSize.M);
+                false, false, false, false, false, false, PizzaSize.M,
+                CrustStyle.CLASSIC, BakeLevel.GOLDEN);
     }
 
     @Test

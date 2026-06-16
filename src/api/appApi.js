@@ -6,10 +6,13 @@ import { orderActions } from '@/store/orderSlice';
 import { buildUserDataInStore } from '@/utils/userState';
 
 const SIZE_TO_ENUM = { regular: 'R', medium: 'M', large: 'L' };
+const CRUST_STYLE_TO_ENUM = { thin: 'THIN', classic: 'CLASSIC', stuffed: 'STUFFED' };
+const BAKE_LEVEL_TO_ENUM = { light: 'LIGHT', golden: 'GOLDEN', 'well-done': 'WELL_DONE' };
 
 const buildOrderPayload = (orderState) => {
   const { base, toppings } = orderState;
-  const selectedSize = store.getState().pizza.size;
+  const pizzaState = store.getState().pizza;
+  const selectedSize = pizzaState.size;
   return {
     sauce:           base.sauce.checked,
     mozzarella:      base.mozzarella.checked,
@@ -23,6 +26,8 @@ const buildOrderPayload = (orderState) => {
     olives:          toppings.olives.checked,
     olivesMedium:    toppings.olives.checked && toppings.olives.medium,
     pizzaSize:       SIZE_TO_ENUM[selectedSize] || 'M',
+    crustStyle:      CRUST_STYLE_TO_ENUM[pizzaState.crustStyle] || 'CLASSIC',
+    bakeLevel:       BAKE_LEVEL_TO_ENUM[pizzaState.bakeLevel] || 'GOLDEN',
   };
 };
 

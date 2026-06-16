@@ -17,6 +17,8 @@ import { fetchMenuPricing } from '@/api/appApi';
 import Base from '@/features/pizza/Base/Base';
 import PizzaDisplay from '@/features/pizza/PizzaDisplay/PizzaDisplay';
 import ToppingsMenu from '@/features/pizza/ToppingsMenu/ToppingsMenu';
+import AnimatedPrice from '@/shared/AnimatedPrice/AnimatedPrice';
+import SoundToggle from '@/shared/SoundToggle/SoundToggle';
 import styles from './pizzahub.module.css';
 
 const Menu = lazy(() => import('@/shared/NavOverlay/NavOverlay'));
@@ -59,7 +61,7 @@ const PizzaHub = (props) => {
     Object.values(toppings).forEach((t) => {
       if (t.checked) total += t.medium ? TOPPING_PRICE_MEDIUM : TOPPING_PRICE_REGULAR;
     });
-    return total.toFixed(2);
+    return total;
   };
 
   const state = {
@@ -75,8 +77,13 @@ const PizzaHub = (props) => {
           </strong>
           <p>Make your own pizza. Customize and Order.</p>
           <div className={styles.priceTag}>
-            <span className={styles.priceLabel}>Estimated Total</span>
-            <span className={styles.priceValue}>${computePrice()}</span>
+            <span className={styles.priceLabel}>
+              Estimated Total
+              <SoundToggle />
+            </span>
+            <span className={styles.priceValue}>
+              <AnimatedPrice value={computePrice()} />
+            </span>
           </div>
         </div>
         <div className={styles.baseWrapper}>
@@ -91,6 +98,14 @@ const PizzaHub = (props) => {
       </div>
       <div className={styles.orderButton}>
         <OrderButton />
+      </div>
+      {/* Mobile only (see media query) — keeps the running total visible
+          while scrolling through the toppings list further down the page. */}
+      <div className={styles.stickyPriceBar}>
+        <span className={styles.stickyPriceLabel}>Total</span>
+        <span className={styles.stickyPriceValue}>
+          <AnimatedPrice value={computePrice()} />
+        </span>
       </div>
       <ProfileMenu />
       <Backdrop />

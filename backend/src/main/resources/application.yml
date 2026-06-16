@@ -22,7 +22,10 @@ spring:
 
   flyway:
     enabled: true
-    locations: classpath:db/migration
+    # common/ holds vendor-neutral migrations; {vendor} resolves to h2 or
+    # postgresql at runtime so engine-specific syntax (e.g. partial indexes,
+    # which H2 doesn't support) only applies where it's actually valid.
+    locations: classpath:db/migration/common,classpath:db/migration/{vendor}
 
 management:
   endpoints:

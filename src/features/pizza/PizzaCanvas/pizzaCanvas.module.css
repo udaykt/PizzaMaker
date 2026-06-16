@@ -13,4 +13,13 @@
   max-height: 360px;
   display: block;
   overflow: visible;
+  user-select: none;
+}
+
+.piece {
+  transition: filter 0.15s ease;
+}
+
+.piece:hover {
+  filter: brightness(1.08);
 }
