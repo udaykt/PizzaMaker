@@ -2,22 +2,28 @@ package com.pizzamaker.dto.request;
 
 import com.pizzamaker.entity.BakeLevel;
 import com.pizzamaker.entity.CrustStyle;
+import com.pizzamaker.entity.DeliveryMethod;
 import com.pizzamaker.entity.PizzaSize;
+import com.pizzamaker.entity.SauceType;
+import com.pizzamaker.entity.ToppingQuantity;
 import jakarta.validation.constraints.NotNull;
 
 public record OrderRequest(
-        boolean sauce,
+        SauceType sauceType,
         boolean mozzarella,
-        boolean cheese,
+        boolean provolone,
+        boolean feta,
+        boolean veganCheese,
         boolean pepperoni,
-        boolean pepperoniMedium,
+        ToppingQuantity pepperoniQuantity,
         boolean sausage,
-        boolean sausageMedium,
+        ToppingQuantity sausageQuantity,
         boolean peppers,
-        boolean peppersMedium,
+        ToppingQuantity peppersQuantity,
         boolean olives,
-        boolean olivesMedium,
+        ToppingQuantity olivesQuantity,
         @NotNull PizzaSize pizzaSize,
         CrustStyle crustStyle,
-        BakeLevel bakeLevel
+        BakeLevel bakeLevel,
+        DeliveryMethod deliveryMethod
 ) {}

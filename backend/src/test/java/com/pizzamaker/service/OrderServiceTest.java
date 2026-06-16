@@ -50,9 +50,9 @@ class OrderServiceTest {
     }
 
     private OrderRequest testOrderRequest() {
-        return new OrderRequest(true, true, false, true, false,
-                false, false, false, false, false, false, PizzaSize.M,
-                CrustStyle.CLASSIC, BakeLevel.GOLDEN);
+        return new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false, true, ToppingQuantity.REGULAR,
+                false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR,
+                PizzaSize.M, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
     }
 
     @Test

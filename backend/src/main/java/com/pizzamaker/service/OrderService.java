@@ -7,8 +7,11 @@ import com.pizzamaker.dto.response.OrderStatusUpdateResponse;
 import com.pizzamaker.dto.response.PageResponse;
 import com.pizzamaker.entity.BakeLevel;
 import com.pizzamaker.entity.CrustStyle;
+import com.pizzamaker.entity.DeliveryMethod;
 import com.pizzamaker.entity.Order;
 import com.pizzamaker.entity.OrderStatus;
+import com.pizzamaker.entity.SauceType;
+import com.pizzamaker.entity.ToppingQuantity;
 import com.pizzamaker.entity.User;
 import com.pizzamaker.exception.ResourceNotFoundException;
 import com.pizzamaker.mapper.OrderMapper;
@@ -70,26 +73,33 @@ public class OrderService {
         Order order = Order.builder()
                 .oid(UUID.randomUUID().toString())
                 .user(user)
-                .sauce(request.sauce())
+                .sauceType(request.sauceType() != null ? request.sauceType() : SauceType.NONE)
                 .mozzarella(request.mozzarella())
-                .cheese(request.cheese())
+                .provolone(request.provolone())
+                .feta(request.feta())
+                .veganCheese(request.veganCheese())
                 .pepperoni(request.pepperoni())
-                .pepperoniMedium(request.pepperoniMedium())
+                .pepperoniQuantity(orDefault(request.pepperoniQuantity()))
                 .sausage(request.sausage())
-                .sausageMedium(request.sausageMedium())
+                .sausageQuantity(orDefault(request.sausageQuantity()))
                 .peppers(request.peppers())
-                .peppersMedium(request.peppersMedium())
+                .peppersQuantity(orDefault(request.peppersQuantity()))
                 .olives(request.olives())
-                .olivesMedium(request.olivesMedium())
+                .olivesQuantity(orDefault(request.olivesQuantity()))
                 .pizzaSize(request.pizzaSize())
-                .crustStyle(request.crustStyle() != null ? request.crustStyle() : CrustStyle.CLASSIC)
-                .bakeLevel(request.bakeLevel() != null ? request.bakeLevel() : BakeLevel.GOLDEN)
+                .crustStyle(request.crustStyle() != null ? request.crustStyle() : CrustStyle.HAND_TOSSED)
+                .bakeLevel(request.bakeLevel() != null ? request.bakeLevel() : BakeLevel.NORMAL)
+                .deliveryMethod(request.deliveryMethod() != null ? request.deliveryMethod() : DeliveryMethod.DELIVERY)
                 .price(PricingService.computeTotal(request))
                 .build();
 
         Order saved = orderRepository.save(order);
         notificationService.sendOrderConfirmation(email, saved.getOid());
         return OrderMapper.toResponse(saved);
+    }
+
+    private static ToppingQuantity orDefault(ToppingQuantity quantity) {
+        return quantity != null ? quantity : ToppingQuantity.REGULAR;
     }
 
     @Transactional(readOnly = true)

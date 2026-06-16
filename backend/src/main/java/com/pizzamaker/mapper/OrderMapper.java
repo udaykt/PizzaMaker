@@ -9,17 +9,19 @@ public final class OrderMapper {
 
     public static OrderResponse toResponse(Order order) {
         var ingredients = new OrderResponse.Ingredients(
-                order.isSauce(),
+                order.getSauceType(),
                 order.isMozzarella(),
-                order.isCheese(),
+                order.isProvolone(),
+                order.isFeta(),
+                order.isVeganCheese(),
                 order.isPepperoni(),
-                order.isPepperoniMedium(),
+                order.getPepperoniQuantity(),
                 order.isSausage(),
-                order.isSausageMedium(),
+                order.getSausageQuantity(),
                 order.isPeppers(),
-                order.isPeppersMedium(),
+                order.getPeppersQuantity(),
                 order.isOlives(),
-                order.isOlivesMedium()
+                order.getOlivesQuantity()
         );
         return new OrderResponse(
                 order.getOid(),
@@ -28,6 +30,7 @@ public final class OrderMapper {
                 order.getPizzaSize(),
                 order.getCrustStyle(),
                 order.getBakeLevel(),
+                order.getDeliveryMethod(),
                 order.getPrice(),
                 order.getStatus(),
                 order.getCreatedAt()

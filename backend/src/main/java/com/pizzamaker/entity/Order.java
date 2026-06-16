@@ -30,20 +30,45 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Base ingredients
-    private boolean sauce;
-    private boolean mozzarella;
-    private boolean cheese;
+    // Sauce is a single choice (Domino's-style: Robust Tomato/Marinara/
+    // Garlic Parmesan/Alfredo/BBQ/None), not a flat boolean.
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private SauceType sauceType = SauceType.NONE;
 
-    // Toppings (regular / medium quantity)
+    // Cheese types are independent — a pizza can combine mozzarella with
+    // feta, unlike sauce. Replaces the old ambiguous "cheese" boolean.
+    private boolean mozzarella;
+    private boolean provolone;
+    private boolean feta;
+    private boolean veganCheese;
+
+    // Toppings + quantity tier (Light/Regular/Extra — matches Domino's,
+    // Pizza Hut, Papa John's online ordering terminology)
     private boolean pepperoni;
-    private boolean pepperoniMedium;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ToppingQuantity pepperoniQuantity = ToppingQuantity.REGULAR;
+
     private boolean sausage;
-    private boolean sausageMedium;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ToppingQuantity sausageQuantity = ToppingQuantity.REGULAR;
+
     private boolean peppers;
-    private boolean peppersMedium;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ToppingQuantity peppersQuantity = ToppingQuantity.REGULAR;
+
     private boolean olives;
-    private boolean olivesMedium;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ToppingQuantity olivesQuantity = ToppingQuantity.REGULAR;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -52,12 +77,17 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private CrustStyle crustStyle = CrustStyle.CLASSIC;
+    private CrustStyle crustStyle = CrustStyle.HAND_TOSSED;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private BakeLevel bakeLevel = BakeLevel.GOLDEN;
+    private BakeLevel bakeLevel = BakeLevel.NORMAL;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private DeliveryMethod deliveryMethod = DeliveryMethod.DELIVERY;
 
     // Computed server-side at order time (see PricingService) — never trust
     // a client-supplied price.

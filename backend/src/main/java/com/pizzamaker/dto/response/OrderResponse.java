@@ -2,8 +2,11 @@ package com.pizzamaker.dto.response;
 
 import com.pizzamaker.entity.BakeLevel;
 import com.pizzamaker.entity.CrustStyle;
+import com.pizzamaker.entity.DeliveryMethod;
 import com.pizzamaker.entity.OrderStatus;
 import com.pizzamaker.entity.PizzaSize;
+import com.pizzamaker.entity.SauceType;
+import com.pizzamaker.entity.ToppingQuantity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,21 +18,24 @@ public record OrderResponse(
         PizzaSize pizzaSize,
         CrustStyle crustStyle,
         BakeLevel bakeLevel,
+        DeliveryMethod deliveryMethod,
         BigDecimal price,
         OrderStatus status,
         LocalDateTime createdAt
 ) {
     public record Ingredients(
-            boolean sauce,
+            SauceType sauceType,
             boolean mozzarella,
-            boolean cheese,
+            boolean provolone,
+            boolean feta,
+            boolean veganCheese,
             boolean pepperoni,
-            boolean pepperoniMedium,
+            ToppingQuantity pepperoniQuantity,
             boolean sausage,
-            boolean sausageMedium,
+            ToppingQuantity sausageQuantity,
             boolean peppers,
-            boolean peppersMedium,
+            ToppingQuantity peppersQuantity,
             boolean olives,
-            boolean olivesMedium
+            ToppingQuantity olivesQuantity
     ) {}
 }

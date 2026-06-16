@@ -6,8 +6,11 @@ import com.pizzamaker.dto.response.OrderResponse;
 import com.pizzamaker.dto.response.PageResponse;
 import com.pizzamaker.entity.BakeLevel;
 import com.pizzamaker.entity.CrustStyle;
+import com.pizzamaker.entity.DeliveryMethod;
 import com.pizzamaker.entity.OrderStatus;
 import com.pizzamaker.entity.PizzaSize;
+import com.pizzamaker.entity.SauceType;
+import com.pizzamaker.entity.ToppingQuantity;
 import com.pizzamaker.service.OrderService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +43,12 @@ class OrderControllerTest {
         return new OrderResponse(
                 UUID.randomUUID().toString(),
                 "test@example.com",
-                new OrderResponse.Ingredients(true, true, false, true, false,
-                        false, false, false, false, false, false),
+                new OrderResponse.Ingredients(SauceType.ROBUST_TOMATO, true, false, false, false, true, ToppingQuantity.REGULAR,
+                        false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR),
                 PizzaSize.M,
-                CrustStyle.CLASSIC,
-                BakeLevel.GOLDEN,
+                CrustStyle.HAND_TOSSED,
+                BakeLevel.NORMAL,
+                DeliveryMethod.DELIVERY,
                 java.math.BigDecimal.valueOf(14.50),
                 OrderStatus.PENDING,
                 LocalDateTime.now()
@@ -54,9 +58,9 @@ class OrderControllerTest {
     @Test
     @WithMockUser(username = "alice@example.com", roles = "USER")
     void placeOrder_authenticated_returns201() throws Exception {
-        var req = new OrderRequest(true, true, false, true, false,
-                false, false, false, false, false, false, PizzaSize.M,
-                CrustStyle.CLASSIC, BakeLevel.GOLDEN);
+        var req = new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false, true, ToppingQuantity.REGULAR,
+                false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR,
+                PizzaSize.M, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
         when(orderService.placeOrder(eq("alice@example.com"), any(), any())).thenReturn(sampleOrder());
 
         mockMvc.perform(post("/api/v1/orders")
@@ -68,9 +72,9 @@ class OrderControllerTest {
 
     @Test
     void placeOrder_unauthenticated_returns401() throws Exception {
-        var req = new OrderRequest(true, true, false, false, false,
-                false, false, false, false, false, false, PizzaSize.R,
-                CrustStyle.CLASSIC, BakeLevel.GOLDEN);
+        var req = new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false, false, ToppingQuantity.REGULAR,
+                false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR,
+                PizzaSize.R, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
