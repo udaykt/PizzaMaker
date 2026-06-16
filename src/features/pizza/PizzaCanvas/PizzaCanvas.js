@@ -6,21 +6,33 @@ import styles from './pizzaCanvas.module.css';
 
 const CENTER = 160;
 const MAX_DRAG_RADIUS = 122; // stay inside the cheese, never spill onto bare crust
+const MIN_PIECE_SPACING = 15; // dragged pieces can't be dropped on/inside a neighbor
 
 // Whole-pizza visual scale per crust size. Distinct from the topping *count*
 // factor — this is how big the pie looks; the spring makes size changes glide.
-const PIZZA_SCALE = { regular: 0.84, medium: 0.93, large: 1.0 };
+const PIZZA_SCALE = { small: 0.84, medium: 0.93, large: 1.0 };
 
 const CRUST_STYLE = {
   thin: { outerR: 142, innerR: 132, stuffed: false },
-  classic: { outerR: 150, innerR: 134, stuffed: false },
+  'hand-tossed': { outerR: 150, innerR: 134, stuffed: false },
   stuffed: { outerR: 154, innerR: 130, stuffed: true },
 };
 
+// Real chains offer a binary Normal/Well Done bake choice, not a 3-tier scale.
 const BAKE_LEVEL = {
-  light: { from: '#f6dca0', mid: '#e3b876', to: '#cf9c54', chars: 0 },
-  golden: { from: '#f0c682', mid: '#d49a4e', to: '#b97a32', chars: 5 },
+  normal: { from: '#f0c682', mid: '#d49a4e', to: '#b97a32', chars: 4 },
   'well-done': { from: '#dba861', mid: '#a96f35', to: '#7c4f22', chars: 11 },
+};
+
+// Sauces render in one of three color families — Tomato/Marinara are both
+// "red" (real pizzas don't look visually different between them either),
+// Garlic Parmesan/Alfredo are a white/cream base, BBQ a deep brown.
+const SAUCE_COLOR_GROUP = {
+  'robust-tomato': 'red',
+  marinara: 'red',
+  'garlic-parmesan': 'white',
+  alfredo: 'white',
+  bbq: 'bbq',
 };
 
 const layerTransition = { duration: 0.35, ease: 'easeOut' };
@@ -141,9 +153,13 @@ const PizzaCanvas = ({
   const ids = {
     crust: `${raw}-crust`,
     crustInner: `${raw}-crustInner`,
-    sauce: `${raw}-sauce`,
+    sauceRed: `${raw}-sauceRed`,
+    sauceWhite: `${raw}-sauceWhite`,
+    sauceBbq: `${raw}-sauceBbq`,
     mozzarella: `${raw}-mozzarella`,
-    cheese: `${raw}-cheese`,
+    provolone: `${raw}-provolone`,
+    feta: `${raw}-feta`,
+    veganCheese: `${raw}-veganCheese`,
     pepperoni: `${raw}-pepperoni`,
     sausage: `${raw}-sausage`,
     pepper: `${raw}-pepper`,
@@ -157,13 +173,24 @@ const PizzaCanvas = ({
   const base = baseProp ?? liveBase;
   const toppings = toppingsProp ?? liveToppings;
   const size = sizeProp ?? liveSize;
-  const crustStyle = CRUST_STYLE[crustStyleProp ?? liveCrustStyle] ?? CRUST_STYLE.classic;
-  const bakeLevel = BAKE_LEVEL[bakeLevelProp ?? liveBakeLevel] ?? BAKE_LEVEL.golden;
+  const crustStyle = CRUST_STYLE[crustStyleProp ?? liveCrustStyle] ?? CRUST_STYLE['hand-tossed'];
+  const bakeLevel = BAKE_LEVEL[bakeLevelProp ?? liveBakeLevel] ?? BAKE_LEVEL.normal;
 
   const pieces = visiblePieces(toppings, size);
   const scale = PIZZA_SCALE[size] ?? PIZZA_SCALE.medium;
-  const hasCheese = base?.cheese?.checked;
-  const hasMozzarella = base?.mozzarella?.checked;
+
+  const sauceType = base?.sauce?.sauceType;
+  const sauceGroup = SAUCE_COLOR_GROUP[sauceType];
+  const sauceGradientId = sauceGroup === 'white' ? ids.sauceWhite : sauceGroup === 'bbq' ? ids.sauceBbq : ids.sauceRed;
+
+  // Each cheese type that's checked gets its own translucent layer, slightly
+  // inset from the last so they read as stacked rather than overlapping flat.
+  const cheeseLayers = [
+    { key: 'mozzarella', on: base?.mozzarella?.checked, gradientId: ids.mozzarella, opacity: 1 },
+    { key: 'provolone', on: base?.provolone?.checked, gradientId: ids.provolone, opacity: 0.94 },
+    { key: 'feta', on: base?.feta?.checked, gradientId: ids.feta, opacity: 0.9 },
+    { key: 'veganCheese', on: base?.veganCheese?.checked, gradientId: ids.veganCheese, opacity: 0.92 },
+  ];
 
   // --- Drag-to-nudge (editable mode only) -----------------------------
   // Positions are computed via the topping layer's own getScreenCTM(), so the
@@ -173,6 +200,14 @@ const PizzaCanvas = ({
   const layerRef = useRef(null);
   const [overrides, setOverrides] = useState({});
   const [draggingId, setDraggingId] = useState(null);
+
+  // handleMove only gets recreated when draggingId changes, so it can't read
+  // fresh `overrides` state directly mid-drag without going stale — keep a
+  // ref in sync instead.
+  const overridesRef = useRef(overrides);
+  useEffect(() => {
+    overridesRef.current = overrides;
+  }, [overrides]);
 
   const clientToLocal = (clientX, clientY) => {
     const g = layerRef.current;
@@ -186,6 +221,30 @@ const PizzaCanvas = ({
     return { x: local.x - CENTER, y: local.y - CENTER };
   };
 
+  // Keeps a dragged piece from being dropped on top of / inside a neighbor —
+  // a hand-placed pizza should still look like a real one, not a stack.
+  const resolveSpacing = (candidate, excludeId) => {
+    let { x, y } = candidate;
+    for (const piece of pieces) {
+      if (piece.id === excludeId) continue;
+      const other = overridesRef.current[piece.id] ?? piece;
+      const dx = x - other.x;
+      const dy = y - other.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < MIN_PIECE_SPACING) {
+        if (dist > 0.001) {
+          const scale = MIN_PIECE_SPACING / dist;
+          x = other.x + dx * scale;
+          y = other.y + dy * scale;
+        } else {
+          x = other.x + MIN_PIECE_SPACING;
+          y = other.y;
+        }
+      }
+    }
+    return { x, y };
+  };
+
   useEffect(() => {
     if (!draggingId) return;
     const handleMove = (e) => {
@@ -195,7 +254,8 @@ const PizzaCanvas = ({
       const clamped = dist > MAX_DRAG_RADIUS
         ? { x: (local.x / dist) * MAX_DRAG_RADIUS, y: (local.y / dist) * MAX_DRAG_RADIUS }
         : local;
-      setOverrides((prev) => ({ ...prev, [draggingId]: clamped }));
+      const spaced = resolveSpacing(clamped, draggingId);
+      setOverrides((prev) => ({ ...prev, [draggingId]: spaced }));
     };
     const handleUp = () => setDraggingId(null);
     window.addEventListener('pointermove', handleMove);
@@ -230,18 +290,40 @@ const PizzaCanvas = ({
             <stop offset="0%" stopColor="#f5d49a" />
             <stop offset="100%" stopColor="#e7b063" />
           </radialGradient>
-          <radialGradient id={ids.sauce} cx="45%" cy="42%" r="70%">
+
+          {/* Robust Tomato / Marinara */}
+          <radialGradient id={ids.sauceRed} cx="45%" cy="42%" r="70%">
             <stop offset="0%" stopColor="#d6452f" />
             <stop offset="100%" stopColor="#a82c1a" />
           </radialGradient>
+          {/* Garlic Parmesan / Alfredo */}
+          <radialGradient id={ids.sauceWhite} cx="45%" cy="42%" r="70%">
+            <stop offset="0%" stopColor="#f5ecd7" />
+            <stop offset="100%" stopColor="#dcc899" />
+          </radialGradient>
+          {/* BBQ */}
+          <radialGradient id={ids.sauceBbq} cx="45%" cy="42%" r="70%">
+            <stop offset="0%" stopColor="#8a4a1f" />
+            <stop offset="100%" stopColor="#5c2f10" />
+          </radialGradient>
+
           <radialGradient id={ids.mozzarella} cx="45%" cy="42%" r="72%">
             <stop offset="0%" stopColor="#f9f4e4" />
             <stop offset="100%" stopColor="#ebe0c4" />
           </radialGradient>
-          <radialGradient id={ids.cheese} cx="45%" cy="42%" r="72%">
-            <stop offset="0%" stopColor="#ffd277" />
-            <stop offset="100%" stopColor="#f3a93d" />
+          <radialGradient id={ids.provolone} cx="45%" cy="42%" r="72%">
+            <stop offset="0%" stopColor="#f7c95a" />
+            <stop offset="100%" stopColor="#e0a030" />
           </radialGradient>
+          <radialGradient id={ids.feta} cx="45%" cy="42%" r="72%">
+            <stop offset="0%" stopColor="#fbf8ee" />
+            <stop offset="100%" stopColor="#e8e2c8" />
+          </radialGradient>
+          <radialGradient id={ids.veganCheese} cx="45%" cy="42%" r="72%">
+            <stop offset="0%" stopColor="#f0c875" />
+            <stop offset="100%" stopColor="#d9a94a" />
+          </radialGradient>
+
           <radialGradient id={ids.pepperoni} cx="38%" cy="34%" r="72%">
             <stop offset="0%" stopColor="#d24f3b" />
             <stop offset="100%" stopColor="#9c2b1b" />
@@ -318,9 +400,9 @@ const PizzaCanvas = ({
             idle
               ? {
                   rotate: { repeat: Infinity, ease: 'linear', duration: 60 },
-                  scale: { type: 'spring', stiffness: 120, damping: 18 },
+                  scale: { type: 'spring', stiffness: 120, damping: 24 },
                 }
-              : { scale: { type: 'spring', stiffness: 120, damping: 18 } }
+              : { scale: { type: 'spring', stiffness: 120, damping: 24 } }
           }
         >
           {/* Crust */}
@@ -358,9 +440,20 @@ const PizzaCanvas = ({
 
           {/* Base layers fade in/out as sauce/cheese are toggled */}
           <AnimatePresence>
-            {base?.sauce?.checked && <Layer key="sauce" r={crustStyle.innerR - 4} fill={`url(#${ids.sauce})`} filter={sauceTex} />}
-            {hasMozzarella && <Layer key="mozzarella" r={crustStyle.innerR - 8} fill={`url(#${ids.mozzarella})`} filter={cheeseTex} />}
-            {hasCheese && <Layer key="cheese" r={crustStyle.innerR - 10} fill={`url(#${ids.cheese})`} opacity={0.92} filter={cheeseTex} />}
+            {sauceType && sauceType !== 'none' && (
+              <Layer key="sauce" r={crustStyle.innerR - 4} fill={`url(#${sauceGradientId})`} filter={sauceTex} />
+            )}
+            {cheeseLayers.map((layer, i) =>
+              layer.on ? (
+                <Layer
+                  key={layer.key}
+                  r={crustStyle.innerR - 8 - i * 2}
+                  fill={`url(#${layer.gradientId})`}
+                  opacity={layer.opacity}
+                  filter={cheeseTex}
+                />
+              ) : null
+            )}
           </AnimatePresence>
 
           {/* Toppings, splattered, each with a soft shadow. Drag any piece to

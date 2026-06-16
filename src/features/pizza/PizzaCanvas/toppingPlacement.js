@@ -16,13 +16,15 @@ const TYPE_ORDER = ['pepperoni', 'sausage', 'peppers', 'olives'];
 
 // Piece counts at "regular" quantity on a medium pizza.
 const BASE_COUNT = { pepperoni: 5, sausage: 8, peppers: 6, olives: 7 };
-const MEDIUM_QTY_MULTIPLIER = 1.6;
-const SIZE_FACTOR = { regular: 0.8, medium: 1.0, large: 1.25 };
+// Light/Regular/Extra — matches the real quantity tiers used by Domino's,
+// Pizza Hut, and Papa John's, rather than an in-house "medium" scale.
+const QTY_MULTIPLIER = { light: 0.6, regular: 1.0, extra: 1.6 };
+const SIZE_FACTOR = { small: 0.8, medium: 1.0, large: 1.25 };
 
 // Real-world relative sizes (radius in SVG units before per-piece variation).
 const TYPE_SIZE = { pepperoni: 10, sausage: 6, peppers: 8, olives: 5.5 };
 
-const MAX_FACTOR = SIZE_FACTOR.large * MEDIUM_QTY_MULTIPLIER;
+const MAX_FACTOR = SIZE_FACTOR.large * QTY_MULTIPLIER.extra;
 const MAX_COUNT = TYPE_ORDER.reduce((acc, type) => {
   acc[type] = Math.round(BASE_COUNT[type] * MAX_FACTOR);
   return acc;
@@ -107,8 +109,9 @@ export function visiblePieces(toppings, size) {
   const counts = {};
   for (const type of TYPE_ORDER) {
     const t = toppings?.[type];
+    const qtyMultiplier = QTY_MULTIPLIER[t?.quantity] ?? QTY_MULTIPLIER.regular;
     counts[type] = t && t.checked
-      ? Math.round(BASE_COUNT[type] * factor * (t.medium ? MEDIUM_QTY_MULTIPLIER : 1))
+      ? Math.round(BASE_COUNT[type] * factor * qtyMultiplier)
       : 0;
   }
   return FULL_LAYOUT.filter((p) => p.indexWithinType < counts[p.type]);

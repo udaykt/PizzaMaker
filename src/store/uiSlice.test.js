@@ -20,19 +20,19 @@ describe('uiSlice', () => {
     vi.stubGlobal('localStorage', createLocalStorageStub());
   });
 
-  it('sound is off by default', () => {
+  it('sound is on by default', () => {
     const state = reducer(undefined, { type: '@@INIT' });
-    expect(state.soundEnabled).toBe(false);
+    expect(state.soundEnabled).toBe(true);
   });
 
   it('toggleSound flips the flag and persists it', () => {
-    let state = reducer(undefined, actions.toggleSound());
-    expect(state.soundEnabled).toBe(true);
-    expect(localStorage.getItem('pizzamaker_sound_enabled')).toBe('1');
-
-    state = reducer(state, actions.toggleSound());
+    let state = reducer({ backdrop: false, soundEnabled: true }, actions.toggleSound());
     expect(state.soundEnabled).toBe(false);
     expect(localStorage.getItem('pizzamaker_sound_enabled')).toBe('0');
+
+    state = reducer(state, actions.toggleSound());
+    expect(state.soundEnabled).toBe(true);
+    expect(localStorage.getItem('pizzamaker_sound_enabled')).toBe('1');
   });
 
   it('setBackdrop sets the flag directly', () => {

@@ -2,12 +2,14 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const SOUND_KEY = 'pizzamaker_sound_enabled';
 
-// Off by default — sound is an opt-in flourish, not a default behaviour.
+// On by default; respects an explicit prior choice (stored '0' or '1') so
+// turning it off in Profile settings sticks across visits.
 const readStoredSoundPref = () => {
   try {
-    return localStorage.getItem(SOUND_KEY) === '1';
+    const stored = localStorage.getItem(SOUND_KEY);
+    return stored === null ? true : stored === '1';
   } catch (_) {
-    return false;
+    return true;
   }
 };
 

@@ -5,21 +5,45 @@
 import { pizzaHubActions } from '@/store/pizzaHubSlice';
 import { pizzaActions } from '@/store/pizzaSlice';
 
-const ENUM_TO_SIZE = { R: 'regular', M: 'medium', L: 'large' };
-const ENUM_TO_CRUST_STYLE = { THIN: 'thin', CLASSIC: 'classic', STUFFED: 'stuffed' };
-const ENUM_TO_BAKE_LEVEL = { LIGHT: 'light', GOLDEN: 'golden', WELL_DONE: 'well-done' };
+const ENUM_TO_SIZE = { R: 'small', M: 'medium', L: 'large' };
+const ENUM_TO_CRUST_STYLE = { THIN: 'thin', HAND_TOSSED: 'hand-tossed', STUFFED: 'stuffed' };
+const ENUM_TO_BAKE_LEVEL = { NORMAL: 'normal', WELL_DONE: 'well-done' };
+const ENUM_TO_QUANTITY = { LIGHT: 'light', REGULAR: 'regular', EXTRA: 'extra' };
+const ENUM_TO_DELIVERY_METHOD = { DELIVERY: 'delivery', CARRYOUT: 'carryout' };
+const ENUM_TO_SAUCE_TYPE = {
+  NONE: 'none',
+  ROBUST_TOMATO: 'robust-tomato',
+  MARINARA: 'marinara',
+  GARLIC_PARMESAN: 'garlic-parmesan',
+  ALFREDO: 'alfredo',
+  BBQ: 'bbq',
+};
 
-const SIZE_LABEL = { R: 'Regular', M: 'Medium', L: 'Large' };
-const CRUST_STYLE_LABEL = { THIN: 'Thin', CLASSIC: 'Classic', STUFFED: 'Stuffed' };
-const BAKE_LEVEL_LABEL = { LIGHT: 'Light', GOLDEN: 'Golden', WELL_DONE: 'Well-done' };
+// Sizes shown with their inch diameter, the way every major chain's
+// ordering UI does (10"/12"/14").
+const SIZE_LABEL = { R: 'Small (10")', M: 'Medium (12")', L: 'Large (14")' };
+const CRUST_STYLE_LABEL = { THIN: 'Thin', HAND_TOSSED: 'Hand Tossed', STUFFED: 'Stuffed' };
+const BAKE_LEVEL_LABEL = { NORMAL: 'Normal Bake', WELL_DONE: 'Well Done' };
+const DELIVERY_METHOD_LABEL = { DELIVERY: 'Delivery', CARRYOUT: 'Carryout' };
+const SAUCE_TYPE_LABEL = {
+  NONE: 'None',
+  ROBUST_TOMATO: 'Robust Tomato',
+  MARINARA: 'Marinara',
+  GARLIC_PARMESAN: 'Garlic Parmesan',
+  ALFREDO: 'Alfredo',
+  BBQ: 'BBQ',
+};
 
-// Human-readable size/crust/bake text for receipts and order lists —
-// distinct from pizzaPropsFromOrder's lowercase keys, which feed PizzaCanvas.
+// Human-readable size/crust/bake/sauce/delivery text for receipts and order
+// lists — distinct from pizzaPropsFromOrder's lowercase keys, which feed
+// PizzaCanvas.
 export function orderDisplayLabels(order) {
   return {
-    size: SIZE_LABEL[order?.pizzaSize] || 'Medium',
-    crustStyle: CRUST_STYLE_LABEL[order?.crustStyle] || 'Classic',
-    bakeLevel: BAKE_LEVEL_LABEL[order?.bakeLevel] || 'Golden',
+    size: SIZE_LABEL[order?.pizzaSize] || 'Medium (12")',
+    crustStyle: CRUST_STYLE_LABEL[order?.crustStyle] || 'Hand Tossed',
+    bakeLevel: BAKE_LEVEL_LABEL[order?.bakeLevel] || 'Normal Bake',
+    deliveryMethod: DELIVERY_METHOD_LABEL[order?.deliveryMethod] || 'Delivery',
+    sauceType: SAUCE_TYPE_LABEL[order?.ingredients?.sauceType] || 'None',
   };
 }
 
@@ -27,27 +51,41 @@ export function pizzaPropsFromOrder(order) {
   const ing = order?.ingredients || {};
   return {
     size: ENUM_TO_SIZE[order?.pizzaSize] || 'medium',
-    crustStyle: ENUM_TO_CRUST_STYLE[order?.crustStyle] || 'classic',
-    bakeLevel: ENUM_TO_BAKE_LEVEL[order?.bakeLevel] || 'golden',
+    crustStyle: ENUM_TO_CRUST_STYLE[order?.crustStyle] || 'hand-tossed',
+    bakeLevel: ENUM_TO_BAKE_LEVEL[order?.bakeLevel] || 'normal',
     base: {
-      sauce: { checked: !!ing.sauce },
+      sauce: { sauceType: ENUM_TO_SAUCE_TYPE[ing.sauceType] || 'none' },
       mozzarella: { checked: !!ing.mozzarella },
-      cheese: { checked: !!ing.cheese },
+      provolone: { checked: !!ing.provolone },
+      feta: { checked: !!ing.feta },
+      veganCheese: { checked: !!ing.veganCheese },
     },
     toppings: {
-      pepperoni: { checked: !!ing.pepperoni, medium: !!ing.pepperoniMedium },
-      sausage: { checked: !!ing.sausage, medium: !!ing.sausageMedium },
-      peppers: { checked: !!ing.peppers, medium: !!ing.peppersMedium },
-      olives: { checked: !!ing.olives, medium: !!ing.olivesMedium },
+      pepperoni: { checked: !!ing.pepperoni, quantity: ENUM_TO_QUANTITY[ing.pepperoniQuantity] || 'regular' },
+      sausage: { checked: !!ing.sausage, quantity: ENUM_TO_QUANTITY[ing.sausageQuantity] || 'regular' },
+      peppers: { checked: !!ing.peppers, quantity: ENUM_TO_QUANTITY[ing.peppersQuantity] || 'regular' },
+      olives: { checked: !!ing.olives, quantity: ENUM_TO_QUANTITY[ing.olivesQuantity] || 'regular' },
     },
   };
+}
+
+export function deliveryMethodFromOrder(order) {
+  return ENUM_TO_DELIVERY_METHOD[order?.deliveryMethod] || 'delivery';
+}
+
+// Shared by "Order Again" and preset pizzas — both just need to push a
+// frontend-shaped pizza config (the same shape pizzaPropsFromOrder returns)
+// into the live builder's redux state.
+export function applyPizzaConfigToBuilder(props, dispatch) {
+  dispatch(pizzaActions.setSize(props.size));
+  dispatch(pizzaActions.setCrustStyle(props.crustStyle));
+  dispatch(pizzaActions.setBakeLevel(props.bakeLevel));
+  if (props.deliveryMethod) dispatch(pizzaActions.setDeliveryMethod(props.deliveryMethod));
+  dispatch(pizzaHubActions.restorePizza({ base: props.base, toppings: props.toppings }));
 }
 
 // "Order Again" — restores a past order's exact pizza into the live builder.
 export function applyOrderToBuilder(order, dispatch) {
   const props = pizzaPropsFromOrder(order);
-  dispatch(pizzaActions.setSize(props.size));
-  dispatch(pizzaActions.setCrustStyle(props.crustStyle));
-  dispatch(pizzaActions.setBakeLevel(props.bakeLevel));
-  dispatch(pizzaHubActions.restorePizza({ base: props.base, toppings: props.toppings }));
+  applyPizzaConfigToBuilder({ ...props, deliveryMethod: deliveryMethodFromOrder(order) }, dispatch);
 }

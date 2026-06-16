@@ -1,45 +1,66 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+// Light/Regular/Extra — the same tiers Domino's, Pizza Hut, and Papa John's
+// use on their own online ordering, rather than an in-house "medium" scale.
+export const TOPPING_QUANTITIES = { LIGHT: 'light', REGULAR: 'regular', EXTRA: 'extra' };
+
+// A pizza has exactly one sauce (or none) — Domino's real sauce menu.
+export const SAUCE_TYPES = {
+  NONE: 'none',
+  ROBUST_TOMATO: 'robust-tomato',
+  MARINARA: 'marinara',
+  GARLIC_PARMESAN: 'garlic-parmesan',
+  ALFREDO: 'alfredo',
+  BBQ: 'bbq',
+};
+
 const pizzaHubSlice = createSlice({
   name: 'pizzaHub',
   initialState: {
     base: {
       sauce: {
         title: 'sauce',
-        checked: false,
-        color: 'var(--sauce-color)',
+        sauceType: SAUCE_TYPES.NONE,
       },
+      // Cheese types are independent toggles — a pizza can combine
+      // mozzarella with feta, unlike sauce, which is a single choice.
       mozzarella: {
         title: 'mozzarella',
         checked: false,
-        color: 'var(--mozzarella-color)',
       },
-      cheese: {
-        title: 'cheese',
+      provolone: {
+        title: 'provolone',
         checked: false,
-        color: 'var(--cheese-color)',
+      },
+      feta: {
+        title: 'feta',
+        checked: false,
+      },
+      veganCheese: {
+        title: 'vegan cheese',
+        checked: false,
       },
     },
     toppings: {
       pepperoni: {
         title: 'pepperoni',
         checked: false,
-        medium: false,
+        quantity: TOPPING_QUANTITIES.REGULAR,
       },
       sausage: {
         title: 'sausage',
         checked: false,
-        medium: false,
+        quantity: TOPPING_QUANTITIES.REGULAR,
       },
       peppers: {
         title: 'peppers',
         checked: false,
-        medium: false,
+        quantity: TOPPING_QUANTITIES.REGULAR,
       },
       olives: {
         title: 'olives',
         checked: false,
-        medium: false,
+        quantity: TOPPING_QUANTITIES.REGULAR,
       },
     },
   },
@@ -48,30 +69,35 @@ const pizzaHubSlice = createSlice({
       state.toppings[action.payload.title].checked =
         !state.toppings[action.payload.title].checked;
     },
-    // Kept for any existing callers that rely on the toggle behaviour.
-    toggleToppingQuantity(state, action) {
-      state.toppings[action.payload.title].medium =
-        !state.toppings[action.payload.title].medium;
-    },
-    // Sets quantity explicitly: medium=true for medium, medium=false for regular.
-    setToppingMedium(state, action) {
-      state.toppings[action.payload.title].medium = action.payload.medium;
+    // Sets quantity explicitly to one of TOPPING_QUANTITIES.
+    setToppingQuantity(state, action) {
+      state.toppings[action.payload.title].quantity = action.payload.quantity;
     },
     toggleBase(state, action) {
       state.base[action.payload.title].checked =
         !state.base[action.payload.title].checked;
     },
-    // Bulk-restore checked/medium flags (e.g. "Order Again"), keeping each
-    // item's own title/color so unrelated shape fields aren't disturbed.
+    // Sauce is a single choice, not a toggle — set it explicitly.
+    setSauceType(state, action) {
+      state.base.sauce.sauceType = action.payload;
+    },
+    // Bulk-restore checked/quantity/sauceType flags (e.g. "Order Again" or a
+    // preset pizza), keeping each item's own title so unrelated shape fields
+    // aren't disturbed.
     restorePizza(state, action) {
       const { base, toppings } = action.payload;
       Object.entries(base || {}).forEach(([key, value]) => {
-        if (state.base[key]) state.base[key].checked = !!value.checked;
+        if (!state.base[key]) return;
+        if (key === 'sauce') {
+          state.base.sauce.sauceType = value.sauceType || SAUCE_TYPES.NONE;
+        } else {
+          state.base[key].checked = !!value.checked;
+        }
       });
       Object.entries(toppings || {}).forEach(([key, value]) => {
         if (state.toppings[key]) {
           state.toppings[key].checked = !!value.checked;
-          state.toppings[key].medium = !!value.medium;
+          state.toppings[key].quantity = value.quantity || TOPPING_QUANTITIES.REGULAR;
         }
       });
     },
@@ -81,9 +107,12 @@ const pizzaHubSlice = createSlice({
 export const pizzaHubActions = pizzaHubSlice.actions;
 
 // Checks whether the pizza has any selection at all (no base, no toppings).
-// Uses field-level comparison so shape differences (e.g. color) don't matter.
+// Uses field-level comparison so shape differences don't matter — sauce is
+// "set" when it has a real type, every other base item when checked.
 export const isPizzaEmpty = (state) => {
-  const noBase = Object.values(state.base).every((b) => !b.checked);
+  const noBase = Object.entries(state.base).every(([key, b]) =>
+    key === 'sauce' ? b.sauceType === SAUCE_TYPES.NONE : !b.checked
+  );
   const noToppings = Object.values(state.toppings).every((t) => !t.checked);
   return noBase && noToppings;
 };

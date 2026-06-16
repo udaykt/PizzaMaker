@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { visiblePieces, PLACEMENT_RADIUS } from './toppingPlacement';
 
 const noToppings = {
-  pepperoni: { checked: false, medium: false },
-  sausage: { checked: false, medium: false },
-  peppers: { checked: false, medium: false },
-  olives: { checked: false, medium: false },
+  pepperoni: { checked: false, quantity: 'regular' },
+  sausage: { checked: false, quantity: 'regular' },
+  peppers: { checked: false, quantity: 'regular' },
+  olives: { checked: false, quantity: 'regular' },
 };
 
 describe('visiblePieces', () => {
@@ -15,42 +15,38 @@ describe('visiblePieces', () => {
 
   it('only emits pieces for the checked toppings', () => {
     const pieces = visiblePieces(
-      { ...noToppings, pepperoni: { checked: true, medium: false } },
+      { ...noToppings, pepperoni: { checked: true, quantity: 'regular' } },
       'medium'
     );
     expect(pieces.length).toBeGreaterThan(0);
     expect(pieces.every((p) => p.type === 'pepperoni')).toBe(true);
   });
 
-  it('medium quantity places more pieces than regular', () => {
-    const regular = visiblePieces(
-      { ...noToppings, olives: { checked: true, medium: false } },
-      'medium'
-    );
-    const medium = visiblePieces(
-      { ...noToppings, olives: { checked: true, medium: true } },
-      'medium'
-    );
-    expect(medium.length).toBeGreaterThan(regular.length);
+  it('extra quantity places more pieces than regular, which places more than light', () => {
+    const light = visiblePieces({ ...noToppings, olives: { checked: true, quantity: 'light' } }, 'medium');
+    const regular = visiblePieces({ ...noToppings, olives: { checked: true, quantity: 'regular' } }, 'medium');
+    const extra = visiblePieces({ ...noToppings, olives: { checked: true, quantity: 'extra' } }, 'medium');
+    expect(regular.length).toBeGreaterThan(light.length);
+    expect(extra.length).toBeGreaterThan(regular.length);
   });
 
   it('a larger pizza places more pieces than a smaller one', () => {
-    const small = visiblePieces({ ...noToppings, sausage: { checked: true } }, 'regular');
-    const large = visiblePieces({ ...noToppings, sausage: { checked: true } }, 'large');
+    const small = visiblePieces({ ...noToppings, sausage: { checked: true, quantity: 'regular' } }, 'small');
+    const large = visiblePieces({ ...noToppings, sausage: { checked: true, quantity: 'regular' } }, 'large');
     expect(large.length).toBeGreaterThan(small.length);
   });
 
   it('is deterministic — same selection yields identical placement', () => {
-    const selection = { ...noToppings, peppers: { checked: true, medium: true } };
+    const selection = { ...noToppings, peppers: { checked: true, quantity: 'extra' } };
     expect(visiblePieces(selection, 'large')).toEqual(visiblePieces(selection, 'large'));
   });
 
   it('keeps every piece inside the placement radius', () => {
     const all = {
-      pepperoni: { checked: true, medium: true },
-      sausage: { checked: true, medium: true },
-      peppers: { checked: true, medium: true },
-      olives: { checked: true, medium: true },
+      pepperoni: { checked: true, quantity: 'extra' },
+      sausage: { checked: true, quantity: 'extra' },
+      peppers: { checked: true, quantity: 'extra' },
+      olives: { checked: true, quantity: 'extra' },
     };
     for (const p of visiblePieces(all, 'large')) {
       expect(Math.hypot(p.x, p.y)).toBeLessThanOrEqual(PLACEMENT_RADIUS + 0.001);
@@ -59,10 +55,16 @@ describe('visiblePieces', () => {
 
   it('gives each piece a stable, unique id', () => {
     const pieces = visiblePieces(
-      { ...noToppings, pepperoni: { checked: true, medium: true } },
+      { ...noToppings, pepperoni: { checked: true, quantity: 'extra' } },
       'medium'
     );
     const ids = pieces.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('treats a missing/unknown quantity as regular', () => {
+    const withUnknown = visiblePieces({ ...noToppings, olives: { checked: true, quantity: 'bogus' } }, 'medium');
+    const withRegular = visiblePieces({ ...noToppings, olives: { checked: true, quantity: 'regular' } }, 'medium');
+    expect(withUnknown.length).toBe(withRegular.length);
   });
 });

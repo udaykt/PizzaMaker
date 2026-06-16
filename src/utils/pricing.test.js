@@ -2,15 +2,17 @@ import { describe, it, expect } from 'vitest';
 import { computePriceBreakdown } from './pricing';
 
 const noBase = {
-  sauce: { checked: false },
+  sauce: { sauceType: 'none' },
   mozzarella: { checked: false },
-  cheese: { checked: false },
+  provolone: { checked: false },
+  feta: { checked: false },
+  veganCheese: { checked: false },
 };
 const noToppings = {
-  pepperoni: { checked: false, medium: false },
-  sausage: { checked: false, medium: false },
-  peppers: { checked: false, medium: false },
-  olives: { checked: false, medium: false },
+  pepperoni: { checked: false, quantity: 'regular' },
+  sausage: { checked: false, quantity: 'regular' },
+  peppers: { checked: false, quantity: 'regular' },
+  olives: { checked: false, quantity: 'regular' },
 };
 const sizePricing = { R: 8, M: 12, L: 16 };
 
@@ -21,32 +23,105 @@ describe('computePriceBreakdown', () => {
     expect(total).toBe(12);
   });
 
-  it('adds a line item and price per checked base', () => {
-    const base = { ...noBase, sauce: { checked: true }, cheese: { checked: true } };
+  it('standard sauce and cheese each charge fifty cents', () => {
+    const base = { ...noBase, sauce: { sauceType: 'marinara' }, mozzarella: { checked: true } };
     const { lineItems, total } = computePriceBreakdown({ base, toppings: noToppings, sizePricing, size: 'medium' });
     expect(lineItems).toEqual([
-      { key: 'sauce', label: 'Sauce', price: 0.5 },
-      { key: 'cheese', label: 'Cheese', price: 0.5 },
+      { key: 'sauce', label: 'Marinara', price: 0.5 },
+      { key: 'mozzarella', label: 'Mozzarella', price: 0.5 },
     ]);
     expect(total).toBe(13);
   });
 
-  it('labels topping quantity and charges medium vs regular correctly', () => {
-    const toppings = { ...noToppings, pepperoni: { checked: true, medium: true }, olives: { checked: true, medium: false } };
-    const { lineItems, total } = computePriceBreakdown({ base: noBase, toppings, sizePricing, size: 'medium' });
-    expect(lineItems).toEqual([
-      { key: 'pepperoni', label: 'Pepperoni (Medium)', price: 2.0 },
-      { key: 'olives', label: 'Olives (Regular)', price: 1.5 },
-    ]);
-    expect(total).toBe(15.5);
+  it('specialty sauces (Garlic Parmesan/Alfredo/BBQ) cost more than standard ones', () => {
+    const standard = computePriceBreakdown({ base: { ...noBase, sauce: { sauceType: 'robust-tomato' } }, toppings: noToppings, sizePricing, size: 'medium' }).total;
+    const specialty = computePriceBreakdown({ base: { ...noBase, sauce: { sauceType: 'bbq' } }, toppings: noToppings, sizePricing, size: 'medium' }).total;
+    expect(specialty).toBeGreaterThan(standard);
+    expect(specialty - 12).toBe(1.25);
   });
 
-  it('uses the right size price for regular/large', () => {
-    expect(computePriceBreakdown({ base: noBase, toppings: noToppings, sizePricing, size: 'regular' }).total).toBe(8);
+  it('specialty cheeses (provolone/feta/vegan) cost more than mozzarella', () => {
+    const mozz = computePriceBreakdown({ base: { ...noBase, mozzarella: { checked: true } }, toppings: noToppings, sizePricing, size: 'medium' }).total;
+    const feta = computePriceBreakdown({ base: { ...noBase, feta: { checked: true } }, toppings: noToppings, sizePricing, size: 'medium' }).total;
+    expect(feta).toBeGreaterThan(mozz);
+    expect(feta - 12).toBe(1.0);
+  });
+
+  it('multiple cheeses stack', () => {
+    const base = { ...noBase, mozzarella: { checked: true }, provolone: { checked: true }, feta: { checked: true } };
+    const { lineItems, total } = computePriceBreakdown({ base, toppings: noToppings, sizePricing, size: 'medium' });
+    expect(lineItems).toEqual([
+      { key: 'mozzarella', label: 'Mozzarella', price: 0.5 },
+      { key: 'provolone', label: 'Provolone', price: 1.0 },
+      { key: 'feta', label: 'Feta', price: 1.0 },
+    ]);
+    expect(total).toBe(14.5);
+  });
+
+  it('charges nothing for sauce when sauceType is none', () => {
+    const { lineItems, total } = computePriceBreakdown({ base: noBase, toppings: noToppings, sizePricing, size: 'medium' });
+    expect(lineItems.find((i) => i.key === 'sauce')).toBeUndefined();
+    expect(total).toBe(12);
+  });
+
+  it('labels topping quantity and charges each tier correctly', () => {
+    const toppings = {
+      ...noToppings,
+      pepperoni: { checked: true, quantity: 'extra' },
+      olives: { checked: true, quantity: 'light' },
+    };
+    const { lineItems, total } = computePriceBreakdown({ base: noBase, toppings, sizePricing, size: 'medium' });
+    expect(lineItems).toEqual([
+      { key: 'pepperoni', label: 'Pepperoni (Extra)', price: 3.0 },
+      { key: 'olives', label: 'Olives (Light)', price: 1.0 },
+    ]);
+    expect(total).toBe(16);
+  });
+
+  it('extra costs roughly double regular, matching real-world pizza chain pricing', () => {
+    const regular = computePriceBreakdown({
+      base: noBase,
+      toppings: { ...noToppings, pepperoni: { checked: true, quantity: 'regular' } },
+      sizePricing,
+      size: 'medium',
+    }).total;
+    const extra = computePriceBreakdown({
+      base: noBase,
+      toppings: { ...noToppings, pepperoni: { checked: true, quantity: 'extra' } },
+      sizePricing,
+      size: 'medium',
+    }).total;
+    expect(extra - 12).toBeCloseTo((regular - 12) * 2, 5);
+  });
+
+  it('uses the right size price for small/large', () => {
+    expect(computePriceBreakdown({ base: noBase, toppings: noToppings, sizePricing, size: 'small' }).total).toBe(8);
     expect(computePriceBreakdown({ base: noBase, toppings: noToppings, sizePricing, size: 'large' }).total).toBe(16);
   });
 
   it('falls back to default size pricing when sizePricing is missing', () => {
     expect(computePriceBreakdown({ base: noBase, toppings: noToppings, size: 'large' }).total).toBe(16);
+  });
+
+  it('treats a missing/unknown quantity as regular pricing', () => {
+    const toppings = { ...noToppings, sausage: { checked: true, quantity: undefined } };
+    const { lineItems } = computePriceBreakdown({ base: noBase, toppings, sizePricing, size: 'medium' });
+    expect(lineItems[0]).toEqual({ key: 'sausage', label: 'Sausage (Regular)', price: 1.5 });
+  });
+
+  it('adds a delivery fee line item only when deliveryMethod is "delivery"', () => {
+    const carryout = computePriceBreakdown({ base: noBase, toppings: noToppings, sizePricing, size: 'medium', deliveryMethod: 'carryout' });
+    expect(carryout.lineItems).toHaveLength(0);
+    expect(carryout.total).toBe(12);
+
+    const delivery = computePriceBreakdown({ base: noBase, toppings: noToppings, sizePricing, size: 'medium', deliveryMethod: 'delivery' });
+    expect(delivery.lineItems).toEqual([{ key: 'deliveryFee', label: 'Delivery Fee', price: 2.99 }]);
+    expect(delivery.total).toBeCloseTo(14.99, 5);
+  });
+
+  it('omits the delivery fee when deliveryMethod is not passed at all (live builder estimate)', () => {
+    const { lineItems, total } = computePriceBreakdown({ base: noBase, toppings: noToppings, sizePricing, size: 'medium' });
+    expect(lineItems).toHaveLength(0);
+    expect(total).toBe(12);
   });
 });

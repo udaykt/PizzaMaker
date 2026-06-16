@@ -161,8 +161,10 @@ export const TOPPING_COUNT = {
   },
 };
 
+// "Small" matches real chain terminology (Domino's, Pizza Hut, Papa John's
+// all call their smallest size "Small", never "Regular").
 export const PIZZASIZES = {
-  R: 'regular',
+  R: 'small',
   M: 'medium',
   L: 'large',
 };
