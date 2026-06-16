@@ -6,7 +6,6 @@ const navigationSlice = createSlice({
     showLoginPage: false,
     showMenuPage: false,
     showSignUpPage: false,
-    showGuestPage: false,
     showProfileMenu: false,
     sizePricing: { R: 8, M: 12, L: 16 },
   },
@@ -19,9 +18,6 @@ const navigationSlice = createSlice({
     },
     toggleSignupPage(state) {
       state.showSignUpPage = !state.showSignUpPage;
-    },
-    toggleGuestPage(state) {
-      state.showGuestPage = !state.showGuestPage;
     },
     toggleProfileMenu(state, action) {
       state.showProfileMenu = action.payload;

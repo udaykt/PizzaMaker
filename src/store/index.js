@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import dashboardSlice from './dashboardSlice';
 import navigationSlice from './navigationSlice';
 import orderSlice from './orderSlice';
 import pizzaHubSlice from './pizzaHubSlice';
@@ -13,7 +12,6 @@ const store = configureStore({
     pizzaHub: pizzaHubSlice.reducer,
     pizza: pizzaSlice.reducer,
     auth: authSlice.reducer,
-    dashboard: dashboardSlice.reducer,
     order: orderSlice.reducer,
     ui: uiSlice.reducer,
   },
