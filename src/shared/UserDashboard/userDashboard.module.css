@@ -7,12 +7,12 @@
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--glass-border);
-  border-top: 2px solid var(--accent);
-  width: 88%;
-  max-width: 1000px;
+  width: 90%;
+  max-width: 1080px;
   min-width: 320px;
-  height: 70%;
-  min-height: 400px;
+  height: 80%;
+  min-height: 520px;
+  max-height: 800px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -22,10 +22,26 @@
   animation: formFadeIn 0.22s ease-out;
 }
 
+/* A uniform 1px border keeps the rounded corners clean — a thicker top-only
+   border (as this used to be) doesn't blend with a thinner side border around
+   a curve, so it visibly "steps" at the corners. The accent line is its own
+   layer instead, clipped to the same radius by the parent's overflow:hidden. */
+.userDashboard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+  z-index: 1;
+}
+
 @media screen and (max-width: 700px) {
   .userDashboard {
     flex-direction: column;
     height: 90%;
+    max-height: none;
     width: 96%;
     overflow-y: auto;
     align-items: stretch;

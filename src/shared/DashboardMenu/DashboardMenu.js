@@ -1,6 +1,7 @@
-﻿import React, { Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
+import { Info, Mail, Receipt, Settings, ShoppingCart, User } from 'lucide-react';
 import {
   ABOUT_PATH,
   ADMIN_PATH,
@@ -17,12 +18,12 @@ const DashboardMenu = (props) => {
   const isAdmin = userType === 'ADMIN';
 
   const menuItems = [
-    { name: 'My Profile', path: PROFILE_PATH },
-    { name: 'Orders',     path: ORDERS_PATH  },
-    { name: 'Checkout',   path: CHECKOUT_PATH },
-    { name: 'Contact',    path: CONTACT_PATH  },
-    { name: 'About',      path: ABOUT_PATH    },
-    ...(isAdmin ? [{ name: '⚙ Admin', path: ADMIN_PATH }] : []),
+    { name: 'My Profile', path: PROFILE_PATH, icon: User },
+    { name: 'Orders', path: ORDERS_PATH, icon: Receipt },
+    { name: 'Checkout', path: CHECKOUT_PATH, icon: ShoppingCart },
+    { name: 'Contact', path: CONTACT_PATH, icon: Mail },
+    { name: 'About', path: ABOUT_PATH, icon: Info },
+    ...(isAdmin ? [{ name: 'Admin', path: ADMIN_PATH, icon: Settings, admin: true }] : []),
   ];
 
   return (
@@ -34,11 +35,12 @@ const DashboardMenu = (props) => {
         <div className={styles.menuLinks}>
           <nav>
             <ul>
-              {menuItems.map((i) => (
-                <li key={i.name}>
-                  <NavLink to={i.path} style={{ textDecoration: 'none' }}>
-                    <Button className={i.name.includes('Admin') ? `${styles.linkButton} ${styles.adminLink}` : styles.linkButton}>
-                      {i.name}
+              {menuItems.map((item) => (
+                <li key={item.name}>
+                  <NavLink to={item.path} style={{ textDecoration: 'none' }}>
+                    <Button className={item.admin ? `${styles.linkButton} ${styles.adminLink}` : styles.linkButton}>
+                      <item.icon size={16} className={styles.linkIcon} />
+                      {item.name}
                     </Button>
                   </NavLink>
                 </li>

@@ -1,17 +1,21 @@
 .dashboard {
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  /* flex-start, not center — centering taller-than-container content inside
+     an overflow:auto box makes the top half unreachable: the overflow splits
+     evenly above and below, but a scroll container can only ever reveal
+     overflow *below* the fold. That's what was cropping Checkout's top when
+     toppings (and the ticket card) grew tall. */
+  justify-content: flex-start;
   align-items: center;
-  position: fixed;
-  right: 1%;
-  width: 60%;
-  height: 95%;
+  flex: 1;
+  height: 100%;
+  padding: 24px 0;
+  box-sizing: border-box;
   background: rgba(18, 16, 14, 0.55);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-left: 1px solid var(--glass-border-subtle);
-  border-radius: var(--radius-xl);
   overflow: auto;
 }
 
@@ -19,4 +23,11 @@
   color: var(--text-muted);
   font-family: monospace;
   font-size: 0.9rem;
+}
+
+@media screen and (max-width: 700px) {
+  .dashboard {
+    height: auto;
+    flex: 1;
+  }
 }

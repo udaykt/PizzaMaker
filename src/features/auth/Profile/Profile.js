@@ -1,7 +1,8 @@
 ﻿import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import { LOGIN_PATH, ORDERS_PATH } from '@/utils/routes';
+import { uiActions } from '@/store/uiSlice';
 import Logout from '@/features/auth/Logout/Logout';
 import styles from './profile.module.css';
 
@@ -13,6 +14,8 @@ const ACCOUNT_TYPE_LABELS = {
 
 const Profile = () => {
   const userState = useSelector((state) => state.auth);
+  const soundEnabled = useSelector((state) => state.ui.soundEnabled);
+  const dispatch = useDispatch();
   const accountInfo = ACCOUNT_TYPE_LABELS[userState.userType] || { label: userState.userType, color: '#999' };
 
   return (
@@ -37,6 +40,21 @@ const Profile = () => {
         <div className={styles.profileRow}>
           <span className={styles.profileLabel}>Account</span>
           <span className={styles.profileValue}>{accountInfo.label}</span>
+        </div>
+      </div>
+
+      <div className={styles.profileDetails}>
+        <div className={styles.profileRow}>
+          <span className={styles.profileLabel}>Topping Sounds</span>
+          <button
+            type='button'
+            className={`${styles.switch} ${soundEnabled ? styles.switchOn : ''}`}
+            role='switch'
+            aria-checked={soundEnabled}
+            onClick={() => dispatch(uiActions.toggleSound())}
+          >
+            <span className={styles.switchKnob} />
+          </button>
         </div>
       </div>
 

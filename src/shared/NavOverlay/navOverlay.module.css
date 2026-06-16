@@ -13,9 +13,23 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border-subtle);
-  border-top: 2px solid var(--accent);
   z-index: 100;
+  overflow: hidden;
   animation: navFadeIn 0.22s ease-out;
+}
+
+/* Uniform 1px border for clean rounded corners; the accent line is its own
+   clipped layer instead of a mismatched-width border-top (see UserDashboard
+   for the same fix and why a thicker top border looks stepped on a curve). */
+.navOverlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+  z-index: 1;
 }
 
 @keyframes navFadeIn {
@@ -61,8 +75,12 @@
 }
 
 .linkButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
   height: 46px;
+  padding: 0 16px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -72,6 +90,11 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.linkIcon {
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 
 .linkButton:hover {
