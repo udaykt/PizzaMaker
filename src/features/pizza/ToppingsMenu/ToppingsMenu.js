@@ -1,7 +1,26 @@
+import { Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { pizzaHubActions } from '@/store/pizzaHubSlice';
+import { pizzaHubActions, TOPPING_QUANTITIES } from '@/store/pizzaHubSlice';
 import usePizzaSound from '@/hooks/usePizzaSound';
 import styles from './toppingsMenu.module.css';
+
+// Ties each row's identity dot to the same colors the topping renders with
+// on the pizza itself, so picking feels directly connected to what you'll see.
+const TOPPING_COLOR_VAR = {
+  pepperoni: 'var(--pepperoni-color)',
+  sausage: 'var(--sausage-color)',
+  peppers: 'var(--pepper-color)',
+  olives: 'var(--olives-color)',
+};
+
+// Light/Regular/Extra — the terms Domino's, Pizza Hut, and Papa John's all
+// use for topping quantity on their own ordering sites.
+const QUANTITY_LABELS = {
+  [TOPPING_QUANTITIES.LIGHT]: 'Light',
+  [TOPPING_QUANTITIES.REGULAR]: 'Regular',
+  [TOPPING_QUANTITIES.EXTRA]: 'Extra',
+};
+const QUANTITY_ORDER = [TOPPING_QUANTITIES.LIGHT, TOPPING_QUANTITIES.REGULAR, TOPPING_QUANTITIES.EXTRA];
 
 const ToppingsMenu = (props) => {
   const toppings = useSelector((state) => state.pizzaHub.toppings);
@@ -17,14 +36,8 @@ const ToppingsMenu = (props) => {
     if (e.target.checked) playPlop();
   };
 
-  // Explicitly set medium to true/false rather than toggling, so that selecting
-  // "regular" always means regular and "medium" always means medium.
-  const regularHandler = (key) => {
-    dispatch(pizzaHubActions.setToppingMedium({ title: key, medium: false }));
-  };
-
-  const mediumHandler = (key) => {
-    dispatch(pizzaHubActions.setToppingMedium({ title: key, medium: true }));
+  const quantityHandler = (key, quantity) => {
+    dispatch(pizzaHubActions.setToppingQuantity({ title: key, quantity }));
   };
 
   return (
@@ -33,42 +46,38 @@ const ToppingsMenu = (props) => {
       <div className={styles.toppings}>
         {Object.entries(toppings).map(([key, value]) => {
           return (
-            <div className={`${styles.topping} ${value.checked ? styles.toppingActive : ''}`} key={key + value}>
-              <div>
-                <h3>{key}</h3>
+            <div className={`${styles.topping} ${value.checked ? styles.toppingActive : ''}`} key={key}>
+              <div className={styles.toppingMain}>
+                <div className={styles.checkbox}>
+                  <input
+                    type='checkbox'
+                    name={key}
+                    id={key}
+                    onChange={(e) => checkboxChangeHandler(e, key)}
+                  />
+                  <label htmlFor={key}></label>
+                </div>
+                <span className={styles.toppingName}>
+                  <span className={styles.toppingDot} style={{ background: TOPPING_COLOR_VAR[key] }} />
+                  {key}
+                </span>
               </div>
-              <div className={styles.checkbox}>
-                <input
-                  type='checkbox'
-                  name={key}
-                  id={key}
-                  key={key + value + 'checkbox'}
-                  onChange={(e) => checkboxChangeHandler(e, key)}
-                />
-                <label htmlFor={key}></label>
-              </div>
-              <div className={styles.radio}>
-                <input
-                  type='radio'
-                  id={key + '_small'}
-                  value='regular'
-                  name={key}
-                  key={key + value + 'small'}
-                  defaultChecked
-                  onChange={() => regularHandler(key)}
-                  disabled={!toppings[key].checked}
-                />
-                <label htmlFor={key + '_small'}>regular</label>
-                <input
-                  type='radio'
-                  id={key + '_medium'}
-                  value='medium'
-                  name={key}
-                  key={key + value + 'radio'}
-                  onChange={() => mediumHandler(key)}
-                  disabled={!toppings[key].checked}
-                />
-                <label htmlFor={key + '_medium'}>medium</label>
+
+              <div className={styles.quantityPill}>
+                {QUANTITY_ORDER.map((q) => (
+                  <Fragment key={q}>
+                    <input
+                      type='radio'
+                      id={`${key}_${q}`}
+                      value={q}
+                      name={key}
+                      checked={value.quantity === q}
+                      onChange={() => quantityHandler(key, q)}
+                      disabled={!value.checked}
+                    />
+                    <label htmlFor={`${key}_${q}`}>{QUANTITY_LABELS[q]}</label>
+                  </Fragment>
+                ))}
               </div>
             </div>
           );

@@ -1,3 +1,8 @@
+/* Single implicit row now — every column spans the page's full content
+   height naturally (rather than being split into two explicit row tracks),
+   so the tallest column (Base, once Crust & Sauce + Cheese are expanded)
+   correctly grows the grid instead of being capped and silently overflowing
+   past it. */
 .pizzahub {
   display: grid;
   position: relative;
@@ -5,9 +10,27 @@
   width: auto;
   min-height: 100vh;
   min-width: 100vw;
-  grid-template-columns: 1fr minmax(100px, 300px) 1fr;
-  grid-template-rows: 55vh 1fr;
+  grid-template-columns: 1fr minmax(160px, 380px) 1fr;
   z-index: 0;
+}
+
+/* Pizza preview + Order button, pinned together. Scrolling the page moves
+   the Base (left) and Toppings (right) columns past this one, but this one
+   stays put — the live preview is always visible no matter how far down
+   you've scrolled to reach Sauce/Cheese/Toppings. Desktop only; see media
+   query below. */
+.previewColumn {
+  grid-column: 2/3;
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  z-index: 2;
 }
 
 .pizzaDiv {
@@ -15,10 +38,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 300px;
-  height: 300px;
-  grid-column: 2/3;
-  grid-row: 1/2;
+  /* Hero-sized, but scales down on narrow viewports instead of overflowing
+     — same clamp() pattern already used for the Base panel and Toppings
+     menu widths. */
+  width: clamp(260px, 38vw, 380px);
+  height: clamp(260px, 38vw, 380px);
 }
 
 .description {
@@ -39,13 +63,16 @@
 
 .descBase {
   width: auto;
-  height: 100vh;
+  /* min-height, not a fixed height — when Crust & Sauce + Cheese are all
+     expanded this column gets taller than one viewport, and it needs to
+     actually grow (not just visually overflow) so the grid track sizes to
+     match and the sticky preview column keeps tracking the full scroll. */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
   grid-column: 1/2;
-  grid-row: 1/3;
 }
 .description p {
   font-size: larger;
@@ -58,17 +85,20 @@
   width: 100%;
 }
 
-.orderButton {
-  grid-column: 2/3;
-  grid-row: 2/3;
+.presetsWrapper {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
+  width: 100%;
+}
+
+.orderButton {
+  display: flex;
+  justify-content: center;
   align-items: center;
 }
 
 .toppingsMenu {
   grid-column: 3/4;
-  grid-row: 1/3;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -76,7 +106,6 @@
 
 .backdrop {
   grid-column: 1/4;
-  grid-row: 1/3;
 }
 
 .priceTag {
@@ -91,9 +120,6 @@
 }
 
 .priceLabel {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -125,6 +151,12 @@
   }
   .pizza {
     position: relative;
+  }
+  /* Stacked flow, not side-by-side columns — the sticky pin only makes
+     sense when Base/Toppings scroll past the preview horizontally next to
+     it. Here everything is already one vertical sequence. */
+  .previewColumn {
+    position: static;
   }
   .orderButton {
     margin-bottom: 30px;

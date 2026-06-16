@@ -15,10 +15,10 @@ import {
 } from '@/utils/routes';
 import { fetchMenuPricing } from '@/api/appApi';
 import Base from '@/features/pizza/Base/Base';
+import PresetPizzas from '@/features/pizza/Presets/PresetPizzas';
 import PizzaDisplay from '@/features/pizza/PizzaDisplay/PizzaDisplay';
 import ToppingsMenu from '@/features/pizza/ToppingsMenu/ToppingsMenu';
 import AnimatedPrice from '@/shared/AnimatedPrice/AnimatedPrice';
-import SoundToggle from '@/shared/SoundToggle/SoundToggle';
 import { computePriceBreakdown } from '@/utils/pricing';
 import styles from './pizzahub.module.css';
 
@@ -64,27 +64,32 @@ const PizzaHub = (props) => {
           </strong>
           <p>Make your own pizza. Customize and Order.</p>
           <div className={styles.priceTag}>
-            <span className={styles.priceLabel}>
-              Estimated Total
-              <SoundToggle />
-            </span>
+            <span className={styles.priceLabel}>Estimated Total</span>
             <span className={styles.priceValue}>
               <AnimatedPrice value={computePrice()} />
             </span>
           </div>
         </div>
+        <div className={styles.presetsWrapper}>
+          <PresetPizzas />
+        </div>
         <div className={styles.baseWrapper}>
           <Base />
         </div>
       </div>
-      <div className={styles.pizzaDiv}>
-        <PizzaDisplay {...state} />
+      {/* Pizza + Order button travel together and stay pinned (desktop only
+          — see media query) so the live preview never scrolls out of view
+          while picking sauce/cheese/toppings further down the side columns. */}
+      <div className={styles.previewColumn}>
+        <div className={styles.pizzaDiv}>
+          <PizzaDisplay {...state} />
+        </div>
+        <div className={styles.orderButton}>
+          <OrderButton />
+        </div>
       </div>
       <div className={styles.toppingsMenu}>
         <ToppingsMenu {...state} />
-      </div>
-      <div className={styles.orderButton}>
-        <OrderButton />
       </div>
       {/* Mobile only (see media query) — keeps the running total visible
           while scrolling through the toppings list further down the page. */}
