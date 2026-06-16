@@ -5,6 +5,7 @@ import com.pizzamaker.entity.CrustStyle;
 import com.pizzamaker.entity.OrderStatus;
 import com.pizzamaker.entity.PizzaSize;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record OrderResponse(
@@ -14,6 +15,7 @@ public record OrderResponse(
         PizzaSize pizzaSize,
         CrustStyle crustStyle,
         BakeLevel bakeLevel,
+        BigDecimal price,
         OrderStatus status,
         LocalDateTime createdAt
 ) {

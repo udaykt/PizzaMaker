@@ -84,6 +84,7 @@ public class OrderService {
                 .pizzaSize(request.pizzaSize())
                 .crustStyle(request.crustStyle() != null ? request.crustStyle() : CrustStyle.CLASSIC)
                 .bakeLevel(request.bakeLevel() != null ? request.bakeLevel() : BakeLevel.GOLDEN)
+                .price(PricingService.computeTotal(request))
                 .build();
 
         Order saved = orderRepository.save(order);

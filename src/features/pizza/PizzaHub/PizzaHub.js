@@ -19,6 +19,7 @@ import PizzaDisplay from '@/features/pizza/PizzaDisplay/PizzaDisplay';
 import ToppingsMenu from '@/features/pizza/ToppingsMenu/ToppingsMenu';
 import AnimatedPrice from '@/shared/AnimatedPrice/AnimatedPrice';
 import SoundToggle from '@/shared/SoundToggle/SoundToggle';
+import { computePriceBreakdown } from '@/utils/pricing';
 import styles from './pizzahub.module.css';
 
 const Menu = lazy(() => import('@/shared/NavOverlay/NavOverlay'));
@@ -28,10 +29,6 @@ const SignUp = lazy(() => import('@/features/auth/SignUp/SignUp'));
 const Guest = lazy(() => import('@/features/auth/Guest/Guest'));
 const UserDashboard = lazy(() => import('@/shared/UserDashboard/UserDashboard'));
 const Modal = lazy(() => import('@/shared/Modal/Modal'));
-
-const TOPPING_PRICE_REGULAR = 1.5;
-const TOPPING_PRICE_MEDIUM = 2.0;
-const BASE_ITEM_PRICE = 0.5;
 
 const PizzaHub = (props) => {
   const userState = useSelector((state) => state.auth);
@@ -51,18 +48,8 @@ const PizzaHub = (props) => {
     if (userState) setUserName(userState.firstName);
   }, [userState, uiState]);
 
-  const SIZE_TO_ENUM = { regular: 'R', medium: 'M', large: 'L' };
-
-  const computePrice = () => {
-    const sizeKey = (pizzaSize && SIZE_TO_ENUM[pizzaSize]) || 'M';
-    let total = sizePricing[sizeKey] || 12;
-    const { base, toppings } = pizzahubState;
-    Object.values(base).forEach((b) => { if (b.checked) total += BASE_ITEM_PRICE; });
-    Object.values(toppings).forEach((t) => {
-      if (t.checked) total += t.medium ? TOPPING_PRICE_MEDIUM : TOPPING_PRICE_REGULAR;
-    });
-    return total;
-  };
+  const computePrice = () =>
+    computePriceBreakdown({ ...pizzahubState, sizePricing, size: pizzaSize }).total;
 
   const state = {
     parts: { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' },

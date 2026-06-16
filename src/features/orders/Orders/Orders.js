@@ -5,9 +5,10 @@ import { useHistory } from 'react-router-dom';
 import useOrderUpdates from '@/hooks/useOrderUpdates';
 import { fetchUserOrders } from '@/api/appApi';
 import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
-import { applyOrderToBuilder, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
+import { applyOrderToBuilder, orderDisplayLabels, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH } from '@/utils/routes';
+import { formatPrice } from '@/utils/formatPrice';
 import Button from '@/shared/Button/Button';
 import LazyMount from '@/shared/LazyMount/LazyMount';
 import styles from './orders.module.css';
@@ -108,6 +109,7 @@ const Orders = () => {
           {orders.map((order) => {
             const statusStyle = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
             const emoji = STATUS_EMOJI[order.status] || '🍕';
+            const labels = orderDisplayLabels(order);
             return (
               <li key={order.oid} className={styles.orderCard}>
                 <div className={styles.orderCardHeader}>
@@ -128,7 +130,7 @@ const Orders = () => {
                   <div className={styles.orderDetails}>
                     <div className={styles.orderDetail}>
                       <span className={styles.orderDetailLabel}>Size</span>
-                      <span className={styles.orderDetailValue}>{order.pizzaSize || 'M'}</span>
+                      <span className={styles.orderDetailValue}>{labels.size}, {labels.crustStyle}</span>
                     </div>
                     <div className={styles.orderDetail}>
                       <span className={styles.orderDetailLabel}>Toppings</span>
@@ -139,6 +141,10 @@ const Orders = () => {
                       <span className={styles.orderDetailValue}>
                         {order.createdAt ? new Date(order.createdAt).toLocaleString() : '—'}
                       </span>
+                    </div>
+                    <div className={styles.orderDetail}>
+                      <span className={styles.orderDetailLabel}>Total</span>
+                      <span className={`${styles.orderDetailValue} ${styles.orderPrice}`}>{formatPrice(order.price)}</span>
                     </div>
                   </div>
                 </div>

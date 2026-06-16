@@ -28,6 +28,7 @@ public final class OrderMapper {
                 order.getPizzaSize(),
                 order.getCrustStyle(),
                 order.getBakeLevel(),
+                order.getPrice(),
                 order.getStatus(),
                 order.getCreatedAt()
         );

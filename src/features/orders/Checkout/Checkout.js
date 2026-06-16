@@ -1,43 +1,37 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { isPizzaEmpty } from '@/store/pizzaHubSlice';
-import Button from '@/shared/Button/Button';
-import Pizza from '@/features/pizza/PizzaDisplay/PizzaDisplay';
-import styles from './checkout.module.css';
 import { useHistory } from 'react-router-dom';
+import { isPizzaEmpty } from '@/store/pizzaHubSlice';
+import { computePriceBreakdown } from '@/utils/pricing';
+import { formatPrice } from '@/utils/formatPrice';
+import Button from '@/shared/Button/Button';
+import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
 import { CONFIRM_PATH, HOME_PATH } from '@/utils/routes';
 import { createOrder } from '@/api/appApi';
 import { uiActions } from '@/store/uiSlice';
+import styles from './checkout.module.css';
 
-const SELECTED = 'selected';
-const NOTSELECTED = 'not selected';
-const REGULAR = 'regular';
-const MEDIUM = 'medium';
+const SIZE_LABELS = { regular: 'Regular', medium: 'Medium', large: 'Large' };
+const CRUST_STYLE_LABELS = { thin: 'Thin', classic: 'Classic', stuffed: 'Stuffed' };
+const BAKE_LEVEL_LABELS = { light: 'Light', golden: 'Golden', 'well-done': 'Well-done' };
 
-const Checkout = (props) => {
+const Checkout = () => {
   const orderState = useSelector((state) => state.pizzaHub);
-  const baseState = orderState.base;
-  const toppingsState = orderState.toppings;
-  const order = { base: baseState, toppings: toppingsState };
-  const state = {
-    parts: {
-      1: 'one',
-      2: 'two',
-      3: 'three',
-      4: 'four',
-      5: 'five',
-      6: 'six',
-    },
-  };
+  const { base: baseState, toppings: toppingsState } = orderState;
+  const sizePricing = useSelector((state) => state.navigation.sizePricing);
+  const pizzaSize = useSelector((state) => state.pizza.size);
+  const crustStyle = useSelector((state) => state.pizza.crustStyle);
+  const bakeLevel = useSelector((state) => state.pizza.bakeLevel);
+
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const customizeHandler = (e) => {
+  const customizeHandler = () => {
     history.push(HOME_PATH);
     dispatch(uiActions.setBackdrop(false));
   };
 
-  const orderHandler = (e) => {
+  const orderHandler = () => {
     createOrder(null, orderState)
       .then((order) => {
         // setCurrentOrder is already dispatched inside createOrder (appApi)
@@ -48,66 +42,74 @@ const Checkout = (props) => {
       });
   };
 
-  const empty = isPizzaEmpty(order);
+  const empty = isPizzaEmpty(orderState);
+
+  if (empty) {
+    return (
+      <div className={styles.checkoutEmpty}>
+        <span className={styles.emptyIcon}>🍕</span>
+        <p>Nothing to checkout yet.</p>
+        <Button className={styles.emptyCta} onClick={customizeHandler}>
+          Customize Your Pizza
+        </Button>
+      </div>
+    );
+  }
+
+  const { lineItems, total } = computePriceBreakdown({
+    base: baseState,
+    toppings: toppingsState,
+    sizePricing,
+    size: pizzaSize,
+  });
 
   return (
-    (!empty && (
-      <div className={styles.checkout}>
-        <div className={styles.pizzaCheckoutDiv}>
-          <Pizza {...state} />
+    <div className={styles.checkout}>
+      <div className={styles.previewPanel}>
+        <div className={styles.previewGlow} />
+        <PizzaCanvas editable />
+      </div>
+
+      <div className={styles.ticketCard}>
+        <h2 className={styles.ticketHeader}>Your Pizza</h2>
+
+        <div className={styles.ticketRow}>
+          <span className={styles.ticketLabel}>Size</span>
+          <span className={styles.ticketValue}>{SIZE_LABELS[pizzaSize] || 'Medium'}</span>
         </div>
-        <table className={styles.ingredients}>
-          <thead>
-            <tr>
-              <td colSpan={2}>
-                <h1>Ingredients</h1>
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(baseState).map(([k, v]) => {
-              return (
-                <tr key={k}>
-                  <td>
-                    <h3>{k}</h3>
-                  </td>
-                  <td id='baseValues'>
-                    <h3>{v.checked ? SELECTED : NOTSELECTED}</h3>
-                  </td>
-                </tr>
-              );
-            })}
-            {Object.entries(toppingsState).map(([k, v]) => {
-              return (
-                <tr key={k}>
-                  <td>
-                    <h3>{k}</h3>
-                  </td>
-                  <td>
-                    <h3>
-                      {v.checked ? (v.medium ? MEDIUM : REGULAR) : NOTSELECTED}
-                    </h3>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className={styles.ticketRow}>
+          <span className={styles.ticketLabel}>Crust</span>
+          <span className={styles.ticketValue}>
+            {CRUST_STYLE_LABELS[crustStyle] || 'Classic'}, {BAKE_LEVEL_LABELS[bakeLevel] || 'Golden'}
+          </span>
+        </div>
+
+        <div className={styles.ticketDivider} />
+
+        {lineItems.map((item) => (
+          <div className={styles.ticketRow} key={item.key}>
+            <span className={styles.ticketLabel}>{item.label}</span>
+            <span className={styles.ticketValue}>{formatPrice(item.price)}</span>
+          </div>
+        ))}
+
+        <div className={styles.ticketDivider} />
+
+        <div className={styles.ticketRow}>
+          <span className={styles.ticketTotalLabel}>Total</span>
+          <span className={styles.ticketTotalValue}>{formatPrice(total)}</span>
+        </div>
+
         <div className={styles.checkoutButtons}>
           <Button className={styles.customizeButton} onClick={customizeHandler}>
             Customize
           </Button>
           <Button className={styles.checkoutOrderButton} onClick={orderHandler}>
-            Order
+            Place Order
           </Button>
         </div>
       </div>
-    )) ||
-    (empty && (
-      <p className={styles.emptyCheckout}>
-        Nothing to checkout! Customize and click order to checkout!
-      </p>
-    ))
+    </div>
   );
 };
 

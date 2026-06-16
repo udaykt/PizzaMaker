@@ -188,6 +188,11 @@
   color: rgba(255, 255, 255, 0.85);
 }
 
+.orderPrice {
+  color: #ff6b00;
+  font-weight: bold;
+}
+
 .orderAgainBtn {
   margin-top: 14px;
   width: 100%;

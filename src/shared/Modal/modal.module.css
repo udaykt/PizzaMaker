@@ -95,6 +95,12 @@
   font-weight: bold;
 }
 
+.receiptPrice {
+  color: #ff6b00;
+  font-weight: bold;
+  font-size: 1.05rem;
+}
+
 .receiptStatus {
   background: #fff3cd;
   color: #856404;

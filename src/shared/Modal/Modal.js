@@ -5,7 +5,8 @@ import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH, ORDERS_PATH } from '@/utils/routes';
 import Button from '@/shared/Button/Button';
 import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
-import { pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
+import { orderDisplayLabels, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
+import { formatPrice } from '@/utils/formatPrice';
 import styles from './modal.module.css';
 
 const Modal = (props) => {
@@ -32,6 +33,7 @@ const Modal = (props) => {
   };
 
   const ingredients = formatIngredients(currentOrder);
+  const labels = orderDisplayLabels(currentOrder);
 
   return (
     <div className={styles.modal}>
@@ -51,7 +53,11 @@ const Modal = (props) => {
         </div>
         <div className={styles.receiptRow}>
           <span className={styles.receiptLabel}>Size</span>
-          <span className={styles.receiptValue}>{currentOrder?.pizzaSize || 'Medium'}</span>
+          <span className={styles.receiptValue}>{labels.size}</span>
+        </div>
+        <div className={styles.receiptRow}>
+          <span className={styles.receiptLabel}>Crust</span>
+          <span className={styles.receiptValue}>{labels.crustStyle}, {labels.bakeLevel}</span>
         </div>
         {ingredients.length > 0 && (
           <div className={styles.receiptRow}>
@@ -59,6 +65,10 @@ const Modal = (props) => {
             <span className={styles.receiptValue}>{ingredients.join(', ')}</span>
           </div>
         )}
+        <div className={styles.receiptRow}>
+          <span className={styles.receiptLabel}>Total</span>
+          <span className={`${styles.receiptValue} ${styles.receiptPrice}`}>{formatPrice(currentOrder?.price)}</span>
+        </div>
         <div className={styles.receiptRow}>
           <span className={styles.receiptLabel}>Status</span>
           <span className={`${styles.receiptValue} ${styles.receiptStatus}`}>{currentOrder?.status || 'PENDING'}</span>

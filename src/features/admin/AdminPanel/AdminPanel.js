@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '@/api/axiosClient';
+import { formatPrice } from '@/utils/formatPrice';
 import styles from './adminPanel.module.css';
 
 const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERED'];
@@ -74,6 +75,7 @@ const AdminPanel = () => {
             <span>Order ID</span>
             <span>Customer</span>
             <span>Size</span>
+            <span>Price</span>
             <span>Placed</span>
             <span>Status</span>
             <span>Update</span>
@@ -85,6 +87,7 @@ const AdminPanel = () => {
                 <span className={styles.adminOid}>#{order.oid}</span>
                 <span className={styles.adminCell}>{order.userEmail || '—'}</span>
                 <span className={styles.adminCell}>{order.pizzaSize || 'M'}</span>
+                <span className={`${styles.adminCell} ${styles.adminPrice}`}>{formatPrice(order.price)}</span>
                 <span className={`${styles.adminCell} ${styles.adminDate}`}>
                   {order.createdAt ? new Date(order.createdAt).toLocaleString() : '—'}
                 </span>

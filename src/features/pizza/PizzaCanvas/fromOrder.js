@@ -9,6 +9,20 @@ const ENUM_TO_SIZE = { R: 'regular', M: 'medium', L: 'large' };
 const ENUM_TO_CRUST_STYLE = { THIN: 'thin', CLASSIC: 'classic', STUFFED: 'stuffed' };
 const ENUM_TO_BAKE_LEVEL = { LIGHT: 'light', GOLDEN: 'golden', WELL_DONE: 'well-done' };
 
+const SIZE_LABEL = { R: 'Regular', M: 'Medium', L: 'Large' };
+const CRUST_STYLE_LABEL = { THIN: 'Thin', CLASSIC: 'Classic', STUFFED: 'Stuffed' };
+const BAKE_LEVEL_LABEL = { LIGHT: 'Light', GOLDEN: 'Golden', WELL_DONE: 'Well-done' };
+
+// Human-readable size/crust/bake text for receipts and order lists —
+// distinct from pizzaPropsFromOrder's lowercase keys, which feed PizzaCanvas.
+export function orderDisplayLabels(order) {
+  return {
+    size: SIZE_LABEL[order?.pizzaSize] || 'Medium',
+    crustStyle: CRUST_STYLE_LABEL[order?.crustStyle] || 'Classic',
+    bakeLevel: BAKE_LEVEL_LABEL[order?.bakeLevel] || 'Golden',
+  };
+}
+
 export function pizzaPropsFromOrder(order) {
   const ing = order?.ingredients || {};
   return {

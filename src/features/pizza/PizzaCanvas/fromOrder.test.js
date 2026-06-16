@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pizzaPropsFromOrder } from './fromOrder';
+import { orderDisplayLabels, pizzaPropsFromOrder } from './fromOrder';
 
 describe('pizzaPropsFromOrder', () => {
   it('maps R/M/L enum to size names', () => {
@@ -44,5 +44,23 @@ describe('pizzaPropsFromOrder', () => {
     expect(pizzaPropsFromOrder({ bakeLevel: 'WELL_DONE' }).bakeLevel).toBe('well-done');
     expect(pizzaPropsFromOrder({}).crustStyle).toBe('classic');
     expect(pizzaPropsFromOrder({}).bakeLevel).toBe('golden');
+  });
+});
+
+describe('orderDisplayLabels', () => {
+  it('produces human-readable labels for size, crust style, and bake level', () => {
+    expect(orderDisplayLabels({ pizzaSize: 'L', crustStyle: 'STUFFED', bakeLevel: 'WELL_DONE' })).toEqual({
+      size: 'Large',
+      crustStyle: 'Stuffed',
+      bakeLevel: 'Well-done',
+    });
+  });
+
+  it('defaults sensibly when fields are missing', () => {
+    expect(orderDisplayLabels({})).toEqual({
+      size: 'Medium',
+      crustStyle: 'Classic',
+      bakeLevel: 'Golden',
+    });
   });
 });

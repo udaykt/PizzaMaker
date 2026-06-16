@@ -45,6 +45,7 @@ class OrderControllerTest {
                 PizzaSize.M,
                 CrustStyle.CLASSIC,
                 BakeLevel.GOLDEN,
+                java.math.BigDecimal.valueOf(14.50),
                 OrderStatus.PENDING,
                 LocalDateTime.now()
         );
