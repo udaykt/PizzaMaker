@@ -1,6 +1,20 @@
 # PizzaMaker
 
-Full-stack pizza ordering app — React + Vite frontend, Spring Boot REST backend.
+Full-stack pizza ordering app with a **live, what-you-see-is-what-you-get pizza builder** — toppings drop onto the pie in real time as you customise, and the exact pizza you build is the one shown on your order confirmation and in your order history.
+
+React + Vite frontend, Spring Boot REST backend.
+
+---
+
+## Features
+
+- **Live pizza builder** — an SVG pizza assembled in real time from your selections. Toppings are placed with a phyllotaxis (sunflower) distribution for an even, natural spread, and animate on/off the pie with Framer Motion as you toggle them.
+- **WYSIWYG end to end** — the same `PizzaCanvas` renders the builder, the order-confirmation modal, and the order-history thumbnails, so what you build is exactly what you order and what you see served.
+- **Auth** — standard accounts, guest checkout, and an admin role, all JWT-backed.
+- **Live order status** — order updates pushed over STOMP/WebSocket and reflected in the UI without a refresh.
+- **Resilient UI** — top-level error boundary and a styled 404 fallback instead of blank screens.
+
+> _Demo GIF: record the builder (toggling toppings + changing size) and drop it in as `docs/demo.gif`, then reference it here._
 
 ---
 
@@ -42,7 +56,9 @@ Browser
 | Layer | Technology |
 |---|---|
 | Frontend | React 18 + Redux Toolkit + React Router v5 |
+| Animation | Framer Motion (SVG pizza rendering) |
 | Build tool | Vite 5 |
+| Frontend tests | Vitest |
 | Language (backend) | Java 21 |
 | Framework | Spring Boot 3.3.5 |
 | Security | Spring Security 6 + JWT (jjwt 0.12.3) |
@@ -118,10 +134,19 @@ App opens at **http://localhost:3000**
 
 ## Run tests
 
+**Backend** (JUnit 5 + Mockito):
+
 ```bash
 cd backend
 .\mvnw.cmd test     # Windows (PowerShell)
 ./mvnw test         # macOS / Linux
+```
+
+**Frontend** (Vitest — placement engine, order mapping, store reducers):
+
+```bash
+npm test            # run once
+npm run test:watch  # watch mode
 ```
 
 ---

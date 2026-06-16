@@ -3,6 +3,8 @@ import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import useOrderUpdates from '@/hooks/useOrderUpdates';
 import { fetchUserOrders } from '@/api/appApi';
+import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
+import { pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
 import styles from './orders.module.css';
 
 const STATUS_COLORS = {
@@ -104,19 +106,24 @@ const Orders = () => {
                   </span>
                 </div>
                 <div className={styles.orderCardBody}>
-                  <div className={styles.orderDetail}>
-                    <span className={styles.orderDetailLabel}>Size</span>
-                    <span className={styles.orderDetailValue}>{order.pizzaSize || 'M'}</span>
+                  <div className={styles.orderThumb}>
+                    <PizzaCanvas {...pizzaPropsFromOrder(order)} textured={false} />
                   </div>
-                  <div className={styles.orderDetail}>
-                    <span className={styles.orderDetailLabel}>Toppings</span>
-                    <span className={styles.orderDetailValue}>{formatIngredients(order.ingredients)}</span>
-                  </div>
-                  <div className={styles.orderDetail}>
-                    <span className={styles.orderDetailLabel}>Placed</span>
-                    <span className={styles.orderDetailValue}>
-                      {order.createdAt ? new Date(order.createdAt).toLocaleString() : '—'}
-                    </span>
+                  <div className={styles.orderDetails}>
+                    <div className={styles.orderDetail}>
+                      <span className={styles.orderDetailLabel}>Size</span>
+                      <span className={styles.orderDetailValue}>{order.pizzaSize || 'M'}</span>
+                    </div>
+                    <div className={styles.orderDetail}>
+                      <span className={styles.orderDetailLabel}>Toppings</span>
+                      <span className={styles.orderDetailValue}>{formatIngredients(order.ingredients)}</span>
+                    </div>
+                    <div className={styles.orderDetail}>
+                      <span className={styles.orderDetailLabel}>Placed</span>
+                      <span className={styles.orderDetailValue}>
+                        {order.createdAt ? new Date(order.createdAt).toLocaleString() : '—'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </li>

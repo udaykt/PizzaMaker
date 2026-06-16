@@ -1,9 +1,0 @@
-.mozzarella {
-  position: absolute;
-  background-color: var(--mozzarella-color);
-  right: 0;
-  bottom: 0;
-  width: 75%;
-  height: 75%;
-  border-radius: 100% 0 0 0;
-}

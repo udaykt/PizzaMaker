@@ -1,6 +1,7 @@
 import { Toaster } from 'react-hot-toast';
 import './App.css';
 import Home from '@/pages/Home/Home';
+import ErrorBoundary from '@/shared/ErrorBoundary/ErrorBoundary';
 
 const App = (props) => {
   return (
@@ -14,7 +15,9 @@ const App = (props) => {
           error: { iconTheme: { primary: '#e53935', secondary: '#fff' } },
         }}
       />
-      <Home />
+      <ErrorBoundary>
+        <Home />
+      </ErrorBoundary>
     </div>
   );
 };

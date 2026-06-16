@@ -4,6 +4,8 @@ import { useHistory, withRouter } from 'react-router-dom';
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH, ORDERS_PATH } from '@/utils/routes';
 import Button from '@/shared/Button/Button';
+import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
+import { pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
 import styles from './modal.module.css';
 
 const Modal = (props) => {
@@ -37,6 +39,11 @@ const Modal = (props) => {
         <span className={styles.modalCheckmark}>✔</span>
         <h2>Order Placed!</h2>
       </div>
+      {currentOrder && (
+        <div className={styles.modalPizza}>
+          <PizzaCanvas {...pizzaPropsFromOrder(currentOrder)} />
+        </div>
+      )}
       <div className={styles.modalReceipt}>
         <div className={styles.receiptRow}>
           <span className={styles.receiptLabel}>Order ID</span>

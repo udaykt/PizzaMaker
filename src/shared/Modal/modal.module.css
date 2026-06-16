@@ -45,6 +45,12 @@
   font-size: 1.5rem;
 }
 
+.modalPizza {
+  width: 168px;
+  height: 168px;
+  margin: -4px 0 -2px;
+}
+
 .modalReceipt {
   width: 100%;
   background: rgba(255, 255, 255, 0.04);

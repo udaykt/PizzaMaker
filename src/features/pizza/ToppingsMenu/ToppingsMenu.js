@@ -7,21 +7,6 @@ const ToppingsMenu = (props) => {
 
   const dispatch = useDispatch();
 
-  const getStyle = (name) => {
-    switch (name) {
-      case 'pepperoni':
-        return `var(--pepperoni-color)`;
-      case 'sausage':
-        return `var(--sausage-color)`;
-      case 'peppers':
-        return `var(--pepper-color)`;
-      case 'olives':
-        return `var(--olives-color)`;
-      default:
-        return '#fff';
-    }
-  };
-
   const checkboxChangeHandler = (e, key) => {
     let topping = toppings[key];
     topping = { ...topping, checked: e.target.checked };
@@ -56,20 +41,7 @@ const ToppingsMenu = (props) => {
                   key={key + value + 'checkbox'}
                   onChange={(e) => checkboxChangeHandler(e, key)}
                 />
-                <label
-                  style={
-                    value.checked
-                      ? {
-                          backgroundColor: getStyle(key),
-                          backgroundImage:
-                            'url(/src/assets/images/toppings/peppers.png)',
-                          backgroundPosition: 'center',
-                          backgroundRepeat: 'no-repeat',
-                        }
-                      : { backgroundColor: 'gray' }
-                  }
-                  htmlFor={key}
-                ></label>
+                <label htmlFor={key}></label>
               </div>
               <div className={styles.radio}>
                 <input

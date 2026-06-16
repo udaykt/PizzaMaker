@@ -136,8 +136,22 @@
 
 .orderCardBody {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.orderThumb {
+  flex-shrink: 0;
+  width: 84px;
+  height: 84px;
+}
+
+.orderDetails {
+  display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
 }
 
 .orderDetail {

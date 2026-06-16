@@ -20,6 +20,7 @@ import ToppingsMenu from '@/features/pizza/ToppingsMenu/ToppingsMenu';
 import styles from './pizzahub.module.css';
 
 const Menu = lazy(() => import('@/shared/NavOverlay/NavOverlay'));
+const NotFound = lazy(() => import('@/pages/NotFound/NotFound'));
 const LoginPage = lazy(() => import('@/features/auth/Login/Login'));
 const SignUp = lazy(() => import('@/features/auth/SignUp/SignUp'));
 const Guest = lazy(() => import('@/features/auth/Guest/Guest'));
@@ -102,6 +103,7 @@ const PizzaHub = (props) => {
           <Route path={GUEST_PATH} component={Guest} />
           <Route path={DASHBOARD_PATH} component={UserDashboard} />
           <Route path={CONFIRM_PATH} component={Modal} />
+          <Route component={NotFound} />
         </Switch>
       </Suspense>
     </div>
