@@ -1,56 +1,87 @@
-.menu,
-.hideMenu {
+.navOverlay {
   position: fixed;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  left: 10px;
-  width: 40%;
-  height: 400px;
-  min-width: 400px;
-  max-width: 500px;
-  min-height: 300px;
-  max-height: 400px;
-  border-radius: 10px;
-  background-color: var(--slice-color);
-  transition: transform 0.5s ease;
-  transform: translateX(0%);
+  gap: 24px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90vw, 360px);
+  padding: 28px 0 32px;
+  border-radius: var(--radius-lg);
+  background: rgba(12, 10, 9, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border-subtle);
+  border-top: 2px solid var(--accent);
   z-index: 100;
+  animation: navFadeIn 0.22s ease-out;
 }
 
-.hideMenu {
-  transform: translateX(-100%);
+@keyframes navFadeIn {
+  from { opacity: 0; transform: translate(-50%, -46%); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
 }
 
-.menuLogo h1 {
+.navLogo {
+  display: flex;
+  justify-content: center;
+}
+
+.navLogo h1 {
+  font-family: monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.4);
 }
 
-.menuLinks {
+.navLinks {
   width: 100%;
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-.menuLinks nav {
-  width: 90%;
+  justify-content: center;
 }
 
-.menuLinks nav ul {
+.navLinks nav {
+  width: 85%;
+}
+
+.navLinks nav ul {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  align-items: center;
+  gap: 10px;
+  align-items: stretch;
   list-style-type: none;
 }
 
-.menuLinks nav ul li {
+.navLinks nav ul li {
   width: 100%;
 }
 
 .linkButton {
   width: 100%;
-  border-radius: 15px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  font-family: monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.linkButton:hover {
+  background: rgba(255, 107, 0, 0.1);
+  border-color: rgba(255, 107, 0, 0.4);
+  color: #ff6b00;
+}
+
+:global(.active) .linkButton {
+  background: rgba(255, 107, 0, 0.14);
+  border-color: rgba(255, 107, 0, 0.5);
+  color: #ff6b00;
 }

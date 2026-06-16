@@ -17,6 +17,6 @@
 
 .dashboard p {
   color: var(--text-muted);
-  font-family: var(--font);
+  font-family: monospace;
   font-size: 0.9rem;
 }

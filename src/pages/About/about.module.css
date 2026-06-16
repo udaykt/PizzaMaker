@@ -1,0 +1,26 @@
+.about {
+  width: 90%;
+  padding-top: 10px;
+}
+
+.card {
+  padding: 24px 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card h2 {
+  margin: 0 0 12px;
+  color: white;
+  font-family: monospace;
+  font-size: 1.1rem;
+}
+
+.card p {
+  margin: 0;
+  font-family: monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+}

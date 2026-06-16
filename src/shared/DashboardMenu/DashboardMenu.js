@@ -22,7 +22,7 @@ const DashboardMenu = (props) => {
     { name: 'Checkout',   path: CHECKOUT_PATH },
     { name: 'Contact',    path: CONTACT_PATH  },
     { name: 'About',      path: ABOUT_PATH    },
-    ...(isAdmin ? [{ name: 'âš™ Admin', path: ADMIN_PATH }] : []),
+    ...(isAdmin ? [{ name: '⚙ Admin', path: ADMIN_PATH }] : []),
   ];
 
   return (
