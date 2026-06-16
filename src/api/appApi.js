@@ -5,29 +5,42 @@ import { navigationActions } from '@/store/navigationSlice';
 import { orderActions } from '@/store/orderSlice';
 import { buildUserDataInStore } from '@/utils/userState';
 
-const SIZE_TO_ENUM = { regular: 'R', medium: 'M', large: 'L' };
-const CRUST_STYLE_TO_ENUM = { thin: 'THIN', classic: 'CLASSIC', stuffed: 'STUFFED' };
-const BAKE_LEVEL_TO_ENUM = { light: 'LIGHT', golden: 'GOLDEN', 'well-done': 'WELL_DONE' };
+const SIZE_TO_ENUM = { small: 'R', medium: 'M', large: 'L' };
+const CRUST_STYLE_TO_ENUM = { thin: 'THIN', 'hand-tossed': 'HAND_TOSSED', stuffed: 'STUFFED' };
+const BAKE_LEVEL_TO_ENUM = { normal: 'NORMAL', 'well-done': 'WELL_DONE' };
+const QUANTITY_TO_ENUM = { light: 'LIGHT', regular: 'REGULAR', extra: 'EXTRA' };
+const DELIVERY_METHOD_TO_ENUM = { delivery: 'DELIVERY', carryout: 'CARRYOUT' };
+const SAUCE_TYPE_TO_ENUM = {
+  none: 'NONE',
+  'robust-tomato': 'ROBUST_TOMATO',
+  marinara: 'MARINARA',
+  'garlic-parmesan': 'GARLIC_PARMESAN',
+  alfredo: 'ALFREDO',
+  bbq: 'BBQ',
+};
 
 const buildOrderPayload = (orderState) => {
   const { base, toppings } = orderState;
   const pizzaState = store.getState().pizza;
   const selectedSize = pizzaState.size;
   return {
-    sauce:           base.sauce.checked,
-    mozzarella:      base.mozzarella.checked,
-    cheese:          base.cheese.checked,
-    pepperoni:       toppings.pepperoni.checked,
-    pepperoniMedium: toppings.pepperoni.checked && toppings.pepperoni.medium,
-    sausage:         toppings.sausage.checked,
-    sausageMedium:   toppings.sausage.checked && toppings.sausage.medium,
-    peppers:         toppings.peppers.checked,
-    peppersMedium:   toppings.peppers.checked && toppings.peppers.medium,
-    olives:          toppings.olives.checked,
-    olivesMedium:    toppings.olives.checked && toppings.olives.medium,
-    pizzaSize:       SIZE_TO_ENUM[selectedSize] || 'M',
-    crustStyle:      CRUST_STYLE_TO_ENUM[pizzaState.crustStyle] || 'CLASSIC',
-    bakeLevel:       BAKE_LEVEL_TO_ENUM[pizzaState.bakeLevel] || 'GOLDEN',
+    sauceType:         SAUCE_TYPE_TO_ENUM[base.sauce.sauceType] || 'NONE',
+    mozzarella:        base.mozzarella.checked,
+    provolone:         base.provolone.checked,
+    feta:              base.feta.checked,
+    veganCheese:       base.veganCheese.checked,
+    pepperoni:         toppings.pepperoni.checked,
+    pepperoniQuantity: QUANTITY_TO_ENUM[toppings.pepperoni.quantity] || 'REGULAR',
+    sausage:           toppings.sausage.checked,
+    sausageQuantity:   QUANTITY_TO_ENUM[toppings.sausage.quantity] || 'REGULAR',
+    peppers:           toppings.peppers.checked,
+    peppersQuantity:   QUANTITY_TO_ENUM[toppings.peppers.quantity] || 'REGULAR',
+    olives:            toppings.olives.checked,
+    olivesQuantity:    QUANTITY_TO_ENUM[toppings.olives.quantity] || 'REGULAR',
+    pizzaSize:         SIZE_TO_ENUM[selectedSize] || 'M',
+    crustStyle:        CRUST_STYLE_TO_ENUM[pizzaState.crustStyle] || 'HAND_TOSSED',
+    bakeLevel:         BAKE_LEVEL_TO_ENUM[pizzaState.bakeLevel] || 'NORMAL',
+    deliveryMethod:    DELIVERY_METHOD_TO_ENUM[pizzaState.deliveryMethod] || 'DELIVERY',
   };
 };
 

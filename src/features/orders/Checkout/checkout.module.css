@@ -49,6 +49,40 @@
   letter-spacing: 1.5px;
 }
 
+.deliveryToggle {
+  display: flex;
+  gap: 6px;
+  padding: 3px;
+  margin-bottom: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.deliveryOption {
+  flex: 1;
+  height: 38px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.deliveryOption:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.deliveryOptionActive {
+  background: var(--accent, #ff6b00);
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 107, 0, 0.4);
+}
+
 .ticketRow {
   display: flex;
   justify-content: space-between;

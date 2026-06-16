@@ -6,15 +6,15 @@ import styles from './pizzaDisplay.module.css';
 // A loaded sample pie shown to logged-out visitors so they can see what the
 // builder produces before signing in. Slowly rotates like a turntable.
 const DEMO_BASE = {
-  sauce: { checked: true },
+  sauce: { sauceType: 'robust-tomato' },
   mozzarella: { checked: true },
-  cheese: { checked: true },
+  provolone: { checked: true },
 };
 const DEMO_TOPPINGS = {
-  pepperoni: { checked: true, medium: true },
-  sausage: { checked: true, medium: false },
-  peppers: { checked: true, medium: false },
-  olives: { checked: true, medium: true },
+  pepperoni: { checked: true, quantity: 'extra' },
+  sausage: { checked: true, quantity: 'regular' },
+  peppers: { checked: true, quantity: 'regular' },
+  olives: { checked: true, quantity: 'extra' },
 };
 
 const HINT_DISMISSED_KEY = 'pizzamaker_drag_hint_dismissed';

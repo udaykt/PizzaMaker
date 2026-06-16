@@ -75,6 +75,7 @@ const AdminPanel = () => {
             <span>Order ID</span>
             <span>Customer</span>
             <span>Size</span>
+            <span>Method</span>
             <span>Price</span>
             <span>Placed</span>
             <span>Status</span>
@@ -87,6 +88,7 @@ const AdminPanel = () => {
                 <span className={styles.adminOid}>#{order.oid}</span>
                 <span className={styles.adminCell}>{order.userEmail || '—'}</span>
                 <span className={styles.adminCell}>{order.pizzaSize || 'M'}</span>
+                <span className={styles.adminCell}>{order.deliveryMethod === 'CARRYOUT' ? 'Carryout' : 'Delivery'}</span>
                 <span className={`${styles.adminCell} ${styles.adminPrice}`}>{formatPrice(order.price)}</span>
                 <span className={`${styles.adminCell} ${styles.adminDate}`}>
                   {order.createdAt ? new Date(order.createdAt).toLocaleString() : '—'}

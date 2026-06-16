@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { isPizzaEmpty } from '@/store/pizzaHubSlice';
+import { pizzaActions, DELIVERY_METHODS } from '@/store/pizzaSlice';
 import { computePriceBreakdown } from '@/utils/pricing';
 import { formatPrice } from '@/utils/formatPrice';
 import Button from '@/shared/Button/Button';
@@ -11,9 +12,10 @@ import { createOrder } from '@/api/appApi';
 import { uiActions } from '@/store/uiSlice';
 import styles from './checkout.module.css';
 
-const SIZE_LABELS = { regular: 'Regular', medium: 'Medium', large: 'Large' };
-const CRUST_STYLE_LABELS = { thin: 'Thin', classic: 'Classic', stuffed: 'Stuffed' };
-const BAKE_LEVEL_LABELS = { light: 'Light', golden: 'Golden', 'well-done': 'Well-done' };
+const SIZE_LABELS = { small: 'Small (10")', medium: 'Medium (12")', large: 'Large (14")' };
+const CRUST_STYLE_LABELS = { thin: 'Thin', 'hand-tossed': 'Hand Tossed', stuffed: 'Stuffed' };
+const BAKE_LEVEL_LABELS = { normal: 'Normal Bake', 'well-done': 'Well Done' };
+const DELIVERY_METHOD_LABELS = { [DELIVERY_METHODS.DELIVERY]: 'Delivery', [DELIVERY_METHODS.CARRYOUT]: 'Carryout' };
 
 const Checkout = () => {
   const orderState = useSelector((state) => state.pizzaHub);
@@ -22,6 +24,7 @@ const Checkout = () => {
   const pizzaSize = useSelector((state) => state.pizza.size);
   const crustStyle = useSelector((state) => state.pizza.crustStyle);
   const bakeLevel = useSelector((state) => state.pizza.bakeLevel);
+  const deliveryMethod = useSelector((state) => state.pizza.deliveryMethod);
 
   const history = useHistory();
   const dispatch = useDispatch();
@@ -29,6 +32,10 @@ const Checkout = () => {
   const customizeHandler = () => {
     history.push(HOME_PATH);
     dispatch(uiActions.setBackdrop(false));
+  };
+
+  const deliveryMethodHandler = (method) => {
+    dispatch(pizzaActions.setDeliveryMethod(method));
   };
 
   const orderHandler = () => {
@@ -61,6 +68,7 @@ const Checkout = () => {
     toppings: toppingsState,
     sizePricing,
     size: pizzaSize,
+    deliveryMethod,
   });
 
   return (
@@ -73,14 +81,27 @@ const Checkout = () => {
       <div className={styles.ticketCard}>
         <h2 className={styles.ticketHeader}>Your Pizza</h2>
 
+        <div className={styles.deliveryToggle}>
+          {Object.values(DELIVERY_METHODS).map((m) => (
+            <button
+              type='button'
+              key={m}
+              className={`${styles.deliveryOption} ${deliveryMethod === m ? styles.deliveryOptionActive : ''}`}
+              onClick={() => deliveryMethodHandler(m)}
+            >
+              {DELIVERY_METHOD_LABELS[m]}
+            </button>
+          ))}
+        </div>
+
         <div className={styles.ticketRow}>
           <span className={styles.ticketLabel}>Size</span>
-          <span className={styles.ticketValue}>{SIZE_LABELS[pizzaSize] || 'Medium'}</span>
+          <span className={styles.ticketValue}>{SIZE_LABELS[pizzaSize] || 'Medium (12")'}</span>
         </div>
         <div className={styles.ticketRow}>
           <span className={styles.ticketLabel}>Crust</span>
           <span className={styles.ticketValue}>
-            {CRUST_STYLE_LABELS[crustStyle] || 'Classic'}, {BAKE_LEVEL_LABELS[bakeLevel] || 'Golden'}
+            {CRUST_STYLE_LABELS[crustStyle] || 'Hand Tossed'}, {BAKE_LEVEL_LABELS[bakeLevel] || 'Normal Bake'}
           </span>
         </div>
 

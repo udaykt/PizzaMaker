@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 18px 0;
+  padding: 18px 20px;
   color: var(--text);
   border-radius: var(--radius-xl);
   user-select: none;
@@ -26,8 +26,10 @@
 .baseDiv {
   width: 100%;
   display: flex;
-  justify-content: space-evenly;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
+  gap: 8px;
 }
 
 .baseRoot h2,
@@ -48,7 +50,7 @@
   position: relative;
   justify-content: space-evenly;
   align-items: center;
-  width: 80%;
+  width: 100%;
   height: 44px;
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.04);
@@ -90,8 +92,60 @@
   color: var(--accent);
 }
 
+.crustSummary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 40px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border-subtle);
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.crustSummary:hover {
+  color: var(--accent);
+  border-color: rgba(255, 107, 0, 0.3);
+  background: rgba(255, 107, 0, 0.06);
+}
+
+.chevron,
+.chevronOpen {
+  transition: transform 0.22s ease;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.crustOptions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.subSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding-top: 4px;
+}
+
 .base {
-  width: 25%;
+  width: calc(50% - 4px);
   height: 44px;
   display: flex;
   border-radius: var(--radius-sm);
@@ -139,28 +193,50 @@
   color: var(--accent);
 }
 
-.base label input[name='sauce']:checked + span {
-  color: var(--sauce-color);
-}
-
 .base label input[name='mozzarella']:checked + span {
   color: var(--mozzarella-color);
-}
-
-.base label input[name='cheese']:checked + span {
-  color: var(--cheese-color);
-}
-
-.base label input[name='sauce']:hover + span {
-  color: var(--sauce-color);
 }
 
 .base label input[name='mozzarella']:hover + span {
   color: var(--mozzarella-color);
 }
 
-.base label input[name='cheese']:hover + span {
-  color: var(--cheese-color);
+/* Flex-wrap, not a grid — sauce is a single choice, so each chip sizes to
+   its own label (like the Crust Style / Bake pills) and rows center
+   themselves, instead of being forced into equal-width grid columns that
+   stretch short labels ("BBQ") as wide as long ones ("Garlic Parmesan"). */
+.sauceGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.sauceOption {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border-subtle);
+  color: var(--text-dim);
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.sauceOption:hover {
+  color: var(--accent);
+  border-color: rgba(255, 107, 0, 0.3);
+}
+
+.sauceOptionActive {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 0 10px rgba(255, 107, 0, 0.35);
 }
 
 @media screen and (max-width: 768px) {

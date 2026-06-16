@@ -9,6 +9,7 @@ import { applyOrderToBuilder, orderDisplayLabels, pizzaPropsFromOrder } from '@/
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH } from '@/utils/routes';
 import { formatPrice } from '@/utils/formatPrice';
+import { STATUS_EMOJI, statusLabel } from '@/utils/orderStatusLabels';
 import Button from '@/shared/Button/Button';
 import LazyMount from '@/shared/LazyMount/LazyMount';
 import styles from './orders.module.css';
@@ -21,19 +22,20 @@ const STATUS_COLORS = {
   DELIVERED:  { bg: '#d6d8d9', color: '#383d41' },
 };
 
-const STATUS_EMOJI = {
-  PENDING:   '🍕',
-  CONFIRMED: '✅',
-  PREPARING: '👨‍🍳',
-  READY:     '📦',
-  DELIVERED: '🎉',
+// camelCase keys like "veganCheese" need a real label — naive capitalize
+// would render "VeganCheese" with no space.
+const INGREDIENT_LABELS = {
+  mozzarella: 'Mozzarella', provolone: 'Provolone', feta: 'Feta', veganCheese: 'Vegan Cheese',
+  pepperoni: 'Pepperoni', sausage: 'Sausage', peppers: 'Peppers', olives: 'Olives',
 };
 
 const formatIngredients = (ingredients) => {
   if (!ingredients) return '—';
+  // sauceType and the *Quantity fields are strings, not booleans — the
+  // strict === true check already excludes them on its own.
   return Object.entries(ingredients)
-    .filter(([k, v]) => v === true && !k.toLowerCase().includes('medium'))
-    .map(([k]) => k.charAt(0).toUpperCase() + k.slice(1))
+    .filter(([, v]) => v === true)
+    .map(([k]) => INGREDIENT_LABELS[k] || k.charAt(0).toUpperCase() + k.slice(1))
     .join(', ') || 'Plain';
 };
 
@@ -70,7 +72,7 @@ const Orders = () => {
       )
     );
     const emoji = STATUS_EMOJI[update.status] || '🍕';
-    toast(`${emoji} Order #${update.oid.slice(0, 8)}… is now ${update.status}`, {
+    toast(`${emoji} Order #${update.oid.slice(0, 8)}…: ${statusLabel(update.status)}`, {
       duration: 4000,
       icon: null,
     });
@@ -118,7 +120,7 @@ const Orders = () => {
                     className={styles.orderStatus}
                     style={{ background: statusStyle.bg, color: statusStyle.color }}
                   >
-                    {emoji} {order.status}
+                    {emoji} {statusLabel(order.status)}
                   </span>
                 </div>
                 <div className={styles.orderCardBody}>
@@ -135,6 +137,16 @@ const Orders = () => {
                     <div className={styles.orderDetail}>
                       <span className={styles.orderDetailLabel}>Toppings</span>
                       <span className={styles.orderDetailValue}>{formatIngredients(order.ingredients)}</span>
+                    </div>
+                    {labels.sauceType !== 'None' && (
+                      <div className={styles.orderDetail}>
+                        <span className={styles.orderDetailLabel}>Sauce</span>
+                        <span className={styles.orderDetailValue}>{labels.sauceType}</span>
+                      </div>
+                    )}
+                    <div className={styles.orderDetail}>
+                      <span className={styles.orderDetailLabel}>Method</span>
+                      <span className={styles.orderDetailValue}>{labels.deliveryMethod}</span>
                     </div>
                     <div className={styles.orderDetail}>
                       <span className={styles.orderDetailLabel}>Placed</span>

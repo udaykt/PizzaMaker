@@ -7,7 +7,15 @@ import Button from '@/shared/Button/Button';
 import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
 import { orderDisplayLabels, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
 import { formatPrice } from '@/utils/formatPrice';
+import { statusLabel } from '@/utils/orderStatusLabels';
 import styles from './modal.module.css';
+
+// camelCase keys like "veganCheese" need a real label — naive capitalize
+// would render "VeganCheese" with no space.
+const INGREDIENT_LABELS = {
+  mozzarella: 'Mozzarella', provolone: 'Provolone', feta: 'Feta', veganCheese: 'Vegan Cheese',
+  pepperoni: 'Pepperoni', sausage: 'Sausage', peppers: 'Peppers', olives: 'Olives',
+};
 
 const Modal = (props) => {
   const orderState = useSelector((state) => state.order);
@@ -27,9 +35,11 @@ const Modal = (props) => {
 
   const formatIngredients = (order) => {
     if (!order || !order.ingredients) return [];
+    // sauceType and the *Quantity fields are strings, not booleans — the
+    // strict === true check already excludes them on its own.
     return Object.entries(order.ingredients)
-      .filter(([k, v]) => v === true && !k.toLowerCase().includes('medium'))
-      .map(([k]) => k.charAt(0).toUpperCase() + k.slice(1));
+      .filter(([, v]) => v === true)
+      .map(([k]) => INGREDIENT_LABELS[k] || k.charAt(0).toUpperCase() + k.slice(1));
   };
 
   const ingredients = formatIngredients(currentOrder);
@@ -59,6 +69,16 @@ const Modal = (props) => {
           <span className={styles.receiptLabel}>Crust</span>
           <span className={styles.receiptValue}>{labels.crustStyle}, {labels.bakeLevel}</span>
         </div>
+        <div className={styles.receiptRow}>
+          <span className={styles.receiptLabel}>Method</span>
+          <span className={styles.receiptValue}>{labels.deliveryMethod}</span>
+        </div>
+        {labels.sauceType !== 'None' && (
+          <div className={styles.receiptRow}>
+            <span className={styles.receiptLabel}>Sauce</span>
+            <span className={styles.receiptValue}>{labels.sauceType}</span>
+          </div>
+        )}
         {ingredients.length > 0 && (
           <div className={styles.receiptRow}>
             <span className={styles.receiptLabel}>Toppings</span>
@@ -71,7 +91,7 @@ const Modal = (props) => {
         </div>
         <div className={styles.receiptRow}>
           <span className={styles.receiptLabel}>Status</span>
-          <span className={`${styles.receiptValue} ${styles.receiptStatus}`}>{currentOrder?.status || 'PENDING'}</span>
+          <span className={`${styles.receiptValue} ${styles.receiptStatus}`}>{statusLabel(currentOrder?.status || 'PENDING')}</span>
         </div>
       </div>
       <p className={styles.modalNote}>We're making your pizza! You'll see it in orders.</p>
