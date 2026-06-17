@@ -60,6 +60,7 @@ const ToppingsMenu = () => {
             <motion.button
               key={key}
               type='button'
+              title={value.title}
               className={`${styles.cheeseCard} ${value.checked ? styles.cheeseActive : ''}`}
               onClick={() => handleCheeseToggle(key, value.checked)}
               whileTap={{ scale: 0.93 }}
@@ -87,6 +88,7 @@ const ToppingsMenu = () => {
                   <motion.button
                     key={key}
                     type='button'
+                    title={value.checked ? `${meta.label} — ${value.quantity}` : meta.label}
                     className={`${styles.topping} ${value.checked ? styles.toppingActive : ''}`}
                     onClick={() => handleToppingCycle(key)}
                     whileTap={{ scale: 0.93 }}

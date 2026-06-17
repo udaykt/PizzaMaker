@@ -3,8 +3,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 300px;
-  height: 300px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 44% 40%, #1e140c 0%, #100a06 55%, #080503 100%);
+  box-shadow:
+    0 20px 56px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .dragHint {
@@ -44,9 +50,7 @@
 
 @media screen and (max-width: 1360px) {
   .pizza {
-    position: relative;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+    width: min(360px, 90vw);
+    height: min(360px, 90vw);
   }
 }

@@ -54,6 +54,7 @@ const PresetPizzas = () => {
           <button
             key={preset.id}
             type='button'
+            title={preset.name}
             className={styles.card}
             onClick={() => handlePick(preset)}
           >

@@ -103,7 +103,7 @@ const PizzaHub = () => {
             </span>
           </div>
           <div className={styles.actionButtons}>
-            <button type='button' className={styles.resetBtn} onClick={handleReset}>
+            <button type='button' title='Reset pizza to defaults' className={styles.resetBtn} onClick={handleReset}>
               Reset
             </button>
             <OrderButton />

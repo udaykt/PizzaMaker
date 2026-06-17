@@ -80,8 +80,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: min(380px, 100%);
-  height: min(380px, 100%);
+  width: 100%;
 }
 
 /* Total + Reset + Order grouped in a glass card under the pizza */
