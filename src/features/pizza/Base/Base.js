@@ -57,9 +57,6 @@ const Base = (props) => {
     dispatch(pizzaHubActions.setSauceType(sauceType));
   };
 
-  // Cheese checkboxes only — sauce is a single-select handled in its own grid.
-  const cheeseEntries = Object.entries(bases).filter(([key]) => key !== 'sauce');
-
   return (
     <div className={styles.baseRoot}>
       <div className={styles.section}>
@@ -153,27 +150,6 @@ const Base = (props) => {
         </AnimatePresence>
       </div>
 
-      <div className={styles.section}>
-        <h3>Cheese</h3>
-        <div className={styles.baseDiv}>
-          {cheeseEntries.map(([key, value]) => (
-            <div key={'_' + key} className={`${styles.base} ${value.checked ? styles.baseActive : ''}`}>
-              <label>
-                <input
-                  type='checkbox'
-                  key={key}
-                  name={key}
-                  value='1'
-                  checked={value.checked}
-                  onChange={(e) => onChangeHandler(e, key)}
-                  hidden
-                />
-                <span>{value.title}</span>
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

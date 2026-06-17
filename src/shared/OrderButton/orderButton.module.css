@@ -25,3 +25,12 @@
   background: #e85e00;
   box-shadow: 0 2px 10px rgba(255, 107, 0, 0.3);
 }
+
+@keyframes orderPulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(255, 107, 0, 0.4); }
+  50%       { box-shadow: 0 4px 32px rgba(255, 107, 0, 0.8), 0 0 0 5px rgba(255, 107, 0, 0.18); }
+}
+
+.pulse {
+  animation: orderPulse 2.2s ease-in-out infinite;
+}

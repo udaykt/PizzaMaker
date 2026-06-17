@@ -95,6 +95,35 @@ const pizzaHubSlice = createSlice({
         }
       });
     },
+    // Cycles a topping through off → light → regular → extra → off.
+    // One tap selects at Light; subsequent taps step up; one more turns it off.
+    cycleToppingQuantity(state, action) {
+      const key = action.payload;
+      const t = state.toppings[key];
+      if (!t) return;
+      if (!t.checked) {
+        t.checked = true;
+        t.quantity = TOPPING_QUANTITIES.LIGHT;
+      } else if (t.quantity === TOPPING_QUANTITIES.LIGHT) {
+        t.quantity = TOPPING_QUANTITIES.REGULAR;
+      } else if (t.quantity === TOPPING_QUANTITIES.REGULAR) {
+        t.quantity = TOPPING_QUANTITIES.EXTRA;
+      } else {
+        t.checked = false;
+        t.quantity = TOPPING_QUANTITIES.REGULAR;
+      }
+    },
+    // Clears sauce, all cheeses, and all toppings back to initial state.
+    resetHub(state) {
+      state.base.sauce.sauceType = SAUCE_TYPES.NONE;
+      Object.keys(state.base).forEach((k) => {
+        if (k !== 'sauce') state.base[k].checked = false;
+      });
+      Object.keys(state.toppings).forEach((k) => {
+        state.toppings[k].checked = false;
+        state.toppings[k].quantity = TOPPING_QUANTITIES.REGULAR;
+      });
+    },
   },
 });
 

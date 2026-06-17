@@ -1,35 +1,72 @@
-/* Single implicit row now — every column spans the page's full content
-   height naturally (rather than being split into two explicit row tracks),
-   so the tallest column (Base, once Crust & Sauce + Cheese are expanded)
-   correctly grows the grid instead of being capped and silently overflowing
-   past it. */
 .pizzahub {
   display: grid;
   position: relative;
-  height: 100%;
-  width: auto;
   min-height: 100vh;
   min-width: 100vw;
-  grid-template-columns: 1fr minmax(160px, 380px) 1fr;
+  width: auto;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: minmax(260px, 340px) 1fr minmax(300px, 420px);
+  grid-template-areas:
+    "presets presets presets"
+    "left    center  right";
+  align-items: start;
   z-index: 0;
 }
 
-/* Pizza preview + Order button, pinned together. Scrolling the page moves
-   the Base (left) and Toppings (right) columns past this one, but this one
-   stays put — the live preview is always visible no matter how far down
-   you've scrolled to reach Sauce/Cheese/Toppings. Desktop only; see media
-   query below. */
-.previewColumn {
-  grid-column: 2/3;
-  position: sticky;
-  top: 24px;
-  align-self: start;
-  height: fit-content;
+/* Full-width auto-scrolling preset carousel */
+.presetBar {
+  grid-area: presets;
+  padding: 16px 20px 8px;
+}
+
+/* Left column: greeting + base options */
+.leftColumn {
+  grid-area: left;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 24px;
+  padding: 24px 16px;
+  min-height: calc(100vh - 120px);
+}
+
+.greeting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text);
+  font-family: var(--font);
+  letter-spacing: 2px;
+  text-transform: capitalize;
+  text-align: center;
+}
+
+.greeting h1 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.greeting p {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  text-transform: none;
+}
+
+/* Center column: pizza + action bar, pinned so the live preview never
+   scrolls off while the user works through base/toppings in the side columns. */
+.centerColumn {
+  grid-area: center;
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 8px;
   z-index: 2;
 }
 
@@ -38,92 +75,38 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Hero-sized, but scales down on narrow viewports instead of overflowing
-     — same clamp() pattern already used for the Base panel and Toppings
-     menu widths. */
-  width: clamp(260px, 38vw, 380px);
-  height: clamp(260px, 38vw, 380px);
+  width: clamp(260px, 36vw, 380px);
+  height: clamp(260px, 36vw, 380px);
 }
 
-.description {
-  display: flex;
-  min-height: fit-content;
-  min-width: fit-content;
-  position: relative;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: var(--text);
-  font-size: 1rem;
-  font-weight: 700;
-  font-family: var(--font);
-  letter-spacing: 2px;
-  text-transform: capitalize;
-}
-
-.descBase {
-  width: auto;
-  /* min-height, not a fixed height — when Crust & Sauce + Cheese are all
-     expanded this column gets taller than one viewport, and it needs to
-     actually grow (not just visually overflow) so the grid track sizes to
-     match and the sticky preview column keeps tracking the full scroll. */
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  grid-column: 1/2;
-}
-.description p {
-  font-size: larger;
-}
-
-.baseWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
-  width: 100%;
-}
-
-.presetsWrapper {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.orderButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.toppingsMenu {
-  grid-column: 3/4;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.backdrop {
-  grid-column: 1/4;
-}
-
-.priceTag {
+/* Total + Reset + Order grouped in a glass card under the pizza */
+.actionBar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 12px;
-  background: rgba(255, 107, 0, 0.12);
-  border: 1px solid rgba(255, 107, 0, 0.4);
-  border-radius: 12px;
-  padding: 10px 24px;
+  gap: 12px;
+  width: clamp(260px, 36vw, 380px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 16px 20px;
+}
+
+.priceBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 
 .priceLabel {
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font);
 }
 
 .priceValue {
@@ -131,46 +114,92 @@
   font-weight: 900;
   color: #ff6b00;
   letter-spacing: 1px;
+  font-family: var(--font);
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.resetBtn {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: var(--font);
+  letter-spacing: 0.3px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.resetBtn:hover {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.resetBtn:active {
+  transform: scale(0.97);
+}
+
+/* Right column: ToppingsMenu (which now includes cheese at the top) */
+.rightColumn {
+  grid-area: right;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  padding: 24px 16px;
+  min-height: calc(100vh - 120px);
 }
 
 .stickyPriceBar {
   display: none;
 }
 
+/* ── Responsive ──────────────────────────────────────────────────────── */
+
 @media screen and (max-width: 1360px) {
   .pizzahub {
     display: flex;
-    position: relative;
     flex-direction: column;
-    justify-content: space-between;
     align-items: center;
-    gap: 40px;
+    gap: 24px;
+    padding-bottom: 32px;
   }
-  .description {
-    margin-top: 120px;
-  }
-  .pizza {
-    position: relative;
-  }
-  /* Stacked flow, not side-by-side columns — the sticky pin only makes
-     sense when Base/Toppings scroll past the preview horizontally next to
-     it. Here everything is already one vertical sequence. */
-  .previewColumn {
-    position: static;
-  }
-  .orderButton {
-    margin-bottom: 30px;
-  }
-  .toppingsMenu {
+
+  .presetBar {
     width: 100%;
-    justify-content: center;
+    padding: 100px 16px 0;
+  }
+
+  .leftColumn,
+  .rightColumn {
+    width: 100%;
+    max-width: 560px;
+    min-height: unset;
+    padding: 0 16px;
+  }
+
+  .centerColumn {
+    position: static;
+    padding: 0;
+  }
+
+  .actionBar {
+    width: clamp(260px, 80vw, 420px);
   }
 }
 
 @media screen and (max-width: 768px) {
-  .description {
-    margin-top: 80px;
-    padding: 0 16px;
+  .presetBar {
+    padding-top: 80px;
   }
 
   .stickyPriceBar {
@@ -204,19 +233,21 @@
   }
 
   /* leave room so the sticky bar never covers the order button */
-  .orderButton {
+  .actionBar {
     margin-bottom: 64px;
   }
 }
 
 @media screen and (max-width: 520px) {
-  .description h1 {
-    font-size: 1.4rem;
+  .greeting h1 {
+    font-size: 1.1rem;
   }
+
   .priceValue {
     font-size: 1.5rem;
   }
-  .priceTag {
-    padding: 8px 16px;
+
+  .actionBar {
+    padding: 12px 14px;
   }
 }

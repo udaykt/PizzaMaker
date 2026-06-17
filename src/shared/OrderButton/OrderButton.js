@@ -19,13 +19,14 @@ const OrderButton = (props) => {
     history.push(CHECKOUT_PATH);
     dispatch(pizzaActions.toggleIsSliced());
   };
+  const empty = isPizzaEmpty(orderState);
   return (
     <Button
-      className={styles.orderButton}
+      className={`${styles.orderButton} ${!empty ? styles.pulse : ''}`}
       type='submit'
       value='Order'
       onClick={OrderSubmitHandler}
-      disabled={!loggedIn || isPizzaEmpty(orderState)}
+      disabled={!loggedIn || empty}
     >
       Order
     </Button>

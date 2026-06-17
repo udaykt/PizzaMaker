@@ -1,14 +1,9 @@
-/* Mirrors .baseRoot's own width/glass treatment exactly (same 500px desktop /
-   92vw mobile breakpoint, same glass card look) so this section reads as
-   one continuous builder block with the panel directly below it, instead
-   of a bare row floating at a different width. */
 .presets {
-  width: 500px;
-  max-width: 500px;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px 0;
+  gap: 10px;
+  padding: 14px 0;
   border-radius: var(--radius-xl);
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
@@ -21,7 +16,7 @@
   justify-content: center;
   align-items: center;
   font-family: var(--font);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -33,21 +28,15 @@
   gap: 10px;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 2px 20px 10px;
-  /* Without overflow-y set explicitly, browsers implicitly promote it to
-     "auto" too (since overflow-x isn't "visible"), which was popping a
-     second, unstyled vertical scrollbar in on top of the themed horizontal
-     one. Firefox theming: */
+  padding: 2px 24px 10px;
   scrollbar-width: thin;
   scrollbar-color: var(--glass-border) transparent;
-  /* Soft fade at both edges hints there's more to scroll to, without
-     needing the scrollbar to be visible at rest. */
-  mask-image: linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent);
+  mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
 }
 
 .row::-webkit-scrollbar {
-  height: 5px;
+  height: 4px;
 }
 
 .row::-webkit-scrollbar-track {
@@ -69,8 +58,8 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  width: 84px;
-  padding: 8px 6px;
+  width: 100px;
+  padding: 10px 8px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--glass-border-subtle);
   border-radius: var(--radius-sm);
@@ -79,14 +68,14 @@
 }
 
 .card:hover {
-  border-color: rgba(255, 107, 0, 0.3);
-  background: rgba(255, 107, 0, 0.06);
-  transform: translateY(-2px);
+  border-color: rgba(255, 107, 0, 0.35);
+  background: rgba(255, 107, 0, 0.07);
+  transform: translateY(-3px);
 }
 
 .thumb {
-  width: 64px;
-  height: 64px;
+  width: 76px;
+  height: 76px;
   pointer-events: none;
 }
 
@@ -112,11 +101,6 @@
 }
 
 @media screen and (max-width: 768px) {
-  .presets {
-    width: 92vw;
-    max-width: 100%;
-  }
-
   .row {
     justify-content: flex-start;
   }

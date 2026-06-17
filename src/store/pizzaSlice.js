@@ -34,6 +34,11 @@ const pizzaSlice = createSlice({
     setDeliveryMethod(state, action) {
       state.deliveryMethod = action.payload;
     },
+    resetPizza(state) {
+      state.size = PIZZASIZES.R;
+      state.crustStyle = CRUST_STYLES.HAND_TOSSED;
+      state.bakeLevel = BAKE_LEVELS.NORMAL;
+    },
   },
 });
 

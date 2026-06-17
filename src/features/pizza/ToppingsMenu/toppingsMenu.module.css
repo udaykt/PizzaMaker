@@ -1,8 +1,7 @@
 .toppingsMenu {
   display: grid;
   position: relative;
-  min-width: 30vw;
-  width: clamp(320px, 40vw, 500px);
+  width: 100%;
   border-radius: var(--radius-xl);
   grid-template-rows: auto 1fr;
   background: var(--glass-bg);
@@ -27,19 +26,15 @@
   border-bottom: 1px solid var(--glass-border-subtle);
 }
 
-/* A 2-column grid instead of one stretched column — fills the card's width
-   rather than its height, and as more toppings get added later this just
-   grows another row instead of stretching existing rows further apart. */
 .toppings {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-row: 2/3;
   align-content: start;
-  gap: 10px;
-  padding: 14px;
+  gap: 8px;
+  padding: 12px;
 }
 
-/* Spans both grid columns; the coloured dot is injected via --cat-color. */
 .categoryHeader {
   grid-column: 1 / -1;
   display: flex;
@@ -64,185 +59,138 @@
   background: var(--cat-color, #888);
 }
 
-.topping {
+/* Cheese chips — span both columns, wrap 3-per-row */
+.cheeseGrid {
+  grid-column: 1 / -1;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  width: 100%;
-  min-height: 52px;
-  color: var(--text);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cheeseCard {
+  flex: 1 1 calc(33.33% - 6px);
+  min-width: 86px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid transparent;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.cheeseCard:hover {
+  background: rgba(255, 183, 0, 0.08);
+  border-color: rgba(255, 183, 0, 0.28);
+}
+
+.cheeseActive {
+  border-color: rgba(255, 183, 0, 0.55) !important;
+  background: rgba(255, 183, 0, 0.11) !important;
+}
+
+.cheeseDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.25);
+}
+
+.cheeseName {
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: var(--font);
+  color: var(--text);
+  text-transform: capitalize;
+  line-height: 1.2;
+  text-align: left;
+}
+
+/* Topping tap-to-cycle cards */
+.topping {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 46px;
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
 }
 
 .topping:hover {
   background: rgba(255, 107, 0, 0.06);
-  border-color: rgba(255, 107, 0, 0.2);
+  border-color: rgba(255, 107, 0, 0.22);
 }
 
 .toppingActive {
-  border-color: rgba(255, 107, 0, 0.35);
-  background: rgba(255, 107, 0, 0.08);
-  animation: toppingPop 0.25s ease;
-}
-
-@keyframes toppingPop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.02); }
-  100% { transform: scale(1); }
+  border-color: rgba(255, 107, 0, 0.38);
+  background: rgba(255, 107, 0, 0.09);
 }
 
 .toppingMain {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  width: 100%;
+}
+
+.toppingImg {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  border-radius: 4px;
   flex-shrink: 0;
 }
 
 .toppingName {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
+  flex: 1;
+  font-size: 0.82rem;
   font-weight: 600;
   font-family: var(--font);
   text-transform: capitalize;
+  text-align: left;
 }
 
-.toppingDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+.dots {
+  display: flex;
+  gap: 4px;
   flex-shrink: 0;
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.15);
 }
 
-.checkbox {
-  display: flex;
-  align-items: center;
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  transition: background 0.18s ease, transform 0.15s ease;
 }
 
-.checkbox input[type='checkbox'] {
-  width: 0;
-  height: 0;
-  visibility: hidden;
-}
-
-.checkbox label {
-  cursor: pointer;
-  text-indent: -9999px;
-  width: 44px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.12);
-  display: block;
-  border-radius: 24px;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: background 0.25s ease, border-color 0.25s ease;
-}
-
-/* The knob image + size come from the topping art registry via the
-   --knob-img / --knob-size custom properties set inline on each label, so a new
-   topping needs no per-topping rule here. */
-.checkbox label:after {
-  content: '';
-  position: absolute;
-  top: 10%;
-  left: 5%;
-  width: 50%;
-  height: 80%;
-  border-radius: 80px;
-  transition: 0.3s;
-  filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 0.5));
-  background: transparent var(--knob-img) no-repeat center;
-  background-size: var(--knob-size);
-}
-
-.checkbox input:checked + label {
+.dotFilled {
   background: var(--accent);
-  border-color: transparent;
-  box-shadow: 0 0 10px rgba(255, 107, 0, 0.4);
-}
-
-.checkbox input:checked + label:after {
-  left: calc(100% - 5%);
-  transform: translateX(-100%);
-}
-
-.checkbox label:active:after {
-  width: 45%;
-}
-
-/* Segmented Reg/Med pill — same visual language as the crust-size slider.
-   Stretches full-width with evenly split segments (rather than sizing to
-   its own content) so it sits cleanly under a narrower 2-column cell. */
-.quantityPill {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--glass-border-subtle);
-  border-radius: 16px;
-  padding: 3px;
-}
-
-.quantityPill input[type='radio'] {
-  width: 0;
-  height: 0;
-  visibility: hidden;
-  position: absolute;
-}
-
-.quantityPill label {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 24px;
-  padding: 0 4px;
-  border-radius: 13px;
-  font-weight: 600;
-  font-family: var(--font);
-  font-size: 0.62rem;
-  color: var(--text-dim);
-  cursor: pointer;
-  transition: all 0.18s ease;
-  white-space: nowrap;
-}
-
-.quantityPill input:checked + label {
-  background: var(--accent);
-  color: #ffffff;
-  box-shadow: 0 0 8px rgba(255, 107, 0, 0.4);
-}
-
-.quantityPill input:disabled + label {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.quantityPill label:hover {
-  color: var(--accent);
-}
-
-.quantityPill input:disabled + label:hover {
-  color: var(--text-dim);
+  transform: scale(1.3);
+  box-shadow: 0 0 4px rgba(255, 107, 0, 0.5);
 }
 
 @media screen and (max-width: 768px) {
   .toppingsMenu {
     width: 92vw;
     max-width: 100%;
-    min-width: unset;
   }
 }
 
-/* Below this, two columns leave too little room per card — fall back to one. */
 @media screen and (max-width: 420px) {
   .toppings {
     grid-template-columns: 1fr;

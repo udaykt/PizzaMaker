@@ -1,17 +1,26 @@
-import { Fragment } from 'react';
+import { Fragment, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { motion } from 'framer-motion';
 import { pizzaHubActions, TOPPING_QUANTITIES } from '@/store/pizzaHubSlice';
 import { TOPPING_CATALOG } from '@/config/toppingCatalog';
 import { TOPPING_ART } from '@/features/pizza/PizzaCanvas/toppingArt';
 import usePizzaSound from '@/hooks/usePizzaSound';
 import styles from './toppingsMenu.module.css';
 
-const QUANTITY_LABELS = {
-  [TOPPING_QUANTITIES.LIGHT]: 'Light',
-  [TOPPING_QUANTITIES.REGULAR]: 'Regular',
-  [TOPPING_QUANTITIES.EXTRA]: 'Extra',
+const CHEESE_SWATCHES = {
+  mozzarella:     '#e8d9bc',
+  cheddar:        '#f08020',
+  parmesanAsiago: '#e8c060',
+  feta:           '#eeeadc',
+  ricotta:        '#ece0c8',
+  veganCheese:    '#f5cc50',
 };
-const QUANTITY_ORDER = [TOPPING_QUANTITIES.LIGHT, TOPPING_QUANTITIES.REGULAR, TOPPING_QUANTITIES.EXTRA];
+
+const DOT_COUNT = {
+  [TOPPING_QUANTITIES.LIGHT]:   1,
+  [TOPPING_QUANTITIES.REGULAR]: 2,
+  [TOPPING_QUANTITIES.EXTRA]:   3,
+};
 
 const TOPPING_META = Object.fromEntries(TOPPING_CATALOG.map((t) => [t.id, t]));
 
@@ -22,24 +31,45 @@ const GROUPS = [
 
 const ToppingsMenu = () => {
   const toppings = useSelector((state) => state.pizzaHub.toppings);
+  const bases    = useSelector((state) => state.pizzaHub.base);
   const dispatch = useDispatch();
   const playPlop = usePizzaSound();
 
-  const checkboxChangeHandler = (e, key) => {
-    let topping = toppings[key];
-    topping = { ...topping, checked: e.target.checked };
-    dispatch(pizzaHubActions.toggleTopping(topping));
-    if (e.target.checked) playPlop();
-  };
+  const cheeseEntries = Object.entries(bases).filter(([k]) => k !== 'sauce');
 
-  const quantityHandler = (key, quantity) => {
-    dispatch(pizzaHubActions.setToppingQuantity({ title: key, quantity }));
-  };
+  const handleCheeseToggle = useCallback((key, isChecked) => {
+    if (!isChecked) playPlop();
+    dispatch(pizzaHubActions.toggleBase(key));
+  }, [dispatch, playPlop]);
+
+  const handleToppingCycle = useCallback((key) => {
+    if (toppings[key] && !toppings[key].checked) playPlop();
+    dispatch(pizzaHubActions.cycleToppingQuantity(key));
+  }, [toppings, dispatch, playPlop]);
 
   return (
     <div className={styles.toppingsMenu}>
-      <h1 title='toppings'>Toppings</h1>
+      <h1>Toppings</h1>
       <div className={styles.toppings}>
+
+        <div className={styles.categoryHeader} style={{ '--cat-color': '#c89030' }}>
+          Cheese
+        </div>
+        <div className={styles.cheeseGrid}>
+          {cheeseEntries.map(([key, value]) => (
+            <motion.button
+              key={key}
+              type='button'
+              className={`${styles.cheeseCard} ${value.checked ? styles.cheeseActive : ''}`}
+              onClick={() => handleCheeseToggle(key, value.checked)}
+              whileTap={{ scale: 0.93 }}
+            >
+              <span className={styles.cheeseDot} style={{ background: CHEESE_SWATCHES[key] }} />
+              <span className={styles.cheeseName}>{value.title}</span>
+            </motion.button>
+          ))}
+        </div>
+
         {GROUPS.map((group) => {
           const ids = TOPPING_CATALOG.filter((t) => t.category === group.key).map((t) => t.id);
           return (
@@ -51,51 +81,40 @@ const ToppingsMenu = () => {
                 const value = toppings[key];
                 if (!value) return null;
                 const meta = TOPPING_META[key];
-                const art = TOPPING_ART[key];
+                const art  = TOPPING_ART[key];
+                const dotCount = value.checked ? (DOT_COUNT[value.quantity] ?? 2) : 0;
                 return (
-                  <div className={`${styles.topping} ${value.checked ? styles.toppingActive : ''}`} key={key}>
+                  <motion.button
+                    key={key}
+                    type='button'
+                    className={`${styles.topping} ${value.checked ? styles.toppingActive : ''}`}
+                    onClick={() => handleToppingCycle(key)}
+                    whileTap={{ scale: 0.93 }}
+                  >
                     <div className={styles.toppingMain}>
-                      <div className={styles.checkbox}>
-                        <input
-                          type='checkbox'
-                          name={key}
-                          id={key}
-                          checked={value.checked}
-                          onChange={(e) => checkboxChangeHandler(e, key)}
-                        />
-                        <label
-                          htmlFor={key}
-                          style={{ '--knob-img': `url(${art.knob})`, '--knob-size': art.knobSize }}
-                        ></label>
-                      </div>
-                      <span className={styles.toppingName}>
-                        <span className={styles.toppingDot} style={{ background: art.swatch }} />
-                        {meta.label}
-                      </span>
-                    </div>
-
-                    <div className={styles.quantityPill}>
-                      {QUANTITY_ORDER.map((q) => (
-                        <Fragment key={q}>
-                          <input
-                            type='radio'
-                            id={`${key}_${q}`}
-                            value={q}
-                            name={`qty_${key}`}
-                            checked={value.quantity === q}
-                            onChange={() => quantityHandler(key, q)}
-                            disabled={!value.checked}
+                      <img
+                        className={styles.toppingImg}
+                        src={art.image}
+                        alt={meta.label}
+                        loading='lazy'
+                      />
+                      <span className={styles.toppingName}>{meta.label}</span>
+                      <div className={styles.dots}>
+                        {[0, 1, 2].map((i) => (
+                          <span
+                            key={i}
+                            className={`${styles.dot} ${i < dotCount ? styles.dotFilled : ''}`}
                           />
-                          <label htmlFor={`${key}_${q}`}>{QUANTITY_LABELS[q]}</label>
-                        </Fragment>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  </motion.button>
                 );
               })}
             </Fragment>
           );
         })}
+
       </div>
     </div>
   );

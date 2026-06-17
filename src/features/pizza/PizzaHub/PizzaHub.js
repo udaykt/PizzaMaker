@@ -1,6 +1,7 @@
-﻿import { Suspense, lazy, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Backdrop from '@/shared/Backdrop/Backdrop';
 import OrderButton from '@/shared/OrderButton/OrderButton';
 import ProfileMenu from '@/shared/ProfileMenu/ProfileMenu';
@@ -20,6 +21,8 @@ import PizzaDisplay from '@/features/pizza/PizzaDisplay/PizzaDisplay';
 import ToppingsMenu from '@/features/pizza/ToppingsMenu/ToppingsMenu';
 import AnimatedPrice from '@/shared/AnimatedPrice/AnimatedPrice';
 import { computePriceBreakdown } from '@/utils/pricing';
+import { pizzaHubActions } from '@/store/pizzaHubSlice';
+import { pizzaActions } from '@/store/pizzaSlice';
 import styles from './pizzahub.module.css';
 
 const Menu = lazy(() => import('@/shared/NavOverlay/NavOverlay'));
@@ -30,12 +33,13 @@ const Guest = lazy(() => import('@/features/auth/Guest/Guest'));
 const UserDashboard = lazy(() => import('@/shared/UserDashboard/UserDashboard'));
 const Modal = lazy(() => import('@/shared/Modal/Modal'));
 
-const PizzaHub = (props) => {
-  const userState = useSelector((state) => state.auth);
-  const uiState = useSelector((state) => state.ui);
+const PizzaHub = () => {
+  const userState     = useSelector((state) => state.auth);
+  const uiState       = useSelector((state) => state.ui);
   const pizzahubState = useSelector((state) => state.pizzaHub);
-  const sizePricing = useSelector((state) => state.navigation.sizePricing);
-  const pizzaSize = useSelector((state) => state.pizza.size);
+  const sizePricing   = useSelector((state) => state.navigation.sizePricing);
+  const pizzaSize     = useSelector((state) => state.pizza.size);
+  const dispatch      = useDispatch();
 
   const [userName, setUserName] = useState('');
 
@@ -48,57 +52,83 @@ const PizzaHub = (props) => {
     if (userState) setUserName(userState.firstName);
   }, [userState, uiState]);
 
-  const computePrice = () =>
-    computePriceBreakdown({ ...pizzahubState, sizePricing, size: pizzaSize }).total;
+  const price = computePriceBreakdown({ ...pizzahubState, sizePricing, size: pizzaSize }).total;
 
-  const state = {
-    parts: { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' },
-  };
+  const handleReset = useCallback(() => {
+    dispatch(pizzaHubActions.resetHub());
+    dispatch(pizzaActions.resetPizza());
+  }, [dispatch]);
 
   return (
     <div className={styles.pizzahub}>
-      <div className={styles.descBase}>
-        <div className={styles.description}>
-          <strong>
-            <h1>Welcome {`${userName ? userName : 'User'}`}!,</h1>
-          </strong>
+      {/* Row 1: full-width auto-scrolling preset bar */}
+      <motion.div
+        className={styles.presetBar}
+        initial={{ opacity: 0, y: -14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, ease: 'easeOut' }}
+      >
+        <PresetPizzas />
+      </motion.div>
+
+      {/* Row 2, Col 1: greeting + base options */}
+      <motion.div
+        className={styles.leftColumn}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.38, ease: 'easeOut', delay: 0.08 }}
+      >
+        <div className={styles.greeting}>
+          <h1>Welcome {userName || 'User'}!,</h1>
           <p>Make your own pizza. Customize and Order.</p>
-          <div className={styles.priceTag}>
+        </div>
+        <Base />
+      </motion.div>
+
+      {/* Row 2, Col 2: pizza canvas + action bar (sticky) */}
+      <motion.div
+        className={styles.centerColumn}
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.42, ease: 'easeOut', delay: 0.12 }}
+      >
+        <div className={styles.pizzaDiv}>
+          <PizzaDisplay />
+        </div>
+        <div className={styles.actionBar}>
+          <div className={styles.priceBlock}>
             <span className={styles.priceLabel}>Estimated Total</span>
             <span className={styles.priceValue}>
-              <AnimatedPrice value={computePrice()} />
+              <AnimatedPrice value={price} />
             </span>
           </div>
+          <div className={styles.actionButtons}>
+            <button type='button' className={styles.resetBtn} onClick={handleReset}>
+              Reset
+            </button>
+            <OrderButton />
+          </div>
         </div>
-        <div className={styles.presetsWrapper}>
-          <PresetPizzas />
-        </div>
-        <div className={styles.baseWrapper}>
-          <Base />
-        </div>
-      </div>
-      {/* Pizza + Order button travel together and stay pinned (desktop only
-          — see media query) so the live preview never scrolls out of view
-          while picking sauce/cheese/toppings further down the side columns. */}
-      <div className={styles.previewColumn}>
-        <div className={styles.pizzaDiv}>
-          <PizzaDisplay {...state} />
-        </div>
-        <div className={styles.orderButton}>
-          <OrderButton />
-        </div>
-      </div>
-      <div className={styles.toppingsMenu}>
-        <ToppingsMenu {...state} />
-      </div>
-      {/* Mobile only (see media query) — keeps the running total visible
-          while scrolling through the toppings list further down the page. */}
+      </motion.div>
+
+      {/* Row 2, Col 3: cheese + toppings */}
+      <motion.div
+        className={styles.rightColumn}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.38, ease: 'easeOut', delay: 0.16 }}
+      >
+        <ToppingsMenu />
+      </motion.div>
+
+      {/* Mobile-only sticky total bar */}
       <div className={styles.stickyPriceBar}>
         <span className={styles.stickyPriceLabel}>Total</span>
         <span className={styles.stickyPriceValue}>
-          <AnimatedPrice value={computePrice()} />
+          <AnimatedPrice value={price} />
         </span>
       </div>
+
       <ProfileMenu />
       <Backdrop />
       <Suspense fallback={null}>
