@@ -2,6 +2,7 @@ import { Toaster } from 'react-hot-toast';
 import './App.css';
 import Home from '@/pages/Home/Home';
 import ErrorBoundary from '@/shared/ErrorBoundary/ErrorBoundary';
+import ApiGate from '@/shared/ApiGate/ApiGate';
 
 const App = (props) => {
   return (
@@ -15,9 +16,11 @@ const App = (props) => {
           error: { iconTheme: { primary: '#e53935', secondary: '#fff' } },
         }}
       />
-      <ErrorBoundary>
-        <Home />
-      </ErrorBoundary>
+      <ApiGate>
+        <ErrorBoundary>
+          <Home />
+        </ErrorBoundary>
+      </ApiGate>
     </div>
   );
 };

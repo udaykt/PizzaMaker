@@ -1,0 +1,63 @@
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: radial-gradient(ellipse at top, #1c1410 0%, #0d0c0b 65%);
+}
+
+.icon {
+  font-size: 4rem;
+  line-height: 1;
+  animation: pizzaPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes pizzaPulse {
+  0%, 100% { transform: scale(1) rotate(-5deg); }
+  50%       { transform: scale(1.1) rotate(5deg); }
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  font-style: italic;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin-top: 4px;
+}
+
+.status {
+  font-family: var(--font);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.42);
+  letter-spacing: 0.3px;
+  min-height: 1.4em;
+}
+
+.dots {
+  display: flex;
+  gap: 7px;
+  margin-top: 6px;
+}
+
+.dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff6b00;
+  animation: dotBounce 1.3s ease-in-out infinite;
+}
+
+.dots span:nth-child(2) { animation-delay: 0.18s; }
+.dots span:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: translateY(0)  scale(0.72); opacity: 0.3; }
+  40%            { transform: translateY(-9px) scale(1);   opacity: 1;   }
+}

@@ -22,6 +22,7 @@
   "scripts": {
     "dev": "vite",
     "start": "concurrently --names \"API,UI\" --prefix-colors \"cyan,green\" \"start-api.cmd\" \"vite\"",
+    "fresh": "powershell -ExecutionPolicy Bypass -File fresh.ps1",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
