@@ -16,11 +16,11 @@
   justify-content: center;
   align-items: center;
   font-family: var(--font);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--text-muted);
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .row {

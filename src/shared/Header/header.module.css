@@ -40,11 +40,11 @@
 
 .logo h1 {
   color: #ffffff;
-  font-weight: 700;
+  font-weight: 800;
   font-style: italic;
   font-size: 1.4rem;
   letter-spacing: -0.5px;
-  font-family: var(--font);
+  font-family: var(--font-display);
 }
 
 .hamburgerMenu {

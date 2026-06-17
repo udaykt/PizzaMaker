@@ -40,25 +40,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--text);
-  font-family: var(--font);
-  letter-spacing: 2px;
-  text-transform: capitalize;
   text-align: center;
 }
 
 .greeting h1 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--text);
+  margin-bottom: 6px;
 }
 
 .greeting p {
-  font-size: 1rem;
+  font-family: var(--font);
+  font-size: 0.92rem;
   font-weight: 400;
-  color: var(--text-dim);
-  letter-spacing: 0.5px;
-  text-transform: none;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
 }
 
 /* Center column: pizza + action bar, pinned so the live preview never
@@ -108,19 +107,20 @@
 }
 
 .priceLabel {
+  font-family: var(--font);
   font-size: 0.68rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.55);
-  font-family: var(--font);
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .priceValue {
-  font-size: 2rem;
+  font-family: var(--font-display);
+  font-size: 2.2rem;
   font-weight: 900;
   color: #ff6b00;
-  letter-spacing: 1px;
-  font-family: var(--font);
+  letter-spacing: -1px;
 }
 
 .actionButtons {
