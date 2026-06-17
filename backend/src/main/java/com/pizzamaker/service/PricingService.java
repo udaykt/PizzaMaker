@@ -19,10 +19,10 @@ public final class PricingService {
 
     private PricingService() {}
 
-    // Mirrors MenuService.getSizePricing() — duplicated here (rather than
-    // injected) to keep this a pure, dependency-free function that's trivial
-    // to unit test.
-    private static final Map<PizzaSize, BigDecimal> SIZE_PRICING = Map.of(
+    // Single source of truth for size pricing: the /menu/sizes endpoint
+    // (MenuService.getSizePricing) derives its payload from this map, so the
+    // estimate the client fetches and the price charged here can't diverge.
+    public static final Map<PizzaSize, BigDecimal> SIZE_PRICING = Map.of(
             PizzaSize.R, BigDecimal.valueOf(8),
             PizzaSize.M, BigDecimal.valueOf(12),
             PizzaSize.L, BigDecimal.valueOf(16)
