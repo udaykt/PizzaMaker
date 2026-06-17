@@ -1,5 +1,6 @@
 package com.pizzamaker.entity;
 
+import com.pizzamaker.entity.converter.ToppingSelectionListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,6 +9,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -44,31 +47,13 @@ public class Order {
     private boolean feta;
     private boolean veganCheese;
 
-    // Toppings + quantity tier (Light/Regular/Extra — matches Domino's,
-    // Pizza Hut, Papa John's online ordering terminology)
-    private boolean pepperoni;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    // Toppings are stored as a JSON list of {id, quantity} (quantity tiers are
+    // Light/Regular/Extra, matching Domino's/Pizza Hut/Papa John's), so adding
+    // a topping never needs a schema change — see ToppingSelectionListConverter.
+    @Convert(converter = ToppingSelectionListConverter.class)
+    @Column(nullable = false, length = 2000)
     @Builder.Default
-    private ToppingQuantity pepperoniQuantity = ToppingQuantity.REGULAR;
-
-    private boolean sausage;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @Builder.Default
-    private ToppingQuantity sausageQuantity = ToppingQuantity.REGULAR;
-
-    private boolean peppers;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @Builder.Default
-    private ToppingQuantity peppersQuantity = ToppingQuantity.REGULAR;
-
-    private boolean olives;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @Builder.Default
-    private ToppingQuantity olivesQuantity = ToppingQuantity.REGULAR;
+    private List<ToppingSelection> toppings = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

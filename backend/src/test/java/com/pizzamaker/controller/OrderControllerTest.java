@@ -11,6 +11,7 @@ import com.pizzamaker.entity.OrderStatus;
 import com.pizzamaker.entity.PizzaSize;
 import com.pizzamaker.entity.SauceType;
 import com.pizzamaker.entity.ToppingQuantity;
+import com.pizzamaker.entity.ToppingSelection;
 import com.pizzamaker.service.OrderService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +44,8 @@ class OrderControllerTest {
         return new OrderResponse(
                 UUID.randomUUID().toString(),
                 "test@example.com",
-                new OrderResponse.Ingredients(SauceType.ROBUST_TOMATO, true, false, false, false, true, ToppingQuantity.REGULAR,
-                        false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR),
+                new OrderResponse.Ingredients(SauceType.ROBUST_TOMATO, true, false, false, false,
+                        List.of(new ToppingSelection("pepperoni", ToppingQuantity.REGULAR))),
                 PizzaSize.M,
                 CrustStyle.HAND_TOSSED,
                 BakeLevel.NORMAL,
@@ -58,8 +59,8 @@ class OrderControllerTest {
     @Test
     @WithMockUser(username = "alice@example.com", roles = "USER")
     void placeOrder_authenticated_returns201() throws Exception {
-        var req = new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false, true, ToppingQuantity.REGULAR,
-                false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR,
+        var req = new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false,
+                List.of(new ToppingSelection("pepperoni", ToppingQuantity.REGULAR)),
                 PizzaSize.M, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
         when(orderService.placeOrder(eq("alice@example.com"), any(), any())).thenReturn(sampleOrder());
 
@@ -72,9 +73,8 @@ class OrderControllerTest {
 
     @Test
     void placeOrder_unauthenticated_returns401() throws Exception {
-        var req = new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false, false, ToppingQuantity.REGULAR,
-                false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR,
-                PizzaSize.R, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
+        var req = new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false,
+                List.of(), PizzaSize.R, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)

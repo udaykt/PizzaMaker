@@ -50,6 +50,9 @@ export function orderDisplayLabels(order) {
 
 export function pizzaPropsFromOrder(order) {
   const ing = order?.ingredients || {};
+  // Toppings arrive as a generic [{ id, quantity }] list; index by id so the
+  // catalog can map each known topping to its checked/quantity state.
+  const selectedToppings = new Map((ing.toppings || []).map((t) => [t.id, t.quantity]));
   return {
     size: ENUM_TO_SIZE[order?.pizzaSize] || 'medium',
     crustStyle: ENUM_TO_CRUST_STYLE[order?.crustStyle] || 'hand-tossed',
@@ -64,7 +67,10 @@ export function pizzaPropsFromOrder(order) {
     toppings: Object.fromEntries(
       TOPPING_CATALOG.map((t) => [
         t.id,
-        { checked: !!ing[t.id], quantity: ENUM_TO_QUANTITY[ing[`${t.id}Quantity`]] || 'regular' },
+        {
+          checked: selectedToppings.has(t.id),
+          quantity: ENUM_TO_QUANTITY[selectedToppings.get(t.id)] || 'regular',
+        },
       ])
     ),
   };

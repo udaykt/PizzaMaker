@@ -5,6 +5,7 @@ import com.pizzamaker.entity.DeliveryMethod;
 import com.pizzamaker.entity.PizzaSize;
 import com.pizzamaker.entity.SauceType;
 import com.pizzamaker.entity.ToppingQuantity;
+import com.pizzamaker.entity.ToppingSelection;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -61,10 +62,11 @@ public final class PricingService {
         if (request.feta()) total = total.add(SPECIALTY_CHEESE_PRICE);
         if (request.veganCheese()) total = total.add(SPECIALTY_CHEESE_PRICE);
 
-        total = total.add(toppingPrice(request.pepperoni(), request.pepperoniQuantity()));
-        total = total.add(toppingPrice(request.sausage(), request.sausageQuantity()));
-        total = total.add(toppingPrice(request.peppers(), request.peppersQuantity()));
-        total = total.add(toppingPrice(request.olives(), request.olivesQuantity()));
+        if (request.toppings() != null) {
+            for (ToppingSelection topping : request.toppings()) {
+                total = total.add(toppingPrice(topping.quantity()));
+            }
+        }
 
         if (request.deliveryMethod() == DeliveryMethod.DELIVERY || request.deliveryMethod() == null) {
             total = total.add(DELIVERY_FEE);
@@ -81,8 +83,10 @@ public final class PricingService {
         };
     }
 
-    private static BigDecimal toppingPrice(boolean checked, ToppingQuantity quantity) {
-        if (!checked) return BigDecimal.ZERO;
+    // Every selected topping costs its quantity tier, regardless of which
+    // topping it is — pricing is intentionally tier-based, not per-topping, so
+    // the price book never grows as toppings are added.
+    private static BigDecimal toppingPrice(ToppingQuantity quantity) {
         ToppingQuantity q = quantity != null ? quantity : ToppingQuantity.REGULAR;
         return TOPPING_PRICE.get(q);
     }

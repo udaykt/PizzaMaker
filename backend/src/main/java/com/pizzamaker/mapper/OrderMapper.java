@@ -14,14 +14,7 @@ public final class OrderMapper {
                 order.isProvolone(),
                 order.isFeta(),
                 order.isVeganCheese(),
-                order.isPepperoni(),
-                order.getPepperoniQuantity(),
-                order.isSausage(),
-                order.getSausageQuantity(),
-                order.isPeppers(),
-                order.getPeppersQuantity(),
-                order.isOlives(),
-                order.getOlivesQuantity()
+                order.getToppings()
         );
         return new OrderResponse(
                 order.getOid(),

@@ -22,10 +22,10 @@ describe('pizzaPropsFromOrder', () => {
         provolone: false,
         feta: true,
         veganCheese: false,
-        pepperoni: true,
-        pepperoniQuantity: 'EXTRA',
-        olives: true,
-        olivesQuantity: 'LIGHT',
+        toppings: [
+          { id: 'pepperoni', quantity: 'EXTRA' },
+          { id: 'olives', quantity: 'LIGHT' },
+        ],
       },
     });
     expect(props.base.sauce.sauceType).toBe('robust-tomato');

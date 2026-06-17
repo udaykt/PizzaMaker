@@ -9,6 +9,7 @@ import com.pizzamaker.entity.DeliveryMethod;
 import com.pizzamaker.entity.PizzaSize;
 import com.pizzamaker.entity.SauceType;
 import com.pizzamaker.entity.ToppingQuantity;
+import com.pizzamaker.entity.ToppingSelection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,18 +51,15 @@ class PricingContractTest {
     }
 
     private OrderRequest pizza(SauceType sauce, boolean mozzarella, boolean feta,
-                               boolean pepperoni, ToppingQuantity pepperoniQuantity,
-                               PizzaSize size, DeliveryMethod deliveryMethod) {
-        return new OrderRequest(sauce, mozzarella, false, feta, false,
-                pepperoni, pepperoniQuantity, false, ToppingQuantity.REGULAR,
-                false, ToppingQuantity.REGULAR, false, ToppingQuantity.REGULAR,
+                               List<ToppingSelection> toppings, PizzaSize size, DeliveryMethod deliveryMethod) {
+        return new OrderRequest(sauce, mozzarella, false, feta, false, toppings,
                 size, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, deliveryMethod);
     }
 
     // A bare medium carryout pizza: its total is exactly the medium size price,
     // so every modifier below can be isolated by subtracting this baseline.
     private OrderRequest plainMedium() {
-        return pizza(SauceType.NONE, false, false, false, ToppingQuantity.REGULAR, PizzaSize.M, DeliveryMethod.CARRYOUT);
+        return pizza(SauceType.NONE, false, false, List.of(), PizzaSize.M, DeliveryMethod.CARRYOUT);
     }
 
     private BigDecimal total(OrderRequest req) {
@@ -69,8 +68,8 @@ class PricingContractTest {
 
     @Test
     void sizePrices_matchContract() {
-        var small = pizza(SauceType.NONE, false, false, false, ToppingQuantity.REGULAR, PizzaSize.R, DeliveryMethod.CARRYOUT);
-        var large = pizza(SauceType.NONE, false, false, false, ToppingQuantity.REGULAR, PizzaSize.L, DeliveryMethod.CARRYOUT);
+        var small = pizza(SauceType.NONE, false, false, List.of(), PizzaSize.R, DeliveryMethod.CARRYOUT);
+        var large = pizza(SauceType.NONE, false, false, List.of(), PizzaSize.L, DeliveryMethod.CARRYOUT);
         assertThat(total(small)).isEqualByComparingTo(price("size", "R"));
         assertThat(total(plainMedium())).isEqualByComparingTo(price("size", "M"));
         assertThat(total(large)).isEqualByComparingTo(price("size", "L"));
@@ -79,8 +78,8 @@ class PricingContractTest {
     @Test
     void cheesePrices_matchContract() {
         var base = total(plainMedium());
-        var withMozzarella = pizza(SauceType.NONE, true, false, false, ToppingQuantity.REGULAR, PizzaSize.M, DeliveryMethod.CARRYOUT);
-        var withFeta = pizza(SauceType.NONE, false, true, false, ToppingQuantity.REGULAR, PizzaSize.M, DeliveryMethod.CARRYOUT);
+        var withMozzarella = pizza(SauceType.NONE, true, false, List.of(), PizzaSize.M, DeliveryMethod.CARRYOUT);
+        var withFeta = pizza(SauceType.NONE, false, true, List.of(), PizzaSize.M, DeliveryMethod.CARRYOUT);
         assertThat(total(withMozzarella).subtract(base)).isEqualByComparingTo(price("cheese", "standard"));
         assertThat(total(withFeta).subtract(base)).isEqualByComparingTo(price("cheese", "specialty"));
     }
@@ -88,8 +87,8 @@ class PricingContractTest {
     @Test
     void saucePrices_matchContract() {
         var base = total(plainMedium());
-        var standardSauce = pizza(SauceType.ROBUST_TOMATO, false, false, false, ToppingQuantity.REGULAR, PizzaSize.M, DeliveryMethod.CARRYOUT);
-        var specialtySauce = pizza(SauceType.BBQ, false, false, false, ToppingQuantity.REGULAR, PizzaSize.M, DeliveryMethod.CARRYOUT);
+        var standardSauce = pizza(SauceType.ROBUST_TOMATO, false, false, List.of(), PizzaSize.M, DeliveryMethod.CARRYOUT);
+        var specialtySauce = pizza(SauceType.BBQ, false, false, List.of(), PizzaSize.M, DeliveryMethod.CARRYOUT);
         assertThat(total(standardSauce).subtract(base)).isEqualByComparingTo(price("sauce", "standard"));
         assertThat(total(specialtySauce).subtract(base)).isEqualByComparingTo(price("sauce", "specialty"));
     }
@@ -97,9 +96,9 @@ class PricingContractTest {
     @Test
     void toppingTierPrices_matchContract() {
         var base = total(plainMedium());
-        var light = pizza(SauceType.NONE, false, false, true, ToppingQuantity.LIGHT, PizzaSize.M, DeliveryMethod.CARRYOUT);
-        var regular = pizza(SauceType.NONE, false, false, true, ToppingQuantity.REGULAR, PizzaSize.M, DeliveryMethod.CARRYOUT);
-        var extra = pizza(SauceType.NONE, false, false, true, ToppingQuantity.EXTRA, PizzaSize.M, DeliveryMethod.CARRYOUT);
+        var light = pizza(SauceType.NONE, false, false, List.of(new ToppingSelection("pepperoni", ToppingQuantity.LIGHT)), PizzaSize.M, DeliveryMethod.CARRYOUT);
+        var regular = pizza(SauceType.NONE, false, false, List.of(new ToppingSelection("pepperoni", ToppingQuantity.REGULAR)), PizzaSize.M, DeliveryMethod.CARRYOUT);
+        var extra = pizza(SauceType.NONE, false, false, List.of(new ToppingSelection("pepperoni", ToppingQuantity.EXTRA)), PizzaSize.M, DeliveryMethod.CARRYOUT);
         assertThat(total(light).subtract(base)).isEqualByComparingTo(price("topping", "light"));
         assertThat(total(regular).subtract(base)).isEqualByComparingTo(price("topping", "regular"));
         assertThat(total(extra).subtract(base)).isEqualByComparingTo(price("topping", "extra"));
@@ -108,7 +107,7 @@ class PricingContractTest {
     @Test
     void deliveryFee_matchesContract() {
         var carryout = plainMedium();
-        var delivery = pizza(SauceType.NONE, false, false, false, ToppingQuantity.REGULAR, PizzaSize.M, DeliveryMethod.DELIVERY);
+        var delivery = pizza(SauceType.NONE, false, false, List.of(), PizzaSize.M, DeliveryMethod.DELIVERY);
         assertThat(total(delivery).subtract(total(carryout)))
                 .isEqualByComparingTo(contract.get("deliveryFee").decimalValue());
     }

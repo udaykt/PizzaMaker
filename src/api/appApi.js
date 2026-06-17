@@ -35,12 +35,12 @@ const buildOrderPayload = (orderState) => {
     bakeLevel:         BAKE_LEVEL_TO_ENUM[pizzaState.bakeLevel] || 'NORMAL',
     deliveryMethod:    DELIVERY_METHOD_TO_ENUM[pizzaState.deliveryMethod] || 'DELIVERY',
   };
-  // Topping fields are driven by the catalog so adding a topping needs no edit
-  // here: each contributes `<id>` and `<id>Quantity`.
-  TOPPING_CATALOG.forEach((t) => {
-    payload[t.id] = toppings[t.id].checked;
-    payload[`${t.id}Quantity`] = QUANTITY_TO_ENUM[toppings[t.id].quantity] || 'REGULAR';
-  });
+  // Toppings are sent as a generic list of the selected ones, driven by the
+  // catalog, so adding a topping needs no edit here.
+  payload.toppings = TOPPING_CATALOG.filter((t) => toppings[t.id].checked).map((t) => ({
+    id: t.id,
+    quantity: QUANTITY_TO_ENUM[toppings[t.id].quantity] || 'REGULAR',
+  }));
   return payload;
 };
 

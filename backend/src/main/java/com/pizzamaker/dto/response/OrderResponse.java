@@ -6,10 +6,11 @@ import com.pizzamaker.entity.DeliveryMethod;
 import com.pizzamaker.entity.OrderStatus;
 import com.pizzamaker.entity.PizzaSize;
 import com.pizzamaker.entity.SauceType;
-import com.pizzamaker.entity.ToppingQuantity;
+import com.pizzamaker.entity.ToppingSelection;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record OrderResponse(
         String oid,
@@ -29,13 +30,6 @@ public record OrderResponse(
             boolean provolone,
             boolean feta,
             boolean veganCheese,
-            boolean pepperoni,
-            ToppingQuantity pepperoniQuantity,
-            boolean sausage,
-            ToppingQuantity sausageQuantity,
-            boolean peppers,
-            ToppingQuantity peppersQuantity,
-            boolean olives,
-            ToppingQuantity olivesQuantity
+            List<ToppingSelection> toppings
     ) {}
 }

@@ -5,8 +5,11 @@ import com.pizzamaker.entity.CrustStyle;
 import com.pizzamaker.entity.DeliveryMethod;
 import com.pizzamaker.entity.PizzaSize;
 import com.pizzamaker.entity.SauceType;
-import com.pizzamaker.entity.ToppingQuantity;
+import com.pizzamaker.entity.ToppingSelection;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 public record OrderRequest(
         SauceType sauceType,
@@ -14,14 +17,7 @@ public record OrderRequest(
         boolean provolone,
         boolean feta,
         boolean veganCheese,
-        boolean pepperoni,
-        ToppingQuantity pepperoniQuantity,
-        boolean sausage,
-        ToppingQuantity sausageQuantity,
-        boolean peppers,
-        ToppingQuantity peppersQuantity,
-        boolean olives,
-        ToppingQuantity olivesQuantity,
+        @Valid List<ToppingSelection> toppings,
         @NotNull PizzaSize pizzaSize,
         CrustStyle crustStyle,
         BakeLevel bakeLevel,

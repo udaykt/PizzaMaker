@@ -11,7 +11,9 @@ import com.pizzamaker.entity.DeliveryMethod;
 import com.pizzamaker.entity.Order;
 import com.pizzamaker.entity.OrderStatus;
 import com.pizzamaker.entity.SauceType;
+import com.pizzamaker.entity.ToppingCatalog;
 import com.pizzamaker.entity.ToppingQuantity;
+import com.pizzamaker.entity.ToppingSelection;
 import com.pizzamaker.entity.User;
 import com.pizzamaker.exception.ResourceNotFoundException;
 import com.pizzamaker.mapper.OrderMapper;
@@ -20,13 +22,17 @@ import com.pizzamaker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -78,14 +84,7 @@ public class OrderService {
                 .provolone(request.provolone())
                 .feta(request.feta())
                 .veganCheese(request.veganCheese())
-                .pepperoni(request.pepperoni())
-                .pepperoniQuantity(orDefault(request.pepperoniQuantity()))
-                .sausage(request.sausage())
-                .sausageQuantity(orDefault(request.sausageQuantity()))
-                .peppers(request.peppers())
-                .peppersQuantity(orDefault(request.peppersQuantity()))
-                .olives(request.olives())
-                .olivesQuantity(orDefault(request.olivesQuantity()))
+                .toppings(sanitizeToppings(request.toppings()))
                 .pizzaSize(request.pizzaSize())
                 .crustStyle(request.crustStyle() != null ? request.crustStyle() : CrustStyle.HAND_TOSSED)
                 .bakeLevel(request.bakeLevel() != null ? request.bakeLevel() : BakeLevel.NORMAL)
@@ -98,8 +97,20 @@ public class OrderService {
         return OrderMapper.toResponse(saved);
     }
 
-    private static ToppingQuantity orDefault(ToppingQuantity quantity) {
-        return quantity != null ? quantity : ToppingQuantity.REGULAR;
+    // Validates topping ids against the kitchen's allow-list (rejecting any a
+    // tampered request might inject) and defaults a missing quantity to regular.
+    private static List<ToppingSelection> sanitizeToppings(List<ToppingSelection> requested) {
+        if (requested == null) return List.of();
+        List<ToppingSelection> result = new ArrayList<>();
+        for (ToppingSelection t : requested) {
+            if (t == null || t.id() == null || !ToppingCatalog.IDS.contains(t.id())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Unknown topping: " + (t == null ? "null" : t.id()));
+            }
+            result.add(new ToppingSelection(t.id(),
+                    t.quantity() != null ? t.quantity() : ToppingQuantity.REGULAR));
+        }
+        return result;
     }
 
     @Transactional(readOnly = true)
