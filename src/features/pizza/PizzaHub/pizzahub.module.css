@@ -1,11 +1,15 @@
 .pizzahub {
   display: grid;
   position: relative;
+  box-sizing: border-box;
   min-height: 100vh;
   min-width: 100vw;
-  width: auto;
+  /* 32px outer page margins + 24px column gutters — everything aligns on the
+     same 8px grid so the layout reads as one intentional system. */
+  padding: 0 32px;
+  column-gap: 24px;
   grid-template-rows: auto 1fr;
-  grid-template-columns: minmax(260px, 340px) 1fr minmax(300px, 420px);
+  grid-template-columns: minmax(240px, 300px) 1fr minmax(280px, 380px);
   grid-template-areas:
     "presets presets presets"
     "left    center  right";
@@ -16,7 +20,7 @@
 /* Full-width auto-scrolling preset carousel */
 .presetBar {
   grid-area: presets;
-  padding: 16px 20px 8px;
+  padding: 20px 0 0;
 }
 
 /* Left column: greeting + base options */
@@ -26,7 +30,7 @@
   flex-direction: column;
   align-items: center;
   gap: 24px;
-  padding: 24px 16px;
+  padding: 24px 0 40px;
   min-height: calc(100vh - 120px);
 }
 
@@ -66,7 +70,7 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  padding: 24px 8px;
+  padding: 24px 0 40px;
   z-index: 2;
 }
 
@@ -155,7 +159,7 @@
   display: flex;
   justify-content: center;
   align-items: start;
-  padding: 24px 16px;
+  padding: 24px 0 40px;
   min-height: calc(100vh - 120px);
 }
 
@@ -171,20 +175,20 @@
     flex-direction: column;
     align-items: center;
     gap: 24px;
-    padding-bottom: 32px;
+    padding: 0 20px 40px;
   }
 
   .presetBar {
     width: 100%;
-    padding: 100px 16px 0;
+    padding: 100px 0 0;
   }
 
   .leftColumn,
   .rightColumn {
     width: 100%;
-    max-width: 560px;
+    max-width: 540px;
     min-height: unset;
-    padding: 0 16px;
+    padding: 0;
   }
 
   .centerColumn {
@@ -198,6 +202,10 @@
 }
 
 @media screen and (max-width: 768px) {
+  .pizzahub {
+    padding: 0 16px 80px;
+  }
+
   .presetBar {
     padding-top: 80px;
   }

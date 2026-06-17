@@ -1,7 +1,7 @@
 .baseRoot {
   position: relative;
-  width: 500px;
-  max-width: 500px;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -238,7 +238,6 @@
 
 @media screen and (max-width: 768px) {
   .baseRoot {
-    width: 92vw;
-    max-width: 100%;
+    width: 100%;
   }
 }
