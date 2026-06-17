@@ -4,6 +4,7 @@ import store from '@/store';
 import { navigationActions } from '@/store/navigationSlice';
 import { orderActions } from '@/store/orderSlice';
 import { buildUserDataInStore } from '@/utils/userState';
+import { TOPPING_CATALOG } from '@/config/toppingCatalog';
 
 const SIZE_TO_ENUM = { small: 'R', medium: 'M', large: 'L' };
 const CRUST_STYLE_TO_ENUM = { thin: 'THIN', 'hand-tossed': 'HAND_TOSSED', stuffed: 'STUFFED' };
@@ -23,25 +24,24 @@ const buildOrderPayload = (orderState) => {
   const { base, toppings } = orderState;
   const pizzaState = store.getState().pizza;
   const selectedSize = pizzaState.size;
-  return {
+  const payload = {
     sauceType:         SAUCE_TYPE_TO_ENUM[base.sauce.sauceType] || 'NONE',
     mozzarella:        base.mozzarella.checked,
     provolone:         base.provolone.checked,
     feta:              base.feta.checked,
     veganCheese:       base.veganCheese.checked,
-    pepperoni:         toppings.pepperoni.checked,
-    pepperoniQuantity: QUANTITY_TO_ENUM[toppings.pepperoni.quantity] || 'REGULAR',
-    sausage:           toppings.sausage.checked,
-    sausageQuantity:   QUANTITY_TO_ENUM[toppings.sausage.quantity] || 'REGULAR',
-    peppers:           toppings.peppers.checked,
-    peppersQuantity:   QUANTITY_TO_ENUM[toppings.peppers.quantity] || 'REGULAR',
-    olives:            toppings.olives.checked,
-    olivesQuantity:    QUANTITY_TO_ENUM[toppings.olives.quantity] || 'REGULAR',
     pizzaSize:         SIZE_TO_ENUM[selectedSize] || 'M',
     crustStyle:        CRUST_STYLE_TO_ENUM[pizzaState.crustStyle] || 'HAND_TOSSED',
     bakeLevel:         BAKE_LEVEL_TO_ENUM[pizzaState.bakeLevel] || 'NORMAL',
     deliveryMethod:    DELIVERY_METHOD_TO_ENUM[pizzaState.deliveryMethod] || 'DELIVERY',
   };
+  // Topping fields are driven by the catalog so adding a topping needs no edit
+  // here: each contributes `<id>` and `<id>Quantity`.
+  TOPPING_CATALOG.forEach((t) => {
+    payload[t.id] = toppings[t.id].checked;
+    payload[`${t.id}Quantity`] = QUANTITY_TO_ENUM[toppings[t.id].quantity] || 'REGULAR';
+  });
+  return payload;
 };
 
 const createOrder = async (_user, orderState) => {

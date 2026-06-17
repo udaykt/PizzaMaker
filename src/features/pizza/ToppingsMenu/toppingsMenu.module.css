@@ -120,6 +120,9 @@
   transition: background 0.25s ease, border-color 0.25s ease;
 }
 
+/* The knob image + size come from the topping art registry via the
+   --knob-img / --knob-size custom properties set inline on each label, so a new
+   topping needs no per-topping rule here. */
 .checkbox label:after {
   content: '';
   position: absolute;
@@ -130,23 +133,8 @@
   border-radius: 80px;
   transition: 0.3s;
   filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 0.5));
-}
-
-.checkbox label[for='pepperoni']:after {
-  background: transparent url(@/assets/images/toppings/pepperoni.png) no-repeat center;
-  background-size: 16px;
-}
-.checkbox label[for='peppers']:after {
-  background: transparent url(@/assets/images/toppings/peppers.png) no-repeat center;
-  background-size: 20px;
-}
-.checkbox label[for='sausage']:after {
-  background: transparent url(@/assets/images/toppings/sausage.png) no-repeat center;
-  background-size: 26px;
-}
-.checkbox label[for='olives']:after {
-  background: transparent url(@/assets/images/toppings/olive.png) no-repeat center;
-  background-size: 20px;
+  background: transparent var(--knob-img) no-repeat center;
+  background-size: var(--knob-size);
 }
 
 .checkbox input:checked + label {

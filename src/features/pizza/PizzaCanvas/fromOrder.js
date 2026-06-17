@@ -4,6 +4,7 @@
 
 import { pizzaHubActions } from '@/store/pizzaHubSlice';
 import { pizzaActions } from '@/store/pizzaSlice';
+import { TOPPING_CATALOG } from '@/config/toppingCatalog';
 
 const ENUM_TO_SIZE = { R: 'small', M: 'medium', L: 'large' };
 const ENUM_TO_CRUST_STYLE = { THIN: 'thin', HAND_TOSSED: 'hand-tossed', STUFFED: 'stuffed' };
@@ -60,12 +61,12 @@ export function pizzaPropsFromOrder(order) {
       feta: { checked: !!ing.feta },
       veganCheese: { checked: !!ing.veganCheese },
     },
-    toppings: {
-      pepperoni: { checked: !!ing.pepperoni, quantity: ENUM_TO_QUANTITY[ing.pepperoniQuantity] || 'regular' },
-      sausage: { checked: !!ing.sausage, quantity: ENUM_TO_QUANTITY[ing.sausageQuantity] || 'regular' },
-      peppers: { checked: !!ing.peppers, quantity: ENUM_TO_QUANTITY[ing.peppersQuantity] || 'regular' },
-      olives: { checked: !!ing.olives, quantity: ENUM_TO_QUANTITY[ing.olivesQuantity] || 'regular' },
-    },
+    toppings: Object.fromEntries(
+      TOPPING_CATALOG.map((t) => [
+        t.id,
+        { checked: !!ing[t.id], quantity: ENUM_TO_QUANTITY[ing[`${t.id}Quantity`]] || 'regular' },
+      ])
+    ),
   };
 }
 

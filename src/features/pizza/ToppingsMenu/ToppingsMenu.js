@@ -1,17 +1,9 @@
 import { Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { pizzaHubActions, TOPPING_QUANTITIES } from '@/store/pizzaHubSlice';
+import { TOPPING_ART } from '@/features/pizza/PizzaCanvas/toppingArt';
 import usePizzaSound from '@/hooks/usePizzaSound';
 import styles from './toppingsMenu.module.css';
-
-// Ties each row's identity dot to the same colors the topping renders with
-// on the pizza itself, so picking feels directly connected to what you'll see.
-const TOPPING_COLOR_VAR = {
-  pepperoni: 'var(--pepperoni-color)',
-  sausage: 'var(--sausage-color)',
-  peppers: 'var(--pepper-color)',
-  olives: 'var(--olives-color)',
-};
 
 // Light/Regular/Extra — the terms Domino's, Pizza Hut, and Papa John's all
 // use for topping quantity on their own ordering sites.
@@ -55,10 +47,13 @@ const ToppingsMenu = (props) => {
                     id={key}
                     onChange={(e) => checkboxChangeHandler(e, key)}
                   />
-                  <label htmlFor={key}></label>
+                  <label
+                    htmlFor={key}
+                    style={{ '--knob-img': `url(${TOPPING_ART[key].knob.image})`, '--knob-size': TOPPING_ART[key].knob.size }}
+                  ></label>
                 </div>
                 <span className={styles.toppingName}>
-                  <span className={styles.toppingDot} style={{ background: TOPPING_COLOR_VAR[key] }} />
+                  <span className={styles.toppingDot} style={{ background: TOPPING_ART[key].swatch }} />
                   {key}
                 </span>
               </div>

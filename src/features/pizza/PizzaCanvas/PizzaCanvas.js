@@ -1,7 +1,9 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { Fragment, useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { visiblePieces } from './toppingPlacement';
+import { TOPPING_CATALOG } from '@/config/toppingCatalog';
+import { TOPPING_ART } from './toppingArt';
 import styles from './pizzaCanvas.module.css';
 
 const CENTER = 160;
@@ -54,52 +56,15 @@ function seededPoints(count, seed) {
 const CHAR_SLOTS = seededPoints(12, 9173);
 const STUFFED_SLOTS = seededPoints(18, 4421);
 
-// Topping artwork, drawn proportional to the piece's own radius so sizes vary.
-const ToppingShape = ({ type, r, ids }) => {
-  switch (type) {
-    case 'pepperoni':
-      return (
-        <g>
-          <circle r={r} fill={`url(#${ids.pepperoni})`} stroke="#7c1f12" strokeWidth={r * 0.07} />
-          <circle cx={-r * 0.33} cy={-r * 0.22} r={r * 0.16} fill="#7c1f12" />
-          <circle cx={r * 0.33} cy={r * 0.16} r={r * 0.18} fill="#7c1f12" />
-          <circle cx={-r * 0.05} cy={r * 0.4} r={r * 0.13} fill="#8f2a18" />
-          <circle cx={-r * 0.38} cy={-r * 0.36} r={r * 0.24} fill="rgba(255,255,255,0.18)" />
-        </g>
-      );
-    case 'sausage':
-      // A lumpy crumble rather than a clean disc.
-      return (
-        <g>
-          <circle r={r} fill={`url(#${ids.sausage})`} stroke="#5f3d27" strokeWidth={r * 0.09} />
-          <circle cx={r * 0.62} cy={-r * 0.22} r={r * 0.55} fill={`url(#${ids.sausage})`} stroke="#5f3d27" strokeWidth={r * 0.09} />
-          <circle cx={-r * 0.5} cy={r * 0.46} r={r * 0.46} fill={`url(#${ids.sausage})`} stroke="#5f3d27" strokeWidth={r * 0.09} />
-          <circle cx={-r * 0.22} cy={-r * 0.22} r={r * 0.18} fill="#5b3a24" />
-          <circle cx={r * 0.18} cy={r * 0.12} r={r * 0.15} fill="#5b3a24" />
-        </g>
-      );
-    case 'peppers':
-      // A thin diced sliver.
-      return (
-        <g>
-          <rect x={-r * 1.1} y={-r * 0.45} width={r * 2.2} height={r * 0.9} rx={r * 0.45} fill={`url(#${ids.pepper})`} />
-          <rect x={-r * 0.95} y={-r * 0.32} width={r * 1.9} height={r * 0.22} rx={r * 0.11} fill="rgba(255,255,255,0.22)" />
-        </g>
-      );
-    case 'olives':
-      // A ring with a real hole (stroke, no fill).
-      return (
-        <g>
-          <circle r={r * 0.82} fill="none" stroke="#2c2c2e" strokeWidth={r * 0.55} />
-          <circle cx={-r * 0.28} cy={-r * 0.28} r={r * 0.16} fill="rgba(255,255,255,0.25)" />
-        </g>
-      );
-    default:
-      return null;
-  }
+// Topping artwork comes from the art registry, keyed by topping id, drawn
+// proportional to the piece's own radius so sizes vary. `gradId` is this
+// canvas's unique gradient id for the topping (or undefined for flat fills).
+const ToppingShape = ({ type, r, gradId }) => {
+  const art = TOPPING_ART[type];
+  return art ? art.shape(r, gradId) : null;
 };
 
-const ToppingPiece = ({ piece, pos, ids, editable, onPointerDown, dragging }) => (
+const ToppingPiece = ({ piece, pos, gradId, editable, onPointerDown, dragging }) => (
   <g
     transform={`translate(${pos.x + CENTER} ${pos.y + CENTER}) rotate(${piece.rotate})`}
     onPointerDown={editable ? (e) => onPointerDown(e, piece.id) : undefined}
@@ -113,7 +78,7 @@ const ToppingPiece = ({ piece, pos, ids, editable, onPointerDown, dragging }) =>
       exit={{ opacity: 0, scale: 0 }}
       transition={pieceTransition}
     >
-      <ToppingShape type={piece.type} r={piece.radius} ids={ids} />
+      <ToppingShape type={piece.type} r={piece.radius} gradId={gradId} />
     </motion.g>
   </g>
 );
@@ -160,15 +125,15 @@ const PizzaCanvas = ({
     provolone: `${raw}-provolone`,
     feta: `${raw}-feta`,
     veganCheese: `${raw}-veganCheese`,
-    pepperoni: `${raw}-pepperoni`,
-    sausage: `${raw}-sausage`,
-    pepper: `${raw}-pepper`,
     shadow: `${raw}-shadow`,
     crustTex: `${raw}-crustTex`,
     sauceTex: `${raw}-sauceTex`,
     cheeseTex: `${raw}-cheeseTex`,
     toppingShadow: `${raw}-toppingShadow`,
   };
+  // Per-topping gradient ids minted from the catalog, so the <defs> below and
+  // the shapes stay in lockstep with no hardcoded per-topping entries.
+  const toppingGrad = Object.fromEntries(TOPPING_CATALOG.map((t) => [t.id, `${raw}-top-${t.id}`]));
 
   const base = baseProp ?? liveBase;
   const toppings = toppingsProp ?? liveToppings;
@@ -324,18 +289,12 @@ const PizzaCanvas = ({
             <stop offset="100%" stopColor="#d9a94a" />
           </radialGradient>
 
-          <radialGradient id={ids.pepperoni} cx="38%" cy="34%" r="72%">
-            <stop offset="0%" stopColor="#d24f3b" />
-            <stop offset="100%" stopColor="#9c2b1b" />
-          </radialGradient>
-          <radialGradient id={ids.sausage} cx="38%" cy="34%" r="72%">
-            <stop offset="0%" stopColor="#a4704a" />
-            <stop offset="100%" stopColor="#774c2f" />
-          </radialGradient>
-          <linearGradient id={ids.pepper} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#5cbb4b" />
-            <stop offset="100%" stopColor="#2f8f2a" />
-          </linearGradient>
+          {/* Topping gradients, one per catalog entry that declares one */}
+          {TOPPING_CATALOG.map((t) =>
+            TOPPING_ART[t.id].gradient ? (
+              <Fragment key={t.id}>{TOPPING_ART[t.id].gradient(toppingGrad[t.id])}</Fragment>
+            ) : null
+          )}
 
           <filter id={ids.shadow} x="-30%" y="-30%" width="160%" height="160%">
             <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#000" floodOpacity="0.35" />
@@ -467,7 +426,7 @@ const PizzaCanvas = ({
                     key={piece.id}
                     piece={piece}
                     pos={pos}
-                    ids={ids}
+                    gradId={toppingGrad[piece.type]}
                     editable={editable}
                     onPointerDown={handlePointerDown}
                     dragging={draggingId === piece.id}

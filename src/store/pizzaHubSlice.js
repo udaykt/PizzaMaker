@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { TOPPING_CATALOG } from '@/config/toppingCatalog';
 
 // Light/Regular/Extra — the same tiers Domino's, Pizza Hut, and Papa John's
 // use on their own online ordering, rather than an in-house "medium" scale.
@@ -41,28 +42,14 @@ const pizzaHubSlice = createSlice({
         checked: false,
       },
     },
-    toppings: {
-      pepperoni: {
-        title: 'pepperoni',
-        checked: false,
-        quantity: TOPPING_QUANTITIES.REGULAR,
-      },
-      sausage: {
-        title: 'sausage',
-        checked: false,
-        quantity: TOPPING_QUANTITIES.REGULAR,
-      },
-      peppers: {
-        title: 'peppers',
-        checked: false,
-        quantity: TOPPING_QUANTITIES.REGULAR,
-      },
-      olives: {
-        title: 'olives',
-        checked: false,
-        quantity: TOPPING_QUANTITIES.REGULAR,
-      },
-    },
+    // Built from the topping catalog so a new topping needs no edit here —
+    // each starts unchecked at regular quantity, keyed by its catalog id.
+    toppings: Object.fromEntries(
+      TOPPING_CATALOG.map((t) => [
+        t.id,
+        { title: t.id, checked: false, quantity: TOPPING_QUANTITIES.REGULAR },
+      ])
+    ),
   },
   reducers: {
     toggleTopping(state, action) {
