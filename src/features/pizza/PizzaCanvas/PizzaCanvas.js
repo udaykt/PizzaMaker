@@ -130,10 +130,12 @@ const PizzaCanvas = ({
     sauceMarinara: `${raw}-sauceMarinara`,
     sauceWhite:    `${raw}-sauceWhite`,
     sauceBbq:      `${raw}-sauceBbq`,
-    mozzarella: `${raw}-mozzarella`,
-    provolone: `${raw}-provolone`,
-    feta: `${raw}-feta`,
-    veganCheese: `${raw}-veganCheese`,
+    mozzarella:     `${raw}-mozzarella`,
+    cheddar:        `${raw}-cheddar`,
+    parmesanAsiago: `${raw}-parmesanAsiago`,
+    feta:           `${raw}-feta`,
+    ricotta:        `${raw}-ricotta`,
+    veganCheese:    `${raw}-veganCheese`,
     shadow: `${raw}-shadow`,
     crustTex: `${raw}-crustTex`,
     sauceTex: `${raw}-sauceTex`,
@@ -153,13 +155,16 @@ const PizzaCanvas = ({
   const sauceType = base?.sauce?.sauceType;
   const sauceGradientId = ids[SAUCE_GRADIENT_KEY[sauceType]] ?? ids.sauceRed;
 
-  // Each cheese type that's checked gets its own translucent layer, slightly
-  // inset from the last so they read as stacked rather than overlapping flat.
+  // Each cheese that's checked gets its own layer, 2px smaller per step so
+  // the edge of every layer peeks out and the stack reads as genuinely layered.
+  // Colors are intentionally distinct so cheeses are identifiable at a glance.
   const cheeseLayers = [
-    { key: 'mozzarella', on: base?.mozzarella?.checked, gradientId: ids.mozzarella, opacity: 1 },
-    { key: 'provolone', on: base?.provolone?.checked, gradientId: ids.provolone, opacity: 0.94 },
-    { key: 'feta', on: base?.feta?.checked, gradientId: ids.feta, opacity: 0.9 },
-    { key: 'veganCheese', on: base?.veganCheese?.checked, gradientId: ids.veganCheese, opacity: 0.92 },
+    { key: 'mozzarella',     on: base?.mozzarella?.checked,     gradientId: ids.mozzarella,     opacity: 1    },
+    { key: 'cheddar',        on: base?.cheddar?.checked,        gradientId: ids.cheddar,        opacity: 0.96 },
+    { key: 'parmesanAsiago', on: base?.parmesanAsiago?.checked, gradientId: ids.parmesanAsiago, opacity: 0.93 },
+    { key: 'feta',           on: base?.feta?.checked,           gradientId: ids.feta,           opacity: 0.90 },
+    { key: 'ricotta',        on: base?.ricotta?.checked,        gradientId: ids.ricotta,        opacity: 0.88 },
+    { key: 'veganCheese',    on: base?.veganCheese?.checked,    gradientId: ids.veganCheese,    opacity: 0.94 },
   ];
 
   // --- Drag-to-nudge (editable mode only) -----------------------------
@@ -282,21 +287,35 @@ const PizzaCanvas = ({
             <stop offset="100%" stopColor="#5c2f10" />
           </radialGradient>
 
+          {/* Mozzarella — classic warm cream white */}
           <radialGradient id={ids.mozzarella} cx="45%" cy="42%" r="72%">
             <stop offset="0%" stopColor="#f9f4e4" />
-            <stop offset="100%" stopColor="#ebe0c4" />
+            <stop offset="100%" stopColor="#e8d9bc" />
           </radialGradient>
-          <radialGradient id={ids.provolone} cx="45%" cy="42%" r="72%">
-            <stop offset="0%" stopColor="#f7c95a" />
-            <stop offset="100%" stopColor="#e0a030" />
+          {/* Cheddar — bold melted orange, unmistakable */}
+          <radialGradient id={ids.cheddar} cx="45%" cy="42%" r="72%">
+            <stop offset="0%" stopColor="#f08020" />
+            <stop offset="100%" stopColor="#d46010" />
           </radialGradient>
+          {/* Parmesan/Asiago — amber gold, baked & nutty */}
+          <radialGradient id={ids.parmesanAsiago} cx="45%" cy="42%" r="72%">
+            <stop offset="0%" stopColor="#e8c060" />
+            <stop offset="100%" stopColor="#c09030" />
+          </radialGradient>
+          {/* Feta — cool bright white, crumbly feel */}
           <radialGradient id={ids.feta} cx="45%" cy="42%" r="72%">
-            <stop offset="0%" stopColor="#fbf8ee" />
-            <stop offset="100%" stopColor="#e8e2c8" />
+            <stop offset="0%" stopColor="#fefdf8" />
+            <stop offset="100%" stopColor="#eeeadc" />
           </radialGradient>
+          {/* Ricotta — thick warm cream dollops */}
+          <radialGradient id={ids.ricotta} cx="45%" cy="42%" r="72%">
+            <stop offset="0%" stopColor="#fdf8ee" />
+            <stop offset="100%" stopColor="#ece0c8" />
+          </radialGradient>
+          {/* Vegan Cheese — vivid turmeric yellow */}
           <radialGradient id={ids.veganCheese} cx="45%" cy="42%" r="72%">
-            <stop offset="0%" stopColor="#f0c875" />
-            <stop offset="100%" stopColor="#d9a94a" />
+            <stop offset="0%" stopColor="#f5cc50" />
+            <stop offset="100%" stopColor="#d4a030" />
           </radialGradient>
 
 

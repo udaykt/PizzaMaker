@@ -34,7 +34,7 @@ const pizzaHubSlice = createSlice({
         checked: false,
       },
       parmesanAsiago: {
-        title: 'parmesanAsiago',
+        title: 'parmesan & asiago',
         checked: false,
       },
       feta: {
