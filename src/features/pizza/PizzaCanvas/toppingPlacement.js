@@ -1,41 +1,19 @@
-// Deterministic topping placement that looks naturally splattered.
-//
-// Real toppings aren't laid out on a grid or a spiral — they're random, but
-// never stacked on top of each other. That quality is "blue noise". We generate
-// it with Mitchell's best-candidate algorithm: each new point is the random
-// candidate that sits farthest from all points placed so far. Because the early
-// points are the most spread out, any prefix of the sequence already covers the
-// whole pie — so a pizza with only a few toppings still looks evenly scattered.
-//
-// Everything is seeded, so the splatter is stable across renders (no jumping)
-// while still reading as random.
-
 import { TOPPING_CATALOG } from '@/config/toppingCatalog';
 
-export const PLACEMENT_RADIUS = 100;
+export const PLACEMENT_RADIUS = 112;
 
-// Topping identity, piece counts and per-piece sizes all come from the catalog,
-// so adding a topping needs no edit here. Order matters: it seeds the permanent
-// blue-noise layout below, so keep it stable (catalog order).
 const TYPE_ORDER = TOPPING_CATALOG.map((t) => t.id);
-// Piece counts at "regular" quantity on a medium pizza.
 const BASE_COUNT = Object.fromEntries(TOPPING_CATALOG.map((t) => [t.id, t.baseCount]));
-// Real-world relative sizes (radius in SVG units before per-piece variation).
-const TYPE_SIZE = Object.fromEntries(TOPPING_CATALOG.map((t) => [t.id, t.pieceRadius]));
+const TYPE_SIZE  = Object.fromEntries(TOPPING_CATALOG.map((t) => [t.id, t.pieceRadius]));
 
-// Light/Regular/Extra — matches the real quantity tiers used by Domino's,
-// Pizza Hut, and Papa John's, rather than an in-house "medium" scale.
 const QTY_MULTIPLIER = { light: 0.6, regular: 1.0, extra: 1.6 };
-const SIZE_FACTOR = { small: 0.8, medium: 1.0, large: 1.25 };
+const SIZE_FACTOR    = { small: 0.8, medium: 1.0, large: 1.25 };
 
 const MAX_FACTOR = SIZE_FACTOR.large * QTY_MULTIPLIER.extra;
-const MAX_COUNT = TYPE_ORDER.reduce((acc, type) => {
-  acc[type] = Math.round(BASE_COUNT[type] * MAX_FACTOR);
-  return acc;
-}, {});
-const TOTAL_SLOTS = Object.values(MAX_COUNT).reduce((a, b) => a + b, 0);
+const MAX_COUNT  = Object.fromEntries(
+  TYPE_ORDER.map((type) => [type, Math.round(BASE_COUNT[type] * MAX_FACTOR)])
+);
 
-// Small, fast, seedable PRNG so the splatter is identical on every render.
 function mulberry32(seed) {
   return function () {
     seed |= 0;
@@ -46,77 +24,86 @@ function mulberry32(seed) {
   };
 }
 
-function randomInDisc(rnd, radius) {
-  const r = radius * Math.sqrt(rnd());
-  const a = rnd() * 2 * Math.PI;
-  return { x: Math.cos(a) * r, y: Math.sin(a) * r };
+function strHash(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0;
+  return h;
 }
 
-// Mitchell's best-candidate blue-noise points, ordered most-spread-first.
-function blueNoise(count, radius, seed) {
-  const rnd = mulberry32(seed);
-  const points = [randomInDisc(rnd, radius)];
-  for (let i = 1; i < count; i++) {
-    let best = null;
-    let bestDist = -1;
-    const candidates = Math.min(8 + i, 28);
+// Pure Mitchell's best-candidate over the FULL disc — no angular sectors.
+// Sectors forced pieces into a spoke-like grid; removing them gives the natural
+// random-but-even scatter a real pizza has.
+//
+// Same-type min-distance: two pieces of the SAME topping whose centres are
+// closer than 2× the piece radius would visually stack — we reject those
+// candidates and pick the next-best. If every candidate fails (very dense
+// "extra" quantity), we fall back to the unconstrained best so placement
+// never gets stuck.
+//
+// Cross-type overlap: intentional. Each topping type has its OWN independent
+// pool, so a sausage and a mushroom can share the same spot, exactly as they
+// do on a real pizza. Selecting only one topping still fills the whole disc
+// because its pool was built in isolation (not as every N-th slot of a shared
+// giant pool).
+function placeToppings(count, radius, pieceRadius, seed) {
+  const rnd       = mulberry32(seed);
+  const points    = [];
+  const minDistSq = (pieceRadius * 2.0) ** 2;
+
+  for (let i = 0; i < count; i++) {
+    // More candidates for later pieces — disc is getting crowded.
+    const candidates = Math.min(20 + i * 3, 60);
+    let valid    = null;
+    let validD   = -1;
+    let fallback = null;
+    let fallD    = -1;
+
     for (let c = 0; c < candidates; c++) {
-      const p = randomInDisc(rnd, radius);
-      let nearest = Infinity;
+      const angle = rnd() * 2 * Math.PI;
+      // sqrt(uniform) ⟹ area-uniform distribution across the disc.
+      // 0.05 floor keeps pieces off the dead centre (sauce blob tip).
+      const r = radius * (0.05 + Math.sqrt(rnd()) * 0.95);
+      const p = { x: Math.cos(angle) * r, y: Math.sin(angle) * r };
+
+      let nearest  = Infinity;
+      let tooClose = false;
       for (const q of points) {
         const d = (p.x - q.x) ** 2 + (p.y - q.y) ** 2;
-        if (d < nearest) nearest = d;
+        if (d < minDistSq) { tooClose = true; }
+        if (d < nearest)   { nearest  = d; }
       }
-      if (nearest > bestDist) {
-        bestDist = nearest;
-        best = p;
-      }
+
+      if (!tooClose && nearest > validD) { validD = nearest; valid    = p; }
+      if (nearest > fallD)               { fallD  = nearest; fallback = p; }
     }
-    points.push(best);
+
+    points.push(valid ?? fallback ?? { x: 0, y: 0 });
   }
+
   return points;
 }
 
-// Permanent layout: round-robin interleave of every type at max count, mapped
-// onto the blue-noise sequence. Each (type, index) keeps the same point and
-// size forever, so toggling one topping never disturbs the others.
-const FULL_LAYOUT = (() => {
-  const points = blueNoise(TOTAL_SLOTS, PLACEMENT_RADIUS, 1337);
-  const jitter = mulberry32(54321);
+const FULL_LAYOUT = TYPE_ORDER.flatMap((type) => {
+  const seed = strHash(type);
+  const jrnd = mulberry32(seed ^ 0x9e3779b9);
+  return placeToppings(MAX_COUNT[type], PLACEMENT_RADIUS, TYPE_SIZE[type], seed).map((p, i) => ({
+    type,
+    indexWithinType: i,
+    id:     `${type}-${i}`,
+    x:      p.x,
+    y:      p.y,
+    radius: TYPE_SIZE[type] * (0.82 + jrnd() * 0.4),
+    rotate: Math.round(jrnd() * 360),
+  }));
+});
 
-  const ordered = [];
-  const maxLen = Math.max(...Object.values(MAX_COUNT));
-  for (let i = 0; i < maxLen; i++) {
-    for (const type of TYPE_ORDER) {
-      if (i < MAX_COUNT[type]) ordered.push({ type, indexWithinType: i });
-    }
-  }
-
-  return ordered.map((piece, slot) => {
-    const { x, y } = points[slot];
-    return {
-      ...piece,
-      id: `${piece.type}-${piece.indexWithinType}`,
-      x,
-      y,
-      // Base size for the type, plus +/- ~22% natural per-piece variation.
-      radius: TYPE_SIZE[piece.type] * (0.82 + jitter() * 0.4),
-      rotate: Math.round(jitter() * 360),
-    };
-  });
-})();
-
-// The pieces visible for the current selection. Stable identity by `id`, so
-// Framer Motion's AnimatePresence only animates the ones added/removed.
 export function visiblePieces(toppings, size) {
   const factor = SIZE_FACTOR[size] ?? 1;
   const counts = {};
   for (const type of TYPE_ORDER) {
-    const t = toppings?.[type];
-    const qtyMultiplier = QTY_MULTIPLIER[t?.quantity] ?? QTY_MULTIPLIER.regular;
-    counts[type] = t && t.checked
-      ? Math.round(BASE_COUNT[type] * factor * qtyMultiplier)
-      : 0;
+    const t   = toppings?.[type];
+    const qty = QTY_MULTIPLIER[t?.quantity] ?? QTY_MULTIPLIER.regular;
+    counts[type] = t?.checked ? Math.round(BASE_COUNT[type] * factor * qty) : 0;
   }
   return FULL_LAYOUT.filter((p) => p.indexWithinType < counts[p.type]);
 }

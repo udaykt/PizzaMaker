@@ -10,5 +10,9 @@ public final class ToppingCatalog {
 
     private ToppingCatalog() {}
 
-    public static final Set<String> IDS = Set.of("pepperoni", "sausage", "peppers", "olives");
+    public static final Set<String> IDS = Set.of(
+        "pepperoni", "sausage", "bacon", "chicken",
+        "peppers", "olives", "jalapeno", "mushroom",
+        "onion", "spinach", "tomato", "zucchini", "broccoli", "corn"
+    );
 }

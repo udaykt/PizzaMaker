@@ -39,6 +39,31 @@
   padding: 14px;
 }
 
+/* Spans both grid columns; the coloured dot is injected via --cat-color. */
+.categoryHeader {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  padding: 6px 2px 4px;
+  border-bottom: 1px solid var(--glass-border-subtle);
+  margin-bottom: 2px;
+}
+
+.categoryHeader::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--cat-color, #888);
+}
+
 .topping {
   display: flex;
   flex-direction: column;

@@ -88,7 +88,7 @@
   width: 100%;
 }
 
-.sizeSlider input:hover {
+.sizeSlider input:not(:checked):hover {
   color: var(--accent);
 }
 
@@ -161,9 +161,18 @@
   cursor: pointer;
 }
 
-.base:hover {
+.base:not(.baseActive):hover {
   border-color: rgba(255, 107, 0, 0.3);
   background: rgba(255, 107, 0, 0.06);
+}
+
+.baseActive {
+  border-color: rgba(255, 107, 0, 0.4);
+  background: rgba(255, 107, 0, 0.1);
+}
+
+.baseActive span {
+  color: var(--accent);
 }
 
 .base label {
@@ -188,18 +197,6 @@
   outline: none;
 }
 
-.base label input:checked + span {
-  border-radius: var(--radius-sm);
-  color: var(--accent);
-}
-
-.base label input[name='mozzarella']:checked + span {
-  color: var(--mozzarella-color);
-}
-
-.base label input[name='mozzarella']:hover + span {
-  color: var(--mozzarella-color);
-}
 
 /* Flex-wrap, not a grid — sauce is a single choice, so each chip sizes to
    its own label (like the Crust Style / Bake pills) and rows center
@@ -227,7 +224,7 @@
   transition: all 0.18s ease;
 }
 
-.sauceOption:hover {
+.sauceOption:not(.sauceOptionActive):hover {
   color: var(--accent);
   border-color: rgba(255, 107, 0, 0.3);
 }

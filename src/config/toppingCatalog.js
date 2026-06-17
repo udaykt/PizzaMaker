@@ -1,21 +1,28 @@
-// Single source of truth for which toppings exist and their mechanical
-// properties: how many pieces render at "regular" on a medium pizza
-// (baseCount) and the base radius of each piece in SVG units (pieceRadius).
+// Single source of truth for every topping: its id (join key across frontend
+// state, order payload, backend allow-list and art registry), display label,
+// veg/non-veg category, and the two canvas properties that drive placement —
+// baseCount (pieces at Regular on a Medium) and pieceRadius (SVG units).
 //
-// Visual identity (swatch colour, SVG gradient and shape) lives in the art
-// registry at features/pizza/PizzaCanvas/toppingArt.js, and pricing is tier
-// based (see utils/pricing.js, same Light/Regular/Extra price for every
-// topping). So adding a topping is: one row here + one art entry keyed by the
-// same id — it then flows through the builder state, menu, canvas, order
-// payload and order replay with no further edits.
-//
-// `id` is the join key — it matches the order-payload field name, the backend
-// topping id, and the key in TOPPING_ART.
+// Adding a topping = one row here + one entry in toppingArt.js. Everything
+// else (builder state, menu grouping, canvas, order payload, backend replay)
+// derives from this automatically.
 export const TOPPING_CATALOG = [
-  { id: 'pepperoni', label: 'Pepperoni', baseCount: 5, pieceRadius: 10 },
-  { id: 'sausage', label: 'Sausage', baseCount: 8, pieceRadius: 6 },
-  { id: 'peppers', label: 'Peppers', baseCount: 6, pieceRadius: 8 },
-  { id: 'olives', label: 'Olives', baseCount: 7, pieceRadius: 5.5 },
+  // Non-Veg
+  { id: 'pepperoni', label: 'Pepperoni', category: 'nonveg', baseCount: 10, pieceRadius: 20  },
+  { id: 'sausage',   label: 'Sausage',   category: 'nonveg', baseCount: 12, pieceRadius: 13  },
+  { id: 'bacon',     label: 'Bacon',     category: 'nonveg', baseCount: 5,  pieceRadius: 24  },
+  { id: 'chicken',   label: 'Chicken',   category: 'nonveg', baseCount: 10, pieceRadius: 15  },
+  // Veg
+  { id: 'peppers',   label: 'Peppers',   category: 'veg',    baseCount: 8,  pieceRadius: 20  },
+  { id: 'olives',    label: 'Olives',    category: 'veg',    baseCount: 12, pieceRadius: 9   },
+  { id: 'jalapeno',  label: 'Jalapeño',  category: 'veg',    baseCount: 12, pieceRadius: 9   },
+  { id: 'mushroom',  label: 'Mushroom',  category: 'veg',    baseCount: 8,  pieceRadius: 18  },
+  { id: 'onion',     label: 'Onion',     category: 'veg',    baseCount: 10, pieceRadius: 16  },
+  { id: 'spinach',   label: 'Spinach',   category: 'veg',    baseCount: 15, pieceRadius: 12  },
+  { id: 'tomato',    label: 'Tomato',    category: 'veg',    baseCount: 5,  pieceRadius: 16  },
+  { id: 'zucchini',  label: 'Zucchini',  category: 'veg',    baseCount: 7,  pieceRadius: 24  },
+  { id: 'broccoli',  label: 'Broccoli',  category: 'veg',    baseCount: 8,  pieceRadius: 14  },
+  { id: 'corn',      label: 'Corn',      category: 'veg',    baseCount: 12, pieceRadius: 8   },
 ];
 
 export const TOPPING_IDS = TOPPING_CATALOG.map((t) => t.id);

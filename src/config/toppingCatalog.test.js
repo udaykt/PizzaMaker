@@ -7,10 +7,10 @@ import { TOPPING_ART } from '@/features/pizza/PizzaCanvas/toppingArt';
 // catalog row without art (or vice versa) fails here rather than rendering a
 // blank piece or shipping an orphan.
 describe('topping catalog and art registry stay in sync', () => {
-  it('every catalog topping has an art entry with a drawable shape', () => {
+  it('every catalog topping has an art entry with an image', () => {
     for (const t of TOPPING_CATALOG) {
       expect(TOPPING_ART[t.id], `missing art for "${t.id}"`).toBeDefined();
-      expect(typeof TOPPING_ART[t.id].shape, `art for "${t.id}" has no shape()`).toBe('function');
+      expect(TOPPING_ART[t.id].image, `art for "${t.id}" has no image`).toBeTruthy();
     }
   });
 

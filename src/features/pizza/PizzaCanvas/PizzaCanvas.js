@@ -1,8 +1,7 @@
-import { Fragment, useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { visiblePieces } from './toppingPlacement';
-import { TOPPING_CATALOG } from '@/config/toppingCatalog';
 import { TOPPING_ART } from './toppingArt';
 import styles from './pizzaCanvas.module.css';
 
@@ -26,15 +25,15 @@ const BAKE_LEVEL = {
   'well-done': { from: '#dba861', mid: '#a96f35', to: '#7c4f22', chars: 11 },
 };
 
-// Sauces render in one of three color families — Tomato/Marinara are both
-// "red" (real pizzas don't look visually different between them either),
-// Garlic Parmesan/Alfredo are a white/cream base, BBQ a deep brown.
-const SAUCE_COLOR_GROUP = {
-  'robust-tomato': 'red',
-  marinara: 'red',
-  'garlic-parmesan': 'white',
-  alfredo: 'white',
-  bbq: 'bbq',
+// Maps each sauce to the gradient key it uses in the SVG defs.
+// Robust Tomato and Marinara are now distinct: Robust Tomato is a deep,
+// thick, hearty red; Marinara is a lighter, brighter, more acidic orange-red.
+const SAUCE_GRADIENT_KEY = {
+  'robust-tomato': 'sauceRed',
+  marinara:        'sauceMarinara',
+  'garlic-parmesan': 'sauceWhite',
+  alfredo:         'sauceWhite',
+  bbq:             'sauceBbq',
 };
 
 const layerTransition = { duration: 0.35, ease: 'easeOut' };
@@ -56,15 +55,24 @@ function seededPoints(count, seed) {
 const CHAR_SLOTS = seededPoints(12, 9173);
 const STUFFED_SLOTS = seededPoints(18, 4421);
 
-// Topping artwork comes from the art registry, keyed by topping id, drawn
-// proportional to the piece's own radius so sizes vary. `gradId` is this
-// canvas's unique gradient id for the topping (or undefined for flat fills).
-const ToppingShape = ({ type, r, gradId }) => {
+// A topping piece is the real photo from the art registry, sized to the
+// piece's own radius (which varies per piece for a natural, non-uniform look).
+const ToppingShape = ({ type, r }) => {
   const art = TOPPING_ART[type];
-  return art ? art.shape(r, gradId) : null;
+  if (!art) return null;
+  return (
+    <image
+      href={art.image}
+      x={-r}
+      y={-r}
+      width={r * 2}
+      height={r * 2}
+      preserveAspectRatio="xMidYMid meet"
+    />
+  );
 };
 
-const ToppingPiece = ({ piece, pos, gradId, editable, onPointerDown, dragging }) => (
+const ToppingPiece = ({ piece, pos, editable, onPointerDown, dragging }) => (
   <g
     transform={`translate(${pos.x + CENTER} ${pos.y + CENTER}) rotate(${piece.rotate})`}
     onPointerDown={editable ? (e) => onPointerDown(e, piece.id) : undefined}
@@ -78,7 +86,7 @@ const ToppingPiece = ({ piece, pos, gradId, editable, onPointerDown, dragging })
       exit={{ opacity: 0, scale: 0 }}
       transition={pieceTransition}
     >
-      <ToppingShape type={piece.type} r={piece.radius} gradId={gradId} />
+      <ToppingShape type={piece.type} r={piece.radius} />
     </motion.g>
   </g>
 );
@@ -118,9 +126,10 @@ const PizzaCanvas = ({
   const ids = {
     crust: `${raw}-crust`,
     crustInner: `${raw}-crustInner`,
-    sauceRed: `${raw}-sauceRed`,
-    sauceWhite: `${raw}-sauceWhite`,
-    sauceBbq: `${raw}-sauceBbq`,
+    sauceRed:      `${raw}-sauceRed`,
+    sauceMarinara: `${raw}-sauceMarinara`,
+    sauceWhite:    `${raw}-sauceWhite`,
+    sauceBbq:      `${raw}-sauceBbq`,
     mozzarella: `${raw}-mozzarella`,
     provolone: `${raw}-provolone`,
     feta: `${raw}-feta`,
@@ -131,9 +140,6 @@ const PizzaCanvas = ({
     cheeseTex: `${raw}-cheeseTex`,
     toppingShadow: `${raw}-toppingShadow`,
   };
-  // Per-topping gradient ids minted from the catalog, so the <defs> below and
-  // the shapes stay in lockstep with no hardcoded per-topping entries.
-  const toppingGrad = Object.fromEntries(TOPPING_CATALOG.map((t) => [t.id, `${raw}-top-${t.id}`]));
 
   const base = baseProp ?? liveBase;
   const toppings = toppingsProp ?? liveToppings;
@@ -145,8 +151,7 @@ const PizzaCanvas = ({
   const scale = PIZZA_SCALE[size] ?? PIZZA_SCALE.medium;
 
   const sauceType = base?.sauce?.sauceType;
-  const sauceGroup = SAUCE_COLOR_GROUP[sauceType];
-  const sauceGradientId = sauceGroup === 'white' ? ids.sauceWhite : sauceGroup === 'bbq' ? ids.sauceBbq : ids.sauceRed;
+  const sauceGradientId = ids[SAUCE_GRADIENT_KEY[sauceType]] ?? ids.sauceRed;
 
   // Each cheese type that's checked gets its own translucent layer, slightly
   // inset from the last so they read as stacked rather than overlapping flat.
@@ -256,10 +261,15 @@ const PizzaCanvas = ({
             <stop offset="100%" stopColor="#e7b063" />
           </radialGradient>
 
-          {/* Robust Tomato / Marinara */}
+          {/* Robust Tomato — thick, deep, hearty red */}
           <radialGradient id={ids.sauceRed} cx="45%" cy="42%" r="70%">
-            <stop offset="0%" stopColor="#d6452f" />
-            <stop offset="100%" stopColor="#a82c1a" />
+            <stop offset="0%" stopColor="#bf3018" />
+            <stop offset="100%" stopColor="#7e1a08" />
+          </radialGradient>
+          {/* Marinara — bright, fresh, slightly orange-red */}
+          <radialGradient id={ids.sauceMarinara} cx="45%" cy="42%" r="70%">
+            <stop offset="0%" stopColor="#e8602e" />
+            <stop offset="100%" stopColor="#c03e18" />
           </radialGradient>
           {/* Garlic Parmesan / Alfredo */}
           <radialGradient id={ids.sauceWhite} cx="45%" cy="42%" r="70%">
@@ -289,12 +299,6 @@ const PizzaCanvas = ({
             <stop offset="100%" stopColor="#d9a94a" />
           </radialGradient>
 
-          {/* Topping gradients, one per catalog entry that declares one */}
-          {TOPPING_CATALOG.map((t) =>
-            TOPPING_ART[t.id].gradient ? (
-              <Fragment key={t.id}>{TOPPING_ART[t.id].gradient(toppingGrad[t.id])}</Fragment>
-            ) : null
-          )}
 
           <filter id={ids.shadow} x="-30%" y="-30%" width="160%" height="160%">
             <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#000" floodOpacity="0.35" />
@@ -426,7 +430,6 @@ const PizzaCanvas = ({
                     key={piece.id}
                     piece={piece}
                     pos={pos}
-                    gradId={toppingGrad[piece.type]}
                     editable={editable}
                     onPointerDown={handlePointerDown}
                     dragging={draggingId === piece.id}

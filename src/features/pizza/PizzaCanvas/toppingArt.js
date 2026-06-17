@@ -1,82 +1,50 @@
-import pepperoniPng from '@/assets/images/toppings/pepperoni.png';
-import sausagePng from '@/assets/images/toppings/sausage.png';
-import peppersPng from '@/assets/images/toppings/peppers.png';
-import olivePng from '@/assets/images/toppings/olive.png';
+import pepperoniPng   from '@/assets/images/toppings/pepperoni.png';
+import sausagePng     from '@/assets/images/toppings/sausage.png';
+import sausageKnobPng from '@/assets/images/toppings/sausage_knob.png';
+import peppersPng     from '@/assets/images/toppings/peppers.png';
+import olivesPng      from '@/assets/images/toppings/olives.png';
+import oliveKnobPng   from '@/assets/images/toppings/olive_knob.png';
+import jalapenoPng    from '@/assets/images/toppings/jalapeno.png';
+import jalapenoKnobPng from '@/assets/images/toppings/jalapeno_knob.png';
+import mushroomPng    from '@/assets/images/toppings/mushroom.png';
+import baconPng       from '@/assets/images/toppings/bacon.png';
+import chickenPng     from '@/assets/images/toppings/chicken.png';
+import chickenKnobPng from '@/assets/images/toppings/chicken_knob.png';
+import onionPng       from '@/assets/images/toppings/onion.png';
+import onionKnobPng   from '@/assets/images/toppings/onion_knob.png';
+import spinachPng     from '@/assets/images/toppings/spinach.png';
+import spinachKnobPng from '@/assets/images/toppings/spinach_knob.png';
+import tomatoPng      from '@/assets/images/toppings/tomato.png';
+import zucchiniPng     from '@/assets/images/toppings/zucchini.png';
+import zucchiniKnobPng from '@/assets/images/toppings/zucchini_knob.png';
+import broccoliPng    from '@/assets/images/toppings/broccoli.png';
+import cornPng        from '@/assets/images/toppings/corn.png';
+import cornKnobPng    from '@/assets/images/toppings/corn_knob.png';
 
-// The one place a topping's look is defined: its menu swatch, the little PNG on
-// the menu toggle knob, its SVG gradient (or null for a flat fill) and its
-// hand-drawn shape. This is deliberately the *only* per-topping code —
-// everything mechanical is data in config/toppingCatalog.js. Adding a topping
-// means adding one entry here under the same id. Shapes are drawn proportional
-// to the piece radius `r` so size varies naturally; `gradId` is the unique
-// gradient id minted per canvas.
+// Each topping's visual identity. `image` is the real photo rendered on the
+// pizza canvas. `knob` is the photo shown on the small menu toggle — same as
+// `image` for most toppings, but a separate file where the full piece reads
+// better at thumbnail size (sausage link, whole onion cross-section, spinach
+// bunch). `knobSize` controls how large the image appears inside the toggle
+// circle. `swatch` is the colour dot next to the topping name.
+//
+// This is the only per-topping code — everything else is data in
+// config/toppingCatalog.js. Adding a topping = one row there + one entry here.
 export const TOPPING_ART = {
-  pepperoni: {
-    swatch: '#a94100',
-    knob: { image: pepperoniPng, size: '16px' },
-    gradient: (id) => (
-      <radialGradient id={id} cx="38%" cy="34%" r="72%">
-        <stop offset="0%" stopColor="#d24f3b" />
-        <stop offset="100%" stopColor="#9c2b1b" />
-      </radialGradient>
-    ),
-    shape: (r, gradId) => (
-      <g>
-        <circle r={r} fill={`url(#${gradId})`} stroke="#7c1f12" strokeWidth={r * 0.07} />
-        <circle cx={-r * 0.33} cy={-r * 0.22} r={r * 0.16} fill="#7c1f12" />
-        <circle cx={r * 0.33} cy={r * 0.16} r={r * 0.18} fill="#7c1f12" />
-        <circle cx={-r * 0.05} cy={r * 0.4} r={r * 0.13} fill="#8f2a18" />
-        <circle cx={-r * 0.38} cy={-r * 0.36} r={r * 0.24} fill="rgba(255,255,255,0.18)" />
-      </g>
-    ),
-  },
-  sausage: {
-    // A lumpy crumble rather than a clean disc.
-    swatch: '#b0926d',
-    knob: { image: sausagePng, size: '26px' },
-    gradient: (id) => (
-      <radialGradient id={id} cx="38%" cy="34%" r="72%">
-        <stop offset="0%" stopColor="#a4704a" />
-        <stop offset="100%" stopColor="#774c2f" />
-      </radialGradient>
-    ),
-    shape: (r, gradId) => (
-      <g>
-        <circle r={r} fill={`url(#${gradId})`} stroke="#5f3d27" strokeWidth={r * 0.09} />
-        <circle cx={r * 0.62} cy={-r * 0.22} r={r * 0.55} fill={`url(#${gradId})`} stroke="#5f3d27" strokeWidth={r * 0.09} />
-        <circle cx={-r * 0.5} cy={r * 0.46} r={r * 0.46} fill={`url(#${gradId})`} stroke="#5f3d27" strokeWidth={r * 0.09} />
-        <circle cx={-r * 0.22} cy={-r * 0.22} r={r * 0.18} fill="#5b3a24" />
-        <circle cx={r * 0.18} cy={r * 0.12} r={r * 0.15} fill="#5b3a24" />
-      </g>
-    ),
-  },
-  peppers: {
-    // A thin diced sliver.
-    swatch: '#078407',
-    knob: { image: peppersPng, size: '20px' },
-    gradient: (id) => (
-      <linearGradient id={id} x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#5cbb4b" />
-        <stop offset="100%" stopColor="#2f8f2a" />
-      </linearGradient>
-    ),
-    shape: (r, gradId) => (
-      <g>
-        <rect x={-r * 1.1} y={-r * 0.45} width={r * 2.2} height={r * 0.9} rx={r * 0.45} fill={`url(#${gradId})`} />
-        <rect x={-r * 0.95} y={-r * 0.32} width={r * 1.9} height={r * 0.22} rx={r * 0.11} fill="rgba(255,255,255,0.22)" />
-      </g>
-    ),
-  },
-  olives: {
-    // A ring with a real hole (stroke, no fill) — no gradient.
-    swatch: '#353535',
-    knob: { image: olivePng, size: '20px' },
-    gradient: null,
-    shape: (r) => (
-      <g>
-        <circle r={r * 0.82} fill="none" stroke="#2c2c2e" strokeWidth={r * 0.55} />
-        <circle cx={-r * 0.28} cy={-r * 0.28} r={r * 0.16} fill="rgba(255,255,255,0.25)" />
-      </g>
-    ),
-  },
+  // Non-Veg
+  pepperoni: { swatch: '#a94100', image: pepperoniPng,   knob: pepperoniPng,   knobSize: '16px' },
+  sausage:   { swatch: '#b0926d', image: sausagePng,     knob: sausageKnobPng, knobSize: '30px' },
+  bacon:     { swatch: '#8b3a1a', image: baconPng,       knob: baconPng,       knobSize: '30px' },
+  chicken:   { swatch: '#d4831a', image: chickenPng,     knob: chickenKnobPng, knobSize: '28px' },
+  // Veg
+  peppers:   { swatch: '#c0392b', image: peppersPng,     knob: peppersPng,     knobSize: '22px' },
+  olives:    { swatch: '#353535', image: olivesPng,      knob: oliveKnobPng,   knobSize: '22px' },
+  jalapeno:  { swatch: '#2d7a2d', image: jalapenoPng,    knob: jalapenoKnobPng, knobSize: '26px' },
+  mushroom:  { swatch: '#c4a87a', image: mushroomPng,    knob: mushroomPng,    knobSize: '24px' },
+  onion:     { swatch: '#9b2c9b', image: onionPng,       knob: onionKnobPng,   knobSize: '26px' },
+  spinach:   { swatch: '#2d6a2d', image: spinachPng,     knob: spinachKnobPng, knobSize: '22px' },
+  tomato:    { swatch: '#e74c3c', image: tomatoPng,      knob: tomatoPng,      knobSize: '24px' },
+  zucchini:  { swatch: '#4a7c59', image: zucchiniPng,    knob: zucchiniKnobPng, knobSize: '28px' },
+  broccoli:  { swatch: '#27612d', image: broccoliPng,    knob: broccoliPng,    knobSize: '24px' },
+  corn:      { swatch: '#e8c41a', image: cornPng,        knob: cornKnobPng,    knobSize: '28px' },
 };

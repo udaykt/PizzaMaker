@@ -75,7 +75,7 @@ const Base = (props) => {
               key={v}
               name='size'
               value={v}
-              defaultChecked={v === PIZZASIZES.R}
+              checked={size === v}
               onChange={(e) => sizeHandler(e)}
             />
           ))}
@@ -159,13 +159,14 @@ const Base = (props) => {
         <h3>Cheese</h3>
         <div className={styles.baseDiv}>
           {cheeseEntries.map(([key, value]) => (
-            <div key={'_' + key} className={styles.base}>
+            <div key={'_' + key} className={`${styles.base} ${value.checked ? styles.baseActive : ''}`}>
               <label>
                 <input
                   type='checkbox'
                   key={key}
                   name={key}
                   value='1'
+                  checked={value.checked}
                   onChange={(e) => onChangeHandler(e, key)}
                   hidden
                 />

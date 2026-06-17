@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { isPizzaEmpty } from '@/store/pizzaHubSlice';
 import { pizzaActions, DELIVERY_METHODS } from '@/store/pizzaSlice';
 import { computePriceBreakdown } from '@/utils/pricing';
+import { pizzaName } from '@/utils/pizzaName';
 import { formatPrice } from '@/utils/formatPrice';
 import Button from '@/shared/Button/Button';
 import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
@@ -79,7 +80,7 @@ const Checkout = () => {
       </div>
 
       <div className={styles.ticketCard}>
-        <h2 className={styles.ticketHeader}>Your Pizza</h2>
+        <h2 className={styles.ticketHeader}>{pizzaName(orderState)}</h2>
 
         <div className={styles.deliveryToggle}>
           {Object.values(DELIVERY_METHODS).map((m) => (
