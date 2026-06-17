@@ -61,8 +61,7 @@ const pizzaHubSlice = createSlice({
       state.toppings[action.payload.title].quantity = action.payload.quantity;
     },
     toggleBase(state, action) {
-      state.base[action.payload.title].checked =
-        !state.base[action.payload.title].checked;
+      state.base[action.payload].checked = !state.base[action.payload].checked;
     },
     // Sauce is a single choice, not a toggle — set it explicitly.
     setSauceType(state, action) {

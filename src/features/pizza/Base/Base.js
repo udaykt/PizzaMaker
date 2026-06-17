@@ -42,9 +42,7 @@ const Base = (props) => {
   const [showCrustOptions, setShowCrustOptions] = useState(false);
 
   const onChangeHandler = (e, key) => {
-    let base = bases[key];
-    base = { ...base, checked: e.target.checked };
-    dispatch(pizzaHubActions.toggleBase(base));
+    dispatch(pizzaHubActions.toggleBase(key));
   };
   const sizeHandler = (e) => {
     dispatch(pizzaActions.setSize(e.target.value));

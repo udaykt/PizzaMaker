@@ -14,7 +14,7 @@ describe('isPizzaEmpty', () => {
   });
 
   it('is false once a cheese is selected', () => {
-    const state = reducer(undefined, actions.toggleBase({ title: 'mozzarella' }));
+    const state = reducer(undefined, actions.toggleBase('mozzarella'));
     expect(isPizzaEmpty(state)).toBe(false);
   });
 
@@ -46,8 +46,13 @@ describe('pizzaHub reducers', () => {
   });
 
   it('toggleBase flips a cheese checked flag', () => {
-    const state = reducer(undefined, actions.toggleBase({ title: 'provolone' }));
+    const state = reducer(undefined, actions.toggleBase('provolone'));
     expect(state.base.provolone.checked).toBe(true);
+  });
+
+  it('toggleBase works for veganCheese whose key differs from its display title', () => {
+    const state = reducer(undefined, actions.toggleBase('veganCheese'));
+    expect(state.base.veganCheese.checked).toBe(true);
   });
 
   it('setSauceType sets the single sauce choice directly (not a toggle)', () => {
