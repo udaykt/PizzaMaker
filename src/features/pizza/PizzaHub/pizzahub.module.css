@@ -4,12 +4,14 @@
   box-sizing: border-box;
   min-height: 100vh;
   min-width: 100vw;
-  /* 32px outer page margins + 24px column gutters — everything aligns on the
-     same 8px grid so the layout reads as one intentional system. */
+  /* 32px outer page margins + 32px column gutters — everything aligns on the
+     same 8px grid so the layout reads as one intentional system.
+     Side columns share remaining space equally (1fr each) so neither gets
+     crushed; the center is capped at the pizza's natural max size. */
   padding: 0 32px;
-  column-gap: 24px;
+  column-gap: 32px;
   grid-template-rows: auto 1fr;
-  grid-template-columns: minmax(240px, 300px) 1fr minmax(280px, 380px);
+  grid-template-columns: 1fr minmax(380px, 440px) 1fr;
   grid-template-areas:
     "presets presets presets"
     "left    center  right";
@@ -79,8 +81,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: clamp(260px, 36vw, 380px);
-  height: clamp(260px, 36vw, 380px);
+  width: min(380px, 100%);
+  height: min(380px, 100%);
 }
 
 /* Total + Reset + Order grouped in a glass card under the pizza */
@@ -89,7 +91,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  width: clamp(260px, 36vw, 380px);
+  width: min(420px, 100%);
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -197,7 +199,7 @@
   }
 
   .actionBar {
-    width: clamp(260px, 80vw, 420px);
+    width: min(420px, 100%);
   }
 }
 
