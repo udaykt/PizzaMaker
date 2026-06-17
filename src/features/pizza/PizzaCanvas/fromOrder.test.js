@@ -19,7 +19,7 @@ describe('pizzaPropsFromOrder', () => {
       ingredients: {
         sauceType: 'ROBUST_TOMATO',
         mozzarella: true,
-        provolone: false,
+        cheddar: false,
         feta: true,
         veganCheese: false,
         toppings: [
@@ -31,7 +31,7 @@ describe('pizzaPropsFromOrder', () => {
     expect(props.base.sauce.sauceType).toBe('robust-tomato');
     expect(props.base.mozzarella.checked).toBe(true);
     expect(props.base.feta.checked).toBe(true);
-    expect(props.base.provolone.checked).toBe(false);
+    expect(props.base.cheddar.checked).toBe(false);
     expect(props.toppings.pepperoni).toEqual({ checked: true, quantity: 'extra' });
     expect(props.toppings.olives).toEqual({ checked: true, quantity: 'light' });
   });
@@ -72,7 +72,7 @@ describe('orderDisplayLabels', () => {
   it('defaults sensibly when fields are missing', () => {
     expect(orderDisplayLabels({})).toEqual({
       size: 'Medium (12")',
-      crustStyle: 'Hand Tossed',
+      crustStyle: 'Classic Hand Tossed',
       bakeLevel: 'Normal Bake',
       deliveryMethod: 'Delivery',
       sauceType: 'None',

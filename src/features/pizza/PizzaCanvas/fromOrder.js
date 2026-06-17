@@ -23,7 +23,7 @@ const ENUM_TO_SAUCE_TYPE = {
 // Sizes shown with their inch diameter, the way every major chain's
 // ordering UI does (10"/12"/14").
 const SIZE_LABEL = { R: 'Small (10")', M: 'Medium (12")', L: 'Large (14")' };
-const CRUST_STYLE_LABEL = { THIN: 'Thin', HAND_TOSSED: 'Hand Tossed', STUFFED: 'Stuffed' };
+const CRUST_STYLE_LABEL = { THIN: 'Thin', HAND_TOSSED: 'Classic Hand Tossed', STUFFED: 'Stuffed' };
 const BAKE_LEVEL_LABEL = { NORMAL: 'Normal Bake', WELL_DONE: 'Well Done' };
 const DELIVERY_METHOD_LABEL = { DELIVERY: 'Delivery', CARRYOUT: 'Carryout' };
 const SAUCE_TYPE_LABEL = {
@@ -41,7 +41,7 @@ const SAUCE_TYPE_LABEL = {
 export function orderDisplayLabels(order) {
   return {
     size: SIZE_LABEL[order?.pizzaSize] || 'Medium (12")',
-    crustStyle: CRUST_STYLE_LABEL[order?.crustStyle] || 'Hand Tossed',
+    crustStyle: CRUST_STYLE_LABEL[order?.crustStyle] || 'Classic Hand Tossed',
     bakeLevel: BAKE_LEVEL_LABEL[order?.bakeLevel] || 'Normal Bake',
     deliveryMethod: DELIVERY_METHOD_LABEL[order?.deliveryMethod] || 'Delivery',
     sauceType: SAUCE_TYPE_LABEL[order?.ingredients?.sauceType] || 'None',
@@ -60,8 +60,10 @@ export function pizzaPropsFromOrder(order) {
     base: {
       sauce: { sauceType: ENUM_TO_SAUCE_TYPE[ing.sauceType] || 'none' },
       mozzarella: { checked: !!ing.mozzarella },
-      provolone: { checked: !!ing.provolone },
+      cheddar: { checked: !!ing.cheddar },
+      parmesanAsiago: { checked: !!ing.parmesanAsiago },
       feta: { checked: !!ing.feta },
+      ricotta: { checked: !!ing.ricotta },
       veganCheese: { checked: !!ing.veganCheese },
     },
     toppings: Object.fromEntries(

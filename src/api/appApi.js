@@ -27,8 +27,10 @@ const buildOrderPayload = (orderState) => {
   const payload = {
     sauceType:         SAUCE_TYPE_TO_ENUM[base.sauce.sauceType] || 'NONE',
     mozzarella:        base.mozzarella.checked,
-    provolone:         base.provolone.checked,
+    cheddar:           base.cheddar.checked,
+    parmesanAsiago:    base.parmesanAsiago.checked,
     feta:              base.feta.checked,
+    ricotta:           base.ricotta.checked,
     veganCheese:       base.veganCheese.checked,
     pizzaSize:         SIZE_TO_ENUM[selectedSize] || 'M',
     crustStyle:        CRUST_STYLE_TO_ENUM[pizzaState.crustStyle] || 'HAND_TOSSED',

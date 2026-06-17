@@ -27,8 +27,10 @@ public record OrderResponse(
     public record Ingredients(
             SauceType sauceType,
             boolean mozzarella,
-            boolean provolone,
+            boolean cheddar,
+            boolean parmesanAsiago,
             boolean feta,
+            boolean ricotta,
             boolean veganCheese,
             List<ToppingSelection> toppings
     ) {}

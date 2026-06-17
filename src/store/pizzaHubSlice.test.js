@@ -46,8 +46,8 @@ describe('pizzaHub reducers', () => {
   });
 
   it('toggleBase flips a cheese checked flag', () => {
-    const state = reducer(undefined, actions.toggleBase('provolone'));
-    expect(state.base.provolone.checked).toBe(true);
+    const state = reducer(undefined, actions.toggleBase('cheddar'));
+    expect(state.base.cheddar.checked).toBe(true);
   });
 
   it('toggleBase works for veganCheese whose key differs from its display title', () => {
@@ -65,7 +65,7 @@ describe('pizzaHub reducers', () => {
       base: {
         sauce: { sauceType: SAUCE_TYPES.MARINARA },
         mozzarella: { checked: true },
-        provolone: { checked: false },
+        cheddar: { checked: false },
         feta: { checked: true },
         veganCheese: { checked: false },
       },
@@ -74,7 +74,7 @@ describe('pizzaHub reducers', () => {
     expect(state.base.sauce.sauceType).toBe('marinara');
     expect(state.base.mozzarella.checked).toBe(true);
     expect(state.base.feta.checked).toBe(true);
-    expect(state.base.provolone.checked).toBe(false);
+    expect(state.base.cheddar.checked).toBe(false);
     expect(state.toppings.pepperoni).toMatchObject({ checked: true, quantity: 'extra' });
     expect(state.toppings.olives).toMatchObject({ checked: false, quantity: 'regular' });
     // unrelated fields (title) survive the bulk restore

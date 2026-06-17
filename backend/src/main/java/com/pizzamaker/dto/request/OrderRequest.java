@@ -14,8 +14,10 @@ import java.util.List;
 public record OrderRequest(
         SauceType sauceType,
         boolean mozzarella,
-        boolean provolone,
+        boolean cheddar,
+        boolean parmesanAsiago,
         boolean feta,
+        boolean ricotta,
         boolean veganCheese,
         @Valid List<ToppingSelection> toppings,
         @NotNull PizzaSize pizzaSize,

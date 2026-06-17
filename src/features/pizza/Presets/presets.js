@@ -1,84 +1,30 @@
-// Quick-start pizza presets — tapping one loads its full config into the
-// live builder via the same restorePizza mechanism "Order Again" uses, so
-// it's instantly a real, editable pizza, not a static picture.
-//
-// Deliberately scoped to ingredients this app actually has (pepperoni,
-// sausage, peppers, olives; no ham/pineapple/chicken/basil) — Hawaiian and
-// "BBQ Chicken" would be dishonest names for a pizza we can't really put
-// ham, pineapple, or chicken on.
-
 const noToppings = () => ({
-  pepperoni: { checked: false, quantity: 'regular' },
-  sausage: { checked: false, quantity: 'regular' },
-  peppers: { checked: false, quantity: 'regular' },
-  olives: { checked: false, quantity: 'regular' },
+  pepperoni:  { checked: false, quantity: 'regular' },
+  sausage:    { checked: false, quantity: 'regular' },
+  bacon:      { checked: false, quantity: 'regular' },
+  chicken:    { checked: false, quantity: 'regular' },
+  peppers:    { checked: false, quantity: 'regular' },
+  olives:     { checked: false, quantity: 'regular' },
+  jalapeno:   { checked: false, quantity: 'regular' },
+  mushroom:   { checked: false, quantity: 'regular' },
+  onion:      { checked: false, quantity: 'regular' },
+  spinach:    { checked: false, quantity: 'regular' },
+  tomato:     { checked: false, quantity: 'regular' },
+  zucchini:   { checked: false, quantity: 'regular' },
+  broccoli:   { checked: false, quantity: 'regular' },
+  corn:       { checked: false, quantity: 'regular' },
 });
 
 const noCheese = () => ({
-  mozzarella: { checked: false },
-  provolone: { checked: false },
-  feta: { checked: false },
-  veganCheese: { checked: false },
+  mozzarella:     { checked: false },
+  cheddar:        { checked: false },
+  parmesanAsiago: { checked: false },
+  feta:           { checked: false },
+  ricotta:        { checked: false },
+  veganCheese:    { checked: false },
 });
 
 export const PRESET_PIZZAS = [
-  {
-    id: 'supreme',
-    name: 'Supreme',
-    config: {
-      size: 'medium',
-      crustStyle: 'hand-tossed',
-      bakeLevel: 'normal',
-      base: { sauce: { sauceType: 'robust-tomato' }, ...noCheese(), mozzarella: { checked: true } },
-      toppings: {
-        pepperoni: { checked: true, quantity: 'regular' },
-        sausage: { checked: true, quantity: 'regular' },
-        peppers: { checked: true, quantity: 'regular' },
-        olives: { checked: true, quantity: 'regular' },
-      },
-    },
-  },
-  {
-    id: 'meat-lovers',
-    name: "Meat Lover's",
-    config: {
-      size: 'medium',
-      crustStyle: 'hand-tossed',
-      bakeLevel: 'normal',
-      base: { sauce: { sauceType: 'robust-tomato' }, ...noCheese(), mozzarella: { checked: true }, provolone: { checked: true } },
-      toppings: {
-        ...noToppings(),
-        pepperoni: { checked: true, quantity: 'extra' },
-        sausage: { checked: true, quantity: 'extra' },
-      },
-    },
-  },
-  {
-    id: 'veggie',
-    name: 'Veggie',
-    config: {
-      size: 'medium',
-      crustStyle: 'thin',
-      bakeLevel: 'normal',
-      base: { sauce: { sauceType: 'marinara' }, ...noCheese(), mozzarella: { checked: true } },
-      toppings: {
-        ...noToppings(),
-        peppers: { checked: true, quantity: 'extra' },
-        olives: { checked: true, quantity: 'extra' },
-      },
-    },
-  },
-  {
-    id: 'bbq-sausage',
-    name: 'BBQ Sausage',
-    config: {
-      size: 'medium',
-      crustStyle: 'hand-tossed',
-      bakeLevel: 'well-done',
-      base: { sauce: { sauceType: 'bbq' }, ...noCheese(), mozzarella: { checked: true } },
-      toppings: { ...noToppings(), sausage: { checked: true, quantity: 'extra' } },
-    },
-  },
   {
     id: 'margherita',
     name: 'Margherita',
@@ -87,18 +33,246 @@ export const PRESET_PIZZAS = [
       crustStyle: 'thin',
       bakeLevel: 'normal',
       base: { sauce: { sauceType: 'marinara' }, ...noCheese(), mozzarella: { checked: true } },
-      toppings: noToppings(),
+      toppings: { ...noToppings(), tomato: { checked: true, quantity: 'regular' } },
     },
   },
   {
-    id: 'white-feta',
-    name: 'White & Feta',
+    id: 'classic-pepperoni',
+    name: 'Classic Pepperoni',
     config: {
       size: 'medium',
       crustStyle: 'hand-tossed',
       bakeLevel: 'normal',
-      base: { sauce: { sauceType: 'garlic-parmesan' }, ...noCheese(), mozzarella: { checked: true }, feta: { checked: true } },
-      toppings: { ...noToppings(), olives: { checked: true, quantity: 'regular' } },
+      base: { sauce: { sauceType: 'robust-tomato' }, ...noCheese(), mozzarella: { checked: true } },
+      toppings: { ...noToppings(), pepperoni: { checked: true, quantity: 'extra' } },
+    },
+  },
+  {
+    id: 'supreme',
+    name: 'Supreme',
+    config: {
+      size: 'large',
+      crustStyle: 'hand-tossed',
+      bakeLevel: 'normal',
+      base: { sauce: { sauceType: 'robust-tomato' }, ...noCheese(), mozzarella: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        pepperoni: { checked: true, quantity: 'regular' },
+        sausage:   { checked: true, quantity: 'regular' },
+        peppers:   { checked: true, quantity: 'regular' },
+        mushroom:  { checked: true, quantity: 'regular' },
+        onion:     { checked: true, quantity: 'regular' },
+        olives:    { checked: true, quantity: 'regular' },
+      },
+    },
+  },
+  {
+    id: 'meat-lovers',
+    name: "Meat Lover's",
+    config: {
+      size: 'large',
+      crustStyle: 'stuffed',
+      bakeLevel: 'normal',
+      base: { sauce: { sauceType: 'robust-tomato' }, ...noCheese(), mozzarella: { checked: true }, cheddar: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        pepperoni: { checked: true, quantity: 'extra' },
+        sausage:   { checked: true, quantity: 'extra' },
+        bacon:     { checked: true, quantity: 'regular' },
+        chicken:   { checked: true, quantity: 'regular' },
+      },
+    },
+  },
+  {
+    id: 'bbq-chicken-bacon',
+    name: 'BBQ Chicken Bacon',
+    config: {
+      size: 'medium',
+      crustStyle: 'hand-tossed',
+      bakeLevel: 'well-done',
+      base: { sauce: { sauceType: 'bbq' }, ...noCheese(), mozzarella: { checked: true }, cheddar: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        chicken: { checked: true, quantity: 'regular' },
+        bacon:   { checked: true, quantity: 'regular' },
+        onion:   { checked: true, quantity: 'light' },
+      },
+    },
+  },
+  {
+    id: 'veggie-deluxe',
+    name: 'Veggie Deluxe',
+    config: {
+      size: 'medium',
+      crustStyle: 'thin',
+      bakeLevel: 'normal',
+      base: { sauce: { sauceType: 'marinara' }, ...noCheese(), mozzarella: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        peppers:  { checked: true, quantity: 'regular' },
+        mushroom: { checked: true, quantity: 'regular' },
+        onion:    { checked: true, quantity: 'regular' },
+        spinach:  { checked: true, quantity: 'regular' },
+        tomato:   { checked: true, quantity: 'regular' },
+        olives:   { checked: true, quantity: 'regular' },
+        broccoli: { checked: true, quantity: 'regular' },
+        corn:     { checked: true, quantity: 'light' },
+      },
+    },
+  },
+  {
+    id: 'spicy-diablo',
+    name: 'Spicy Diablo',
+    config: {
+      size: 'medium',
+      crustStyle: 'hand-tossed',
+      bakeLevel: 'well-done',
+      base: { sauce: { sauceType: 'robust-tomato' }, ...noCheese(), mozzarella: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        pepperoni: { checked: true, quantity: 'extra' },
+        sausage:   { checked: true, quantity: 'regular' },
+        jalapeno:  { checked: true, quantity: 'extra' },
+      },
+    },
+  },
+  {
+    id: 'white-garlic-spinach',
+    name: 'White Garlic Spinach',
+    config: {
+      size: 'medium',
+      crustStyle: 'hand-tossed',
+      bakeLevel: 'normal',
+      base: { sauce: { sauceType: 'garlic-parmesan' }, ...noCheese(), mozzarella: { checked: true }, ricotta: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        spinach: { checked: true, quantity: 'extra' },
+        onion:   { checked: true, quantity: 'light' },
+      },
+    },
+  },
+  {
+    id: 'mediterranean',
+    name: 'Mediterranean',
+    config: {
+      size: 'medium',
+      crustStyle: 'thin',
+      bakeLevel: 'normal',
+      base: { sauce: { sauceType: 'marinara' }, ...noCheese(), mozzarella: { checked: true }, feta: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        olives:   { checked: true, quantity: 'regular' },
+        spinach:  { checked: true, quantity: 'regular' },
+        tomato:   { checked: true, quantity: 'regular' },
+        onion:    { checked: true, quantity: 'regular' },
+        zucchini: { checked: true, quantity: 'regular' },
+      },
+    },
+  },
+  {
+    id: 'mushroom-truffle',
+    name: 'Mushroom Truffle',
+    config: {
+      size: 'medium',
+      crustStyle: 'thin',
+      bakeLevel: 'normal',
+      base: { sauce: { sauceType: 'garlic-parmesan' }, ...noCheese(), mozzarella: { checked: true }, parmesanAsiago: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        mushroom: { checked: true, quantity: 'extra' },
+        onion:    { checked: true, quantity: 'light' },
+        spinach:  { checked: true, quantity: 'light' },
+      },
+    },
+  },
+  {
+    id: 'buffalo-bacon',
+    name: 'Buffalo Bacon',
+    config: {
+      size: 'large',
+      crustStyle: 'hand-tossed',
+      bakeLevel: 'well-done',
+      base: { sauce: { sauceType: 'robust-tomato' }, ...noCheese(), mozzarella: { checked: true }, cheddar: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        chicken:  { checked: true, quantity: 'regular' },
+        bacon:    { checked: true, quantity: 'regular' },
+        jalapeno: { checked: true, quantity: 'regular' },
+        onion:    { checked: true, quantity: 'light' },
+      },
+    },
+  },
+  {
+    id: 'garden-vegan',
+    name: 'Garden Vegan',
+    config: {
+      size: 'medium',
+      crustStyle: 'thin',
+      bakeLevel: 'normal',
+      base: { sauce: { sauceType: 'robust-tomato' }, ...noCheese(), veganCheese: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        peppers:  { checked: true, quantity: 'regular' },
+        mushroom: { checked: true, quantity: 'regular' },
+        spinach:  { checked: true, quantity: 'regular' },
+        broccoli: { checked: true, quantity: 'regular' },
+        corn:     { checked: true, quantity: 'regular' },
+        tomato:   { checked: true, quantity: 'regular' },
+      },
+    },
+  },
+  {
+    id: 'bbq-sausage-peppers',
+    name: 'BBQ Sausage & Peppers',
+    config: {
+      size: 'medium',
+      crustStyle: 'hand-tossed',
+      bakeLevel: 'well-done',
+      base: { sauce: { sauceType: 'bbq' }, ...noCheese(), mozzarella: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        sausage: { checked: true, quantity: 'extra' },
+        peppers: { checked: true, quantity: 'regular' },
+        onion:   { checked: true, quantity: 'regular' },
+      },
+    },
+  },
+  {
+    id: 'jalapeno-bacon-ranch',
+    name: 'Jalapeño Bacon Ranch',
+    config: {
+      size: 'medium',
+      crustStyle: 'hand-tossed',
+      bakeLevel: 'normal',
+      base: { sauce: { sauceType: 'alfredo' }, ...noCheese(), mozzarella: { checked: true }, cheddar: { checked: true } },
+      toppings: {
+        ...noToppings(),
+        bacon:    { checked: true, quantity: 'regular' },
+        chicken:  { checked: true, quantity: 'regular' },
+        jalapeno: { checked: true, quantity: 'regular' },
+        onion:    { checked: true, quantity: 'light' },
+      },
+    },
+  },
+  {
+    id: 'cheesy-stuffed',
+    name: 'Cheesy Stuffed',
+    config: {
+      size: 'large',
+      crustStyle: 'stuffed',
+      bakeLevel: 'normal',
+      base: {
+        sauce: { sauceType: 'robust-tomato' },
+        ...noCheese(),
+        mozzarella:     { checked: true },
+        cheddar:        { checked: true },
+        parmesanAsiago: { checked: true },
+      },
+      toppings: {
+        ...noToppings(),
+        pepperoni: { checked: true, quantity: 'regular' },
+        mushroom:  { checked: true, quantity: 'regular' },
+      },
     },
   },
 ];

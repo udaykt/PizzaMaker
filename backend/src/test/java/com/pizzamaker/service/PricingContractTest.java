@@ -52,7 +52,7 @@ class PricingContractTest {
 
     private OrderRequest pizza(SauceType sauce, boolean mozzarella, boolean feta,
                                List<ToppingSelection> toppings, PizzaSize size, DeliveryMethod deliveryMethod) {
-        return new OrderRequest(sauce, mozzarella, false, feta, false, toppings,
+        return new OrderRequest(sauce, mozzarella, false, false, feta, false, false, toppings,
                 size, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, deliveryMethod);
     }
 

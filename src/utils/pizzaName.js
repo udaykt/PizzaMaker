@@ -7,7 +7,7 @@ import { PRESET_PIZZAS } from '@/features/pizza/Presets/presets';
 import { TOPPING_CATALOG } from '@/config/toppingCatalog';
 import { SAUCE_TYPES } from '@/store/pizzaHubSlice';
 
-const CHEESE_KEYS = ['mozzarella', 'provolone', 'feta', 'veganCheese'];
+const CHEESE_KEYS = ['mozzarella', 'cheddar', 'parmesanAsiago', 'feta', 'ricotta', 'veganCheese'];
 const TOPPING_LABEL = Object.fromEntries(TOPPING_CATALOG.map((t) => [t.id, t.label]));
 
 // The "composition" that identifies a pizza: which toppings, which cheeses and

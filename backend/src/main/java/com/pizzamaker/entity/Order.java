@@ -43,8 +43,10 @@ public class Order {
     // Cheese types are independent — a pizza can combine mozzarella with
     // feta, unlike sauce. Replaces the old ambiguous "cheese" boolean.
     private boolean mozzarella;
-    private boolean provolone;
+    private boolean cheddar;
+    private boolean parmesanAsiago;
     private boolean feta;
+    private boolean ricotta;
     private boolean veganCheese;
 
     // Toppings are stored as a JSON list of {id, quantity} (quantity tiers are

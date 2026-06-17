@@ -10,7 +10,7 @@ import styles from './base.module.css';
 // Real chain terminology: "Hand Tossed" (not "Classic"), sizes shown with
 // inch diameter, and Domino's real sauce menu instead of a flat checkbox.
 const SIZE_LABELS = { [PIZZASIZES.R]: 'Small (10")', [PIZZASIZES.M]: 'Medium (12")', [PIZZASIZES.L]: 'Large (14")' };
-const CRUST_STYLE_LABELS = { [CRUST_STYLES.THIN]: 'Thin', [CRUST_STYLES.HAND_TOSSED]: 'Hand Tossed', [CRUST_STYLES.STUFFED]: 'Stuffed' };
+const CRUST_STYLE_LABELS = { [CRUST_STYLES.THIN]: 'Thin', [CRUST_STYLES.HAND_TOSSED]: 'Classic Hand Tossed', [CRUST_STYLES.STUFFED]: 'Stuffed' };
 const BAKE_LEVEL_LABELS = { [BAKE_LEVELS.NORMAL]: 'Normal Bake', [BAKE_LEVELS.WELL_DONE]: 'Well Done' };
 const SAUCE_TYPE_LABELS = {
   [SAUCE_TYPES.NONE]: 'None',

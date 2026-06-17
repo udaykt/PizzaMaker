@@ -32,6 +32,8 @@ public final class PricingService {
     private static final BigDecimal STANDARD_CHEESE_PRICE = BigDecimal.valueOf(0.5);
     // Specialty cheeses (provolone/feta/vegan) cost more than the standard
     // mozzarella, matching how Domino's prices feta as a premium add-on today.
+    // Specialty cheeses (parmesan-asiago/feta/ricotta/vegan) cost more than
+    // standard ones (mozzarella/cheddar), matching Domino's premium add-on pricing.
     private static final BigDecimal SPECIALTY_CHEESE_PRICE = BigDecimal.valueOf(1.0);
 
     private static final BigDecimal STANDARD_SAUCE_PRICE = BigDecimal.valueOf(0.5);
@@ -58,8 +60,10 @@ public final class PricingService {
 
         total = total.add(saucePrice(request.sauceType()));
         if (request.mozzarella()) total = total.add(STANDARD_CHEESE_PRICE);
-        if (request.provolone()) total = total.add(SPECIALTY_CHEESE_PRICE);
+        if (request.cheddar()) total = total.add(STANDARD_CHEESE_PRICE);
+        if (request.parmesanAsiago()) total = total.add(SPECIALTY_CHEESE_PRICE);
         if (request.feta()) total = total.add(SPECIALTY_CHEESE_PRICE);
+        if (request.ricotta()) total = total.add(SPECIALTY_CHEESE_PRICE);
         if (request.veganCheese()) total = total.add(SPECIALTY_CHEESE_PRICE);
 
         if (request.toppings() != null) {

@@ -50,7 +50,7 @@ class OrderServiceTest {
     }
 
     private OrderRequest testOrderRequest() {
-        return new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false,
+        return new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
                 List.of(new ToppingSelection("pepperoni", ToppingQuantity.REGULAR)),
                 PizzaSize.M, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
     }

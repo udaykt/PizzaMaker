@@ -19,10 +19,12 @@ const contract = JSON.parse(readFileSync(resolve(process.cwd(), 'pricing.contrac
 
 const noBase = {
   sauce: { sauceType: 'none' },
-  mozzarella: { checked: false },
-  provolone: { checked: false },
-  feta: { checked: false },
-  veganCheese: { checked: false },
+  mozzarella:     { checked: false },
+  cheddar:        { checked: false },
+  parmesanAsiago: { checked: false },
+  feta:           { checked: false },
+  ricotta:        { checked: false },
+  veganCheese:    { checked: false },
 };
 const noToppings = {
   pepperoni: { checked: false, quantity: 'regular' },
@@ -67,10 +69,12 @@ describe('frontend pricing matches the shared price contract', () => {
   it('composes a full estimate purely from contract numbers', () => {
     const base = {
       sauce: { sauceType: 'bbq' }, // specialty sauce
-      mozzarella: { checked: true }, // standard cheese
-      provolone: { checked: false },
-      feta: { checked: true }, // specialty cheese
-      veganCheese: { checked: false },
+      mozzarella:     { checked: true }, // standard cheese
+      cheddar:        { checked: false },
+      parmesanAsiago: { checked: false },
+      feta:           { checked: true }, // specialty cheese
+      ricotta:        { checked: false },
+      veganCheese:    { checked: false },
     };
     const toppings = {
       ...noToppings,

@@ -3,10 +3,12 @@ import { computePriceBreakdown } from './pricing';
 
 const noBase = {
   sauce: { sauceType: 'none' },
-  mozzarella: { checked: false },
-  provolone: { checked: false },
-  feta: { checked: false },
-  veganCheese: { checked: false },
+  mozzarella:     { checked: false },
+  cheddar:        { checked: false },
+  parmesanAsiago: { checked: false },
+  feta:           { checked: false },
+  ricotta:        { checked: false },
+  veganCheese:    { checked: false },
 };
 const noToppings = {
   pepperoni: { checked: false, quantity: 'regular' },
@@ -40,7 +42,7 @@ describe('computePriceBreakdown', () => {
     expect(specialty - 12).toBe(1.25);
   });
 
-  it('specialty cheeses (provolone/feta/vegan) cost more than mozzarella', () => {
+  it('specialty cheeses (parmesan-asiago/feta/ricotta/vegan) cost more than mozzarella', () => {
     const mozz = computePriceBreakdown({ base: { ...noBase, mozzarella: { checked: true } }, toppings: noToppings, sizePricing, size: 'medium' }).total;
     const feta = computePriceBreakdown({ base: { ...noBase, feta: { checked: true } }, toppings: noToppings, sizePricing, size: 'medium' }).total;
     expect(feta).toBeGreaterThan(mozz);
@@ -48,14 +50,14 @@ describe('computePriceBreakdown', () => {
   });
 
   it('multiple cheeses stack', () => {
-    const base = { ...noBase, mozzarella: { checked: true }, provolone: { checked: true }, feta: { checked: true } };
+    const base = { ...noBase, mozzarella: { checked: true }, cheddar: { checked: true }, feta: { checked: true } };
     const { lineItems, total } = computePriceBreakdown({ base, toppings: noToppings, sizePricing, size: 'medium' });
     expect(lineItems).toEqual([
       { key: 'mozzarella', label: 'Mozzarella', price: 0.5 },
-      { key: 'provolone', label: 'Provolone', price: 1.0 },
+      { key: 'cheddar', label: 'Cheddar', price: 0.5 },
       { key: 'feta', label: 'Feta', price: 1.0 },
     ]);
-    expect(total).toBe(14.5);
+    expect(total).toBe(14);
   });
 
   it('charges nothing for sauce when sauceType is none', () => {

@@ -29,12 +29,20 @@ const pizzaHubSlice = createSlice({
         title: 'mozzarella',
         checked: false,
       },
-      provolone: {
-        title: 'provolone',
+      cheddar: {
+        title: 'cheddar',
+        checked: false,
+      },
+      parmesanAsiago: {
+        title: 'parmesanAsiago',
         checked: false,
       },
       feta: {
         title: 'feta',
+        checked: false,
+      },
+      ricotta: {
+        title: 'ricotta',
         checked: false,
       },
       veganCheese: {

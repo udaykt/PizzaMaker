@@ -11,8 +11,10 @@ public final class OrderMapper {
         var ingredients = new OrderResponse.Ingredients(
                 order.getSauceType(),
                 order.isMozzarella(),
-                order.isProvolone(),
+                order.isCheddar(),
+                order.isParmesanAsiago(),
                 order.isFeta(),
+                order.isRicotta(),
                 order.isVeganCheese(),
                 order.getToppings()
         );

@@ -14,7 +14,7 @@ import { uiActions } from '@/store/uiSlice';
 import styles from './checkout.module.css';
 
 const SIZE_LABELS = { small: 'Small (10")', medium: 'Medium (12")', large: 'Large (14")' };
-const CRUST_STYLE_LABELS = { thin: 'Thin', 'hand-tossed': 'Hand Tossed', stuffed: 'Stuffed' };
+const CRUST_STYLE_LABELS = { thin: 'Thin', 'hand-tossed': 'Classic Hand Tossed', stuffed: 'Stuffed' };
 const BAKE_LEVEL_LABELS = { normal: 'Normal Bake', 'well-done': 'Well Done' };
 const DELIVERY_METHOD_LABELS = { [DELIVERY_METHODS.DELIVERY]: 'Delivery', [DELIVERY_METHODS.CARRYOUT]: 'Carryout' };
 
@@ -102,7 +102,7 @@ const Checkout = () => {
         <div className={styles.ticketRow}>
           <span className={styles.ticketLabel}>Crust</span>
           <span className={styles.ticketValue}>
-            {CRUST_STYLE_LABELS[crustStyle] || 'Hand Tossed'}, {BAKE_LEVEL_LABELS[bakeLevel] || 'Normal Bake'}
+            {CRUST_STYLE_LABELS[crustStyle] || 'Classic Hand Tossed'}, {BAKE_LEVEL_LABELS[bakeLevel] || 'Normal Bake'}
           </span>
         </div>
 

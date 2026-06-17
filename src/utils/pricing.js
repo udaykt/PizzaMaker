@@ -9,8 +9,8 @@ import { DELIVERY_METHODS } from '@/store/pizzaSlice';
 
 export const SIZE_TO_ENUM = { small: 'R', medium: 'M', large: 'L' };
 export const STANDARD_CHEESE_PRICE = 0.5;
-// Specialty cheeses (provolone/feta/vegan) cost more than mozzarella —
-// matches how Domino's prices feta as a premium add-on today.
+// Specialty cheeses (parmesan-asiago/feta/ricotta/vegan) cost more than
+// mozzarella/cheddar — matches Domino's premium add-on pricing.
 export const SPECIALTY_CHEESE_PRICE = 1.0;
 export const STANDARD_SAUCE_PRICE = 0.5;
 export const SPECIALTY_SAUCE_PRICE = 1.25;
@@ -43,8 +43,8 @@ const SAUCE_LABEL = {
 // are the standard price.
 const SPECIALTY_SAUCES = new Set([SAUCE_TYPES.GARLIC_PARMESAN, SAUCE_TYPES.ALFREDO, SAUCE_TYPES.BBQ]);
 
-const CHEESE_LABELS = { mozzarella: 'Mozzarella', provolone: 'Provolone', feta: 'Feta', veganCheese: 'Vegan Cheese' };
-const SPECIALTY_CHEESES = new Set(['provolone', 'feta', 'veganCheese']);
+const CHEESE_LABELS = { mozzarella: 'Mozzarella', cheddar: 'Cheddar', parmesanAsiago: 'Parmesan/Asiago', feta: 'Feta', ricotta: 'Ricotta', veganCheese: 'Vegan Cheese' };
+const SPECIALTY_CHEESES = new Set(['parmesanAsiago', 'feta', 'ricotta', 'veganCheese']);
 
 const TOPPING_LABELS = { pepperoni: 'Pepperoni', sausage: 'Sausage', peppers: 'Peppers', olives: 'Olives' };
 
