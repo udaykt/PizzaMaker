@@ -3,7 +3,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import styles from './apiGate.module.css';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-const HEALTH_URL = `${API_BASE}/actuator/health`;
+// /actuator/health is not in the CORS allowlist — use an API endpoint that is.
+// /api/v1/menu/sizes is permitAll + covered by /api/** CORS, so it works cross-origin.
+const PING_URL = `${API_BASE}/api/v1/menu/sizes`;
 const POLL_MS = 500;
 const SLOW_AFTER = 20; // attempts before "taking longer" message (~10 s)
 
@@ -18,13 +20,10 @@ const ApiGate = ({ children }) => {
       attemptsRef.current += 1;
       if (attemptsRef.current === SLOW_AFTER) setSlow(true);
       try {
-        const res = await fetch(HEALTH_URL, { signal: AbortSignal.timeout(700) });
+        const res = await fetch(PING_URL, { signal: AbortSignal.timeout(700) });
         if (res.ok) {
-          const { status } = await res.json();
-          if (status === 'UP') {
-            clearInterval(intervalRef.current);
-            setReady(true);
-          }
+          clearInterval(intervalRef.current);
+          setReady(true);
         }
       } catch (_) {}
     };
