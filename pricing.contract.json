@@ -1,0 +1,8 @@
+{
+  "_comment": "Single source of truth for pizza pricing. Both the backend charge path (PricingService.java) and the frontend pre-order estimate (src/utils/pricing.js) are tested against these numbers, so the displayed estimate can never silently disagree with the charged total. Change a price here and update both sides, or the contract tests fail.",
+  "size": { "R": 8, "M": 12, "L": 16 },
+  "cheese": { "standard": 0.5, "specialty": 1.0 },
+  "sauce": { "standard": 0.5, "specialty": 1.25 },
+  "topping": { "light": 1.0, "regular": 1.5, "extra": 3.0 },
+  "deliveryFee": 2.99
+}
