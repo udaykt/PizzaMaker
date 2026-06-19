@@ -96,7 +96,7 @@ const ToppingsMenu = () => {
                     <div className={styles.toppingMain}>
                       <img
                         className={styles.toppingImg}
-                        src={art.image}
+                        src={art.knob ?? art.image}
                         alt={meta.label}
                         loading='lazy'
                       />
