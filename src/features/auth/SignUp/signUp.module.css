@@ -1,3 +1,13 @@
+.logoPlaque {
+  width: 88%;
+  max-width: 340px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.55));
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
 .signUp,
 .hideSignUp {
   display: flex;
@@ -27,7 +37,7 @@
 .hideSignUp h1 {
   font-size: 1.65rem;
   font-weight: 700;
-  font-family: var(--font);
+  font-family: var(--font-display);
   color: #ffffff;
   letter-spacing: -0.4px;
 }
@@ -47,6 +57,77 @@
   gap: 20px;
   width: 90%;
   user-select: none;
+}
+
+.formLink {
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-muted);
+}
+
+.formLink a {
+  color: inherit;
+  transition: color 0.15s ease;
+}
+
+.formLink a:hover {
+  color: var(--accent);
+}
+
+.formInputTextDiv {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  align-items: center;
+}
+
+.formInputTextDiv label {
+  font-family: var(--font);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: var(--text-muted);
+}
+
+.formInputTextDiv input {
+  width: 95%;
+  height: 40px;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--text);
+  caret-color: var(--accent);
+  margin-left: 12px;
+}
+
+.formInputTextDiv .labelInputDiv {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 90%;
+}
+
+.formInputTextDiv .inputField {
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.formInputTextDiv .inputField:focus-within {
+  border-color: rgba(255, 107, 0, 0.5);
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+.formInputTextDiv .inputField:hover {
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .signUpSubmitButton {

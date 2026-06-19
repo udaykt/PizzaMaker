@@ -35,7 +35,7 @@
 .hideGuestPage h1 {
   font-size: 1.65rem;
   font-weight: 700;
-  font-family: var(--font);
+  font-family: var(--font-display);
   color: #ffffff;
   letter-spacing: -0.4px;
 }

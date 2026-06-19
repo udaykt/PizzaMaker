@@ -3,6 +3,16 @@
   to   { opacity: 1; transform: translate(-50%, -50%); }
 }
 
+.logoPlaque {
+  width: 88%;
+  max-width: 340px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.55));
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
 .loginPage,
 .hideLoginPage {
   display: flex;
@@ -35,7 +45,7 @@
 .hideLoginPage h1 {
   font-size: 1.65rem;
   font-weight: 700;
-  font-family: var(--font);
+  font-family: var(--font-display);
   color: #ffffff;
   letter-spacing: -0.4px;
 }

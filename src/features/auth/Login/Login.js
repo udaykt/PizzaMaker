@@ -7,6 +7,7 @@ import { GUEST_PATH, HOME_PATH, SIGNUP_PATH } from '@/utils/routes';
 import { uiActions } from '@/store/uiSlice';
 import { loginUser } from '@/api/authApi';
 import { fetchLoggedInUser, fetchUserOrders } from '@/api/appApi';
+import logoPlaqueImg from '@/assets/images/logo-plaque.png';
 import styles from './login.module.css';
 
 const Login = (props) => {
@@ -50,6 +51,7 @@ const Login = (props) => {
 
   return (
     <div className={styles.loginPage}>
+      <img src={logoPlaqueImg} alt='Pizza Maker' className={styles.logoPlaque} />
       <form onSubmit={handleLoginUser} noValidate>
         <div><h1>Login</h1></div>
         <div className={styles.formInputTextDiv}>

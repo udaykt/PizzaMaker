@@ -1,7 +1,7 @@
 ﻿import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import avatarIcon from '@/assets/images/avatar.png';
-import appLogo from '@/assets/images/logo-badge.png';
+import appLogo from '@/assets/images/logo-banner.png';
 import AvatarIcon from '@/shared/Avatar/Avatar';
 import MenuIcon from '@/shared/MenuButton/MenuButton';
 import LoginButton from '@/shared/LoginButton/LoginButton';

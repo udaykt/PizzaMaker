@@ -40,7 +40,7 @@
 
 .modalSuccess h2 {
   color: white;
-  font-family: monospace;
+  font-family: var(--font-display);
   margin: 0;
   font-size: 1.5rem;
 }
@@ -75,15 +75,16 @@
 }
 
 .receiptLabel {
-  font-family: monospace;
-  font-size: 0.75rem;
+  font-family: var(--font-caps);
+  font-size: 0.82rem;
+  font-weight: 400;
   color: rgba(255,255,255,0.45);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .receiptValue {
-  font-family: monospace;
+  font-family: var(--font);
   font-size: 0.9rem;
   color: rgba(255,255,255,0.85);
   text-align: right;
@@ -112,7 +113,7 @@
 }
 
 .modalNote {
-  font-family: monospace;
+  font-family: var(--font);
   font-size: 0.8rem;
   color: rgba(255,255,255,0.4);
   text-align: center;

@@ -26,9 +26,9 @@
 }
 
 .code {
-  font-family: var(--font);
+  font-family: var(--font-caps);
   font-size: 3.4rem;
-  font-weight: 900;
+  font-weight: 400;
   color: var(--accent);
   letter-spacing: 2px;
   line-height: 1;

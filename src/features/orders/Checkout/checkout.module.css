@@ -43,7 +43,7 @@
 .ticketHeader {
   margin: 0 0 10px;
   color: white;
-  font-family: monospace;
+  font-family: var(--font-display);
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
@@ -66,9 +66,9 @@
   border-radius: 9px;
   background: transparent;
   color: rgba(255, 255, 255, 0.55);
-  font-family: monospace;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-family: var(--font-caps);
+  font-size: 0.9rem;
+  font-weight: 400;
   cursor: pointer;
   transition: all 0.18s ease;
 }
@@ -91,14 +91,16 @@
 }
 
 .ticketLabel {
-  font-family: monospace;
-  font-size: 0.82rem;
+  font-family: var(--font-caps);
+  font-size: 0.9rem;
+  font-weight: 400;
   color: rgba(255, 255, 255, 0.55);
-  text-transform: capitalize;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .ticketValue {
-  font-family: monospace;
+  font-family: var(--font);
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.9);
   text-align: right;
@@ -111,7 +113,7 @@
 }
 
 .ticketTotalLabel {
-  font-family: monospace;
+  font-family: var(--font-caps);
   font-size: 0.9rem;
   font-weight: 700;
   color: white;
@@ -120,9 +122,9 @@
 }
 
 .ticketTotalValue {
-  font-family: monospace;
+  font-family: var(--font-caps);
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 400;
   color: #ff6b00;
 }
 
@@ -138,7 +140,7 @@
   height: 46px;
   border-radius: 12px;
   border: none;
-  font-family: monospace;
+  font-family: var(--font-caps);
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
@@ -186,7 +188,7 @@
 
 .checkoutEmpty p {
   margin: 0;
-  font-family: monospace;
+  font-family: var(--font);
   color: rgba(255, 255, 255, 0.5);
 }
 
@@ -199,7 +201,7 @@
   background: rgba(255, 107, 0, 0.12);
   border: 1px solid rgba(255, 107, 0, 0.4);
   color: #ff6b00;
-  font-family: monospace;
+  font-family: var(--font-caps);
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;

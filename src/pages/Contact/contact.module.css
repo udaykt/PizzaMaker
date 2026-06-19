@@ -18,13 +18,13 @@
 .card h2 {
   margin: 0;
   color: white;
-  font-family: monospace;
+  font-family: var(--font-display);
   font-size: 1.1rem;
 }
 
 .card p {
   margin: 0;
-  font-family: monospace;
+  font-family: var(--font);
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.45);
 }

@@ -6,6 +6,7 @@ import Button from '@/shared/Button/Button';
 import { GUEST_PATH, HOME_PATH, LOGIN_PATH } from '@/utils/routes';
 import { uiActions } from '@/store/uiSlice';
 import { createUser } from '@/api/authApi';
+import logoPlaqueImg from '@/assets/images/logo-plaque.png';
 import styles from './signUp.module.css';
 
 const SignUp = (props) => {
@@ -51,6 +52,7 @@ const SignUp = (props) => {
 
   return (
     <div className={styles.signUp}>
+      <img src={logoPlaqueImg} alt='Pizza Maker' className={styles.logoPlaque} />
       <form onSubmit={registerUser} noValidate>
         <div><h1>Sign Up</h1></div>
         <div className={styles.formInputTextDiv}>

@@ -2,6 +2,7 @@
 import Header from '@/shared/Header/Header';
 import PizzaHub from '@/features/pizza/PizzaHub/PizzaHub';
 import { navigationActions } from '@/store/navigationSlice';
+import logoStripImg from '@/assets/images/logo-strip.png';
 import styles from './home.module.css';
 
 const Home = (props) => {
@@ -20,6 +21,9 @@ const Home = (props) => {
       <div className={styles.pizzahubDiv}>
         <PizzaHub />
       </div>
+      <footer className={styles.footer}>
+        <img src={logoStripImg} alt='Pizza Maker' className={styles.footerLogo} />
+      </footer>
     </div>
   );
 };
