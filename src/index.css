@@ -1,4 +1,44 @@
 @font-face {
+  font-family: 'Product Sans';
+  src: url('/fonts/ProductSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Product Sans';
+  src: url('/fonts/ProductSans-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Product Sans';
+  src: url('/fonts/ProductSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Product Sans';
+  src: url('/fonts/ProductSans-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Luxury';
+  src: url('/fonts/Luxury.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Bourbon';
   src: url('/fonts/Bourbon-Regular.otf') format('opentype');
   font-weight: 400;
@@ -37,8 +77,8 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --font: 'Inter', system-ui, sans-serif;
-  --font-display: 'Bourbon', serif;
+  --font: 'Product Sans', 'Inter', system-ui, sans-serif;
+  --font-display: 'Luxury', serif;
   --font-script: 'Thirsty Script', cursive;
   --font-caps: 'Bebas Neue', sans-serif;
 
