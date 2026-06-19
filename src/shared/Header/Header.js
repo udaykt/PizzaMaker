@@ -1,7 +1,7 @@
 ﻿import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import avatarIcon from '@/assets/images/avatar.png';
-import appLogo from '@/assets/images/logo.png';
+import appLogo from '@/assets/images/logo-badge.png';
 import AvatarIcon from '@/shared/Avatar/Avatar';
 import MenuIcon from '@/shared/MenuButton/MenuButton';
 import LoginButton from '@/shared/LoginButton/LoginButton';
@@ -29,8 +29,7 @@ const Header = (props) => {
       </div>
       <div className={styles.logo} title='Pizza Maker'>
         <Link to={HOME_PATH} onClick={handleClick}>
-          <img src={appLogo} alt='' />
-          <h1>Pizza Maker</h1>
+          <img src={appLogo} alt='Pizza Maker' />
         </Link>
       </div>
       <div className={styles.avatar}>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import logoNoBg from '@/assets/images/logo-badge-nobg.png';
 import styles from './apiGate.module.css';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -42,8 +43,7 @@ const ApiGate = ({ children }) => {
             className={styles.splash}
             exit={{ opacity: 0, transition: { duration: 0.5, ease: 'easeOut' } }}
           >
-            <div className={styles.icon}>🍕</div>
-            <h1 className={styles.brand}>Pizza Maker</h1>
+            <img src={logoNoBg} alt='Pizza Maker' className={styles.icon} />
             <p className={styles.status}>
               {slow ? 'Taking longer than usual…' : 'Kitchen is warming up'}
             </p>

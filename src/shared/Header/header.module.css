@@ -33,9 +33,14 @@
 }
 
 .logo img {
-  height: 36px;
-  width: 36px;
-  filter: drop-shadow(0 0 8px rgba(255, 107, 0, 0.45));
+  height: 56px;
+  width: 56px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+  transition: transform 0.2s ease;
+}
+
+.logo img:hover {
+  transform: scale(1.06);
 }
 
 .logo h1 {
@@ -96,7 +101,7 @@
     font-size: 1.15rem;
   }
   .logo img {
-    height: 28px;
-    width: 28px;
+    height: 44px;
+    width: 44px;
   }
 }

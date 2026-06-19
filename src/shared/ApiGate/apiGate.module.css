@@ -11,24 +11,16 @@
 }
 
 .icon {
-  font-size: 4rem;
-  line-height: 1;
-  animation: pizzaPulse 2.8s ease-in-out infinite;
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.6));
+  animation: logoPulse 2.8s ease-in-out infinite;
 }
 
-@keyframes pizzaPulse {
-  0%, 100% { transform: scale(1) rotate(-5deg); }
-  50%       { transform: scale(1.1) rotate(5deg); }
-}
-
-.brand {
-  font-family: var(--font-display);
-  font-size: 2.2rem;
-  font-weight: 800;
-  font-style: italic;
-  color: #ffffff;
-  letter-spacing: -0.5px;
-  margin-top: 4px;
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.06); }
 }
 
 .status {
