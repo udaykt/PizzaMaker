@@ -2,6 +2,7 @@ import pepperoniPng   from '@/assets/images/toppings/pepperoni.png';
 import sausagePng     from '@/assets/images/toppings/sausage.png';
 import sausageKnobPng from '@/assets/images/toppings/sausage_knob.png';
 import peppersPng     from '@/assets/images/toppings/peppers.png';
+import peppersKnobPng from '@/assets/images/toppings/peppers_knob.png';
 import olivesPng      from '@/assets/images/toppings/olives.png';
 import oliveKnobPng   from '@/assets/images/toppings/olive_knob.png';
 import jalapenoPng    from '@/assets/images/toppings/jalapeno.png';
@@ -37,7 +38,7 @@ export const TOPPING_ART = {
   bacon:     { swatch: '#8b3a1a', image: baconPng,       knob: baconPng,       knobSize: '30px' },
   chicken:   { swatch: '#d4831a', image: chickenPng,     knob: chickenKnobPng, knobSize: '28px' },
   // Veg
-  peppers:   { swatch: '#c0392b', image: peppersPng,     knob: peppersPng,     knobSize: '22px' },
+  peppers:   { swatch: '#c0392b', image: peppersPng,     knob: peppersKnobPng, knobSize: '26px' },
   olives:    { swatch: '#353535', image: olivesPng,      knob: oliveKnobPng,   knobSize: '22px' },
   jalapeno:  { swatch: '#2d7a2d', image: jalapenoPng,    knob: jalapenoKnobPng, knobSize: '26px' },
   mushroom:  { swatch: '#c4a87a', image: mushroomPng,    knob: mushroomPng,    knobSize: '24px' },
