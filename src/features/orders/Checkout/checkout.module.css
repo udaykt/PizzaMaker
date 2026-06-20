@@ -43,10 +43,14 @@
 .ticketHeader {
   margin: 0 0 10px;
   color: white;
-  font-family: var(--font-display);
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+  /* Thirsty Script reads premium in natural case — uppercase + tracking fights
+     a connected script, so they're dropped here. ExtraBold is the only weight
+     loaded for this face. */
+  font-family: var(--font-script);
+  font-weight: 800;
+  font-size: 1.85rem;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
 }
 
 .deliveryToggle {
