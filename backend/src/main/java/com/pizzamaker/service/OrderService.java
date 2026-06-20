@@ -3,38 +3,40 @@ package com.pizzamaker.service;
 import com.pizzamaker.dto.request.OrderRequest;
 import com.pizzamaker.dto.request.UpdateStatusRequest;
 import com.pizzamaker.dto.response.OrderResponse;
-import com.pizzamaker.dto.response.OrderStatusUpdateResponse;
 import com.pizzamaker.dto.response.PageResponse;
 import com.pizzamaker.entity.BakeLevel;
 import com.pizzamaker.entity.CrustStyle;
 import com.pizzamaker.entity.DeliveryMethod;
 import com.pizzamaker.entity.Order;
+import com.pizzamaker.entity.OrderLineItem;
 import com.pizzamaker.entity.OrderStatus;
+import com.pizzamaker.entity.OrderStatusHistory;
 import com.pizzamaker.entity.SauceType;
-import com.pizzamaker.entity.ToppingCatalog;
 import com.pizzamaker.entity.ToppingQuantity;
 import com.pizzamaker.entity.ToppingSelection;
 import com.pizzamaker.entity.User;
+import com.pizzamaker.event.OrderPlacedEvent;
+import com.pizzamaker.event.OrderStatusChangedEvent;
 import com.pizzamaker.exception.ResourceNotFoundException;
 import com.pizzamaker.mapper.OrderMapper;
+import com.pizzamaker.repository.OrderLineItemRepository;
 import com.pizzamaker.repository.OrderRepository;
+import com.pizzamaker.repository.OrderStatusHistoryRepository;
 import com.pizzamaker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -42,42 +44,33 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
-    private final NotificationService notificationService;
-    private final SimpMessagingTemplate messagingTemplate;
-
-    private record CachedOrder(OrderResponse response, Instant expiresAt) {}
-    private static final Duration IDEMPOTENCY_TTL = Duration.ofHours(24);
-    private final ConcurrentHashMap<String, CachedOrder> idempotencyCache = new ConcurrentHashMap<>();
+    private final OrderLineItemRepository orderLineItemRepository;
+    private final OrderStatusHistoryRepository statusHistoryRepository;
+    private final CatalogService catalogService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public OrderResponse placeOrder(String email, OrderRequest request, String idempotencyKey) {
-        if (idempotencyKey != null) {
-            // computeIfAbsent is atomic per key — only one thread creates the order
-            // even under concurrent requests with the same idempotency key.
-            // NOTE: this deduplication is per-instance only; a multi-instance deployment
-            // requires a shared store (e.g. Redis) or a DB unique constraint instead.
-            CachedOrder existing = idempotencyCache.get(idempotencyKey);
-            if (existing != null && Instant.now().isBefore(existing.expiresAt())) {
-                return existing.response();
+        boolean hasKey = idempotencyKey != null && !idempotencyKey.isBlank();
+
+        // Fast path: a retried request with the same key returns the original
+        // order instead of placing a duplicate. The unique index on
+        // idempotency_key is the real guarantee — a rare concurrent race that
+        // slips past this check surfaces as a 409 (DataIntegrityViolation),
+        // which the client safely resolves by retrying into this same check.
+        if (hasKey) {
+            var existing = orderRepository.findByIdempotencyKey(idempotencyKey);
+            if (existing.isPresent()) {
+                return OrderMapper.toResponse(existing.get());
             }
-            // Evict expired entry so computeIfAbsent will compute a fresh one
-            idempotencyCache.remove(idempotencyKey, existing);
-
-            CachedOrder result = idempotencyCache.computeIfAbsent(
-                    idempotencyKey,
-                    k -> new CachedOrder(createOrderInternal(email, request),
-                                         Instant.now().plus(IDEMPOTENCY_TTL)));
-            return result.response();
         }
-        return createOrderInternal(email, request);
-    }
 
-    private OrderResponse createOrderInternal(String email, OrderRequest request) {
         User user = userRepository.findByEmailId(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
         Order order = Order.builder()
                 .oid(UUID.randomUUID().toString())
+                .idempotencyKey(hasKey ? idempotencyKey : null)
                 .user(user)
                 .sauceType(request.sauceType() != null ? request.sauceType() : SauceType.NONE)
                 .mozzarella(request.mozzarella())
@@ -94,18 +87,56 @@ public class OrderService {
                 .price(PricingService.computeTotal(request))
                 .build();
 
+        // IDENTITY generation flushes the insert here, so a duplicate
+        // idempotency key fails fast before any line items are written.
         Order saved = orderRepository.save(order);
-        notificationService.sendOrderConfirmation(email, saved.getOid());
+
+        persistReceiptSnapshot(saved, request);
+        recordStatusChange(saved, null, saved.getStatus(), saved.getCreatedBy());
+
+        // Side effects (confirmation) fire only after this transaction commits.
+        eventPublisher.publishEvent(new OrderPlacedEvent(email, saved.getOid()));
+
         return OrderMapper.toResponse(saved);
     }
 
-    // Validates topping ids against the kitchen's allow-list (rejecting any a
-    // tampered request might inject) and defaults a missing quantity to regular.
-    private static List<ToppingSelection> sanitizeToppings(List<ToppingSelection> requested) {
+    // Snapshot the priced breakdown so a receipt survives later price changes and
+    // analytics can aggregate line items without parsing the toppings JSON.
+    private void persistReceiptSnapshot(Order order, OrderRequest request) {
+        LocalDateTime now = LocalDateTime.now();
+        List<OrderLineItem> items = PricingService.computeBreakdown(request).stream()
+                .map(li -> OrderLineItem.builder()
+                        .order(order)
+                        .lineType(li.type())
+                        .refId(li.refId())
+                        .label(li.label())
+                        .amount(li.amount())
+                        .createdAt(now)
+                        .build())
+                .toList();
+        orderLineItemRepository.saveAll(items);
+    }
+
+    private void recordStatusChange(Order order, OrderStatus from, OrderStatus to, String changedBy) {
+        statusHistoryRepository.save(OrderStatusHistory.builder()
+                .order(order)
+                .fromStatus(from)
+                .toStatus(to)
+                .changedBy(changedBy)
+                .changedAt(LocalDateTime.now())
+                .build());
+    }
+
+    // Validates topping ids against the kitchen's active allow-list (rejecting
+    // any a tampered request might inject) and defaults a missing quantity to
+    // regular. The allow-list now lives in the topping table (CatalogService),
+    // not a hardcoded Set.
+    private List<ToppingSelection> sanitizeToppings(List<ToppingSelection> requested) {
         if (requested == null) return List.of();
+        Set<String> allowed = catalogService.activeToppingCodes();
         List<ToppingSelection> result = new ArrayList<>();
         for (ToppingSelection t : requested) {
-            if (t == null || t.id() == null || !ToppingCatalog.IDS.contains(t.id())) {
+            if (t == null || t.id() == null || !allowed.contains(t.id())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Unknown topping: " + (t == null ? "null" : t.id()));
             }
@@ -130,7 +161,10 @@ public class OrderService {
         if (!order.getUser().getEmailId().equals(email)) {
             throw new ResourceNotFoundException("Order not found: " + oid);
         }
-        return OrderMapper.toResponse(order);
+        // The single-order view includes the itemized receipt snapshot; list
+        // views omit it to stay light.
+        List<OrderLineItem> lineItems = orderLineItemRepository.findByOrder_IdOrderById(order.getId());
+        return OrderMapper.toResponse(order, lineItems);
     }
 
     @Transactional(readOnly = true)
@@ -144,34 +178,25 @@ public class OrderService {
         Order order = orderRepository.findByOid(oid)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + oid));
 
-        OrderStatus current = order.getStatus();
-        OrderStatus next = request.status();
+        OrderStatus from = order.getStatus();
+        OrderStatus to = request.status();
 
-        // Enforce forward-only transitions: PENDING → CONFIRMED → PREPARING → READY → DELIVERED
-        if (next.ordinal() <= current.ordinal()) {
+        if (!from.canTransitionTo(to)) {
             throw new IllegalArgumentException(
-                "Invalid status transition: cannot move from " + current + " to " + next +
-                ". Transitions must be forward-only.");
+                    "Invalid status transition: cannot move from " + from + " to " + to +
+                    ". Transitions must be forward-only.");
         }
 
-        order.setStatus(next);
+        order.setStatus(to);
         Order saved = orderRepository.save(order);
 
-        // Route update only to the owning user's WebSocket session (bug #7).
-        messagingTemplate.convertAndSendToUser(
-                saved.getUser().getEmailId(),
-                "/queue/orders",
-                new OrderStatusUpdateResponse(saved.getOid(), saved.getUser().getUid(), saved.getStatus())
-        );
+        recordStatusChange(saved, from, to, saved.getUpdatedBy());
+
+        // Real-time push to the owning user fires only after commit.
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                saved.getUser().getEmailId(), saved.getOid(), saved.getUser().getUid(), to));
 
         return OrderMapper.toResponse(saved);
-    }
-
-    // Evict idempotency cache entries whose TTL has expired every 5 minutes.
-    @Scheduled(fixedRate = 300_000)
-    public void evictExpiredIdempotencyEntries() {
-        Instant now = Instant.now();
-        idempotencyCache.entrySet().removeIf(e -> !now.isBefore(e.getValue().expiresAt()));
     }
 
     private PageResponse<OrderResponse> toPageResponse(Page<Order> page) {

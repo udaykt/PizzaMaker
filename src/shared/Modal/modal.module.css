@@ -4,19 +4,46 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  background: #1a1a2e;
-  border: 1px solid rgba(255, 107, 0, 0.3);
+  /* Match the app-wide glass-morphism modal system (login / signup / guest /
+     nav overlay) instead of the old hardcoded #1a1a2e block. */
+  background: var(--glass-modal);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
   width: 90%;
   max-width: 480px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   z-index: 101;
   padding: 30px 28px;
   gap: 20px;
+  overflow: hidden;
   box-shadow: 0 20px 60px rgba(0,0,0,0.5);
   animation: modalIn 0.25s ease;
+}
+
+/* Brand accent strip clipped to the rounded corners — the same signature the
+   nav overlay uses, so every modal shares one visual identity. */
+.modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+  z-index: 1;
+}
+
+/* Pizza Maker round badge as a branding "stamp" — the hero seal at the top of
+   the confirmation, in place of the old plain checkmark. */
+.modalStamp {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
 }
 
 @keyframes modalIn {

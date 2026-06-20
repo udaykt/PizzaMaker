@@ -8,12 +8,15 @@ import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
 import { orderDisplayLabels, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
 import { formatPrice } from '@/utils/formatPrice';
 import { statusLabel } from '@/utils/orderStatusLabels';
+import logoBadge from '@/assets/images/logo-badge-nobg.png';
 import styles from './modal.module.css';
 
-// camelCase keys like "veganCheese" need a real label — naive capitalize
-// would render "VeganCheese" with no space.
+// camelCase / multi-word keys need a real label — naive capitalize would render
+// "VeganCheese" or "ParmesanAsiago" with no space. Keys match the cheese
+// booleans on order.ingredients.
 const INGREDIENT_LABELS = {
-  mozzarella: 'Mozzarella', provolone: 'Provolone', feta: 'Feta', veganCheese: 'Vegan Cheese',
+  mozzarella: 'Mozzarella', cheddar: 'Cheddar', parmesanAsiago: 'Parmesan-Asiago',
+  feta: 'Feta', ricotta: 'Ricotta', veganCheese: 'Vegan Cheese',
   pepperoni: 'Pepperoni', sausage: 'Sausage', peppers: 'Peppers', olives: 'Olives',
 };
 
@@ -48,7 +51,7 @@ const Modal = (props) => {
   return (
     <div className={styles.modal}>
       <div className={styles.modalSuccess}>
-        <span className={styles.modalCheckmark}>✔</span>
+        <img src={logoBadge} alt="Pizza Maker" className={styles.modalStamp} />
         <h2>Order Placed!</h2>
       </div>
       {currentOrder && (

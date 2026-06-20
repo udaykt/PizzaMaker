@@ -3,7 +3,9 @@ package com.pizzamaker.entity;
 import com.pizzamaker.entity.converter.ToppingSelectionListConverter;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -28,6 +30,12 @@ public class Order {
 
     @Column(nullable = false, unique = true)
     private String oid;
+
+    // Set when the client sends an Idempotency-Key header. A unique index makes
+    // a retried request return the original order instead of placing a duplicate
+    // (see OrderService.placeOrder). Null for requests that omit the header.
+    @Column(name = "idempotency_key")
+    private String idempotencyKey;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -87,6 +95,12 @@ public class Order {
     @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
 
+    // Optimistic lock: rejects a status update made against a stale copy so two
+    // admins acting at once can't silently overwrite each other.
+    @Version
+    @Builder.Default
+    private Long version = 0L;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -94,4 +108,12 @@ public class Order {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @CreatedBy
+    @Column(name = "created_by", updatable = false)
+    private String createdBy;
+
+    @LastModifiedBy
+    @Column(name = "updated_by")
+    private String updatedBy;
 }

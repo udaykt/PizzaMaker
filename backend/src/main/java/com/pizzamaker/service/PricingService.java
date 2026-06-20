@@ -2,6 +2,7 @@ package com.pizzamaker.service;
 
 import com.pizzamaker.dto.request.OrderRequest;
 import com.pizzamaker.entity.DeliveryMethod;
+import com.pizzamaker.entity.LineType;
 import com.pizzamaker.entity.PizzaSize;
 import com.pizzamaker.entity.SauceType;
 import com.pizzamaker.entity.ToppingQuantity;
@@ -9,6 +10,8 @@ import com.pizzamaker.entity.ToppingSelection;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 // Computes the order total server-side. The client never sends a price —
@@ -20,6 +23,11 @@ public final class PricingService {
 
     private PricingService() {}
 
+    // One priced component of an order. computeBreakdown returns these in the
+    // order they appear on a receipt, and they are persisted as OrderLineItem
+    // rows so a receipt is a snapshot that survives later price changes.
+    public record LineItem(LineType type, String refId, String label, BigDecimal amount) {}
+
     // Single source of truth for size pricing: the /menu/sizes endpoint
     // (MenuService.getSizePricing) derives its payload from this map, so the
     // estimate the client fetches and the price charged here can't diverge.
@@ -30,8 +38,6 @@ public final class PricingService {
     );
 
     private static final BigDecimal STANDARD_CHEESE_PRICE = BigDecimal.valueOf(0.5);
-    // Specialty cheeses (provolone/feta/vegan) cost more than the standard
-    // mozzarella, matching how Domino's prices feta as a premium add-on today.
     // Specialty cheeses (parmesan-asiago/feta/ricotta/vegan) cost more than
     // standard ones (mozzarella/cheddar), matching Domino's premium add-on pricing.
     private static final BigDecimal SPECIALTY_CHEESE_PRICE = BigDecimal.valueOf(1.0);
@@ -52,31 +58,56 @@ public final class PricingService {
     // Typical real-world delivery surcharge; carryout has none.
     private static final BigDecimal DELIVERY_FEE = BigDecimal.valueOf(2.99);
 
+    // The order total is exactly the sum of the receipt's line items, so the
+    // stored total and the snapshotted breakdown can never disagree.
     public static BigDecimal computeTotal(OrderRequest request) {
-        // Map.of() throws on a null-key lookup rather than falling through to
-        // getOrDefault's default, so guard explicitly instead of relying on it.
-        PizzaSize size = request.pizzaSize() != null ? request.pizzaSize() : PizzaSize.M;
-        BigDecimal total = SIZE_PRICING.get(size);
+        BigDecimal total = BigDecimal.ZERO;
+        for (LineItem item : computeBreakdown(request)) {
+            total = total.add(item.amount());
+        }
+        return total.setScale(2, RoundingMode.HALF_UP);
+    }
 
-        total = total.add(saucePrice(request.sauceType()));
-        if (request.mozzarella()) total = total.add(STANDARD_CHEESE_PRICE);
-        if (request.cheddar()) total = total.add(STANDARD_CHEESE_PRICE);
-        if (request.parmesanAsiago()) total = total.add(SPECIALTY_CHEESE_PRICE);
-        if (request.feta()) total = total.add(SPECIALTY_CHEESE_PRICE);
-        if (request.ricotta()) total = total.add(SPECIALTY_CHEESE_PRICE);
-        if (request.veganCheese()) total = total.add(SPECIALTY_CHEESE_PRICE);
+    public static List<LineItem> computeBreakdown(OrderRequest request) {
+        List<LineItem> items = new ArrayList<>();
+
+        // Map.of() throws on a null-key lookup rather than falling through to a
+        // default, so guard the size explicitly.
+        PizzaSize size = request.pizzaSize() != null ? request.pizzaSize() : PizzaSize.M;
+        items.add(new LineItem(LineType.SIZE, size.name(), sizeLabel(size) + " pizza", SIZE_PRICING.get(size)));
+
+        BigDecimal sauce = saucePrice(request.sauceType());
+        if (sauce.signum() > 0) {
+            items.add(new LineItem(LineType.SAUCE, request.sauceType().name(),
+                    titleCase(request.sauceType().name()) + " sauce", sauce));
+        }
+
+        addCheese(items, request.mozzarella(), "mozzarella", "Mozzarella", STANDARD_CHEESE_PRICE);
+        addCheese(items, request.cheddar(), "cheddar", "Cheddar", STANDARD_CHEESE_PRICE);
+        addCheese(items, request.parmesanAsiago(), "parmesanAsiago", "Parmesan-Asiago", SPECIALTY_CHEESE_PRICE);
+        addCheese(items, request.feta(), "feta", "Feta", SPECIALTY_CHEESE_PRICE);
+        addCheese(items, request.ricotta(), "ricotta", "Ricotta", SPECIALTY_CHEESE_PRICE);
+        addCheese(items, request.veganCheese(), "veganCheese", "Vegan cheese", SPECIALTY_CHEESE_PRICE);
 
         if (request.toppings() != null) {
             for (ToppingSelection topping : request.toppings()) {
-                total = total.add(toppingPrice(topping.quantity()));
+                ToppingQuantity q = topping.quantity() != null ? topping.quantity() : ToppingQuantity.REGULAR;
+                items.add(new LineItem(LineType.TOPPING, topping.id(),
+                        titleCase(topping.id()) + " (" + titleCase(q.name()) + ")", TOPPING_PRICE.get(q)));
             }
         }
 
         if (request.deliveryMethod() == DeliveryMethod.DELIVERY || request.deliveryMethod() == null) {
-            total = total.add(DELIVERY_FEE);
+            items.add(new LineItem(LineType.DELIVERY, null, "Delivery fee", DELIVERY_FEE));
         }
 
-        return total.setScale(2, RoundingMode.HALF_UP);
+        return items;
+    }
+
+    private static void addCheese(List<LineItem> items, boolean selected, String refId, String label, BigDecimal price) {
+        if (selected) {
+            items.add(new LineItem(LineType.CHEESE, refId, label, price));
+        }
     }
 
     private static BigDecimal saucePrice(SauceType sauceType) {
@@ -87,11 +118,23 @@ public final class PricingService {
         };
     }
 
-    // Every selected topping costs its quantity tier, regardless of which
-    // topping it is — pricing is intentionally tier-based, not per-topping, so
-    // the price book never grows as toppings are added.
-    private static BigDecimal toppingPrice(ToppingQuantity quantity) {
-        ToppingQuantity q = quantity != null ? quantity : ToppingQuantity.REGULAR;
-        return TOPPING_PRICE.get(q);
+    private static String sizeLabel(PizzaSize size) {
+        return switch (size) {
+            case R -> "Regular";
+            case M -> "Medium";
+            case L -> "Large";
+        };
+    }
+
+    // "ROBUST_TOMATO" -> "Robust Tomato", "EXTRA" -> "Extra", "pepperoni" -> "Pepperoni".
+    private static String titleCase(String raw) {
+        String[] parts = raw.toLowerCase().split("[_ ]");
+        StringBuilder sb = new StringBuilder();
+        for (String part : parts) {
+            if (part.isEmpty()) continue;
+            if (sb.length() > 0) sb.append(' ');
+            sb.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
+        }
+        return sb.toString();
     }
 }

@@ -59,6 +59,13 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(403, "Access denied", req.getRequestURI());
     }
 
+    // e.g. an illegal order status transition rejected by OrderStatus.canTransitionTo
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest req) {
+        return new ErrorResponse(400, ex.getMessage(), req.getRequestURI());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGeneric(Exception ex, HttpServletRequest req) {

@@ -22,7 +22,10 @@ public record OrderResponse(
         DeliveryMethod deliveryMethod,
         BigDecimal price,
         OrderStatus status,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        // Itemized receipt snapshot — populated for the single-order view, null
+        // in list views to keep them light.
+        List<LineItem> lineItems
 ) {
     public record Ingredients(
             SauceType sauceType,
@@ -33,5 +36,11 @@ public record OrderResponse(
             boolean ricotta,
             boolean veganCheese,
             List<ToppingSelection> toppings
+    ) {}
+
+    public record LineItem(
+            String type,
+            String label,
+            BigDecimal amount
     ) {}
 }

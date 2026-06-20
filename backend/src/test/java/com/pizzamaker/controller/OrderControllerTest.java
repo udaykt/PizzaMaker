@@ -52,7 +52,8 @@ class OrderControllerTest {
                 DeliveryMethod.DELIVERY,
                 java.math.BigDecimal.valueOf(14.50),
                 OrderStatus.PENDING,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null
         );
     }
 
