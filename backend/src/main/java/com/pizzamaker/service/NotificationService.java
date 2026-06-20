@@ -1,25 +1,18 @@
 package com.pizzamaker.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.CompletableFuture;
-
+// Sends the order confirmation. Called synchronously by the outbox dispatcher —
+// the relay already runs on a background scheduler, so this no longer needs its
+// own @Async, and a throw here propagates to the relay to drive a retry. In a
+// real system this would call an email/SMS provider behind a timeout + circuit
+// breaker.
 @Service
 @Slf4j
 public class NotificationService {
 
-    @Async("notificationExecutor")
-    public CompletableFuture<Void> sendOrderConfirmation(String email, String oid) {
-        log.info("[ASYNC] Sending order confirmation to {} for order {}", email, oid);
-        // Simulate email send latency
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        log.info("[ASYNC] Order confirmation sent to {} for order {}", email, oid);
-        return CompletableFuture.completedFuture(null);
+    public void sendOrderConfirmation(String email, String oid) {
+        log.info("Sending order confirmation to {} for order {}", email, oid);
     }
 }

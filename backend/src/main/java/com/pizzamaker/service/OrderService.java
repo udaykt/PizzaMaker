@@ -19,12 +19,12 @@ import com.pizzamaker.event.OrderPlacedEvent;
 import com.pizzamaker.event.OrderStatusChangedEvent;
 import com.pizzamaker.exception.ResourceNotFoundException;
 import com.pizzamaker.mapper.OrderMapper;
+import com.pizzamaker.outbox.OutboxService;
 import com.pizzamaker.repository.OrderLineItemRepository;
 import com.pizzamaker.repository.OrderRepository;
 import com.pizzamaker.repository.OrderStatusHistoryRepository;
 import com.pizzamaker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -47,7 +47,7 @@ public class OrderService {
     private final OrderLineItemRepository orderLineItemRepository;
     private final OrderStatusHistoryRepository statusHistoryRepository;
     private final CatalogService catalogService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final OutboxService outboxService;
 
     @Transactional
     public OrderResponse placeOrder(String email, OrderRequest request, String idempotencyKey) {
@@ -94,8 +94,11 @@ public class OrderService {
         persistReceiptSnapshot(saved, request);
         recordStatusChange(saved, null, saved.getStatus(), saved.getCreatedBy());
 
-        // Side effects (confirmation) fire only after this transaction commits.
-        eventPublisher.publishEvent(new OrderPlacedEvent(email, saved.getOid()));
+        // The confirmation is enqueued in the outbox within this same
+        // transaction, so it commits atomically with the order and is delivered
+        // by the relay only once the order is durably persisted.
+        outboxService.append(OutboxService.AGGREGATE_ORDER, saved.getOid(),
+                OutboxService.ORDER_PLACED, new OrderPlacedEvent(email, saved.getOid()));
 
         return OrderMapper.toResponse(saved);
     }
@@ -192,9 +195,12 @@ public class OrderService {
 
         recordStatusChange(saved, from, to, saved.getUpdatedBy());
 
-        // Real-time push to the owning user fires only after commit.
-        eventPublisher.publishEvent(new OrderStatusChangedEvent(
-                saved.getUser().getEmailId(), saved.getOid(), saved.getUser().getUid(), to));
+        // Enqueue the real-time push in the outbox so it commits with the status
+        // change and the relay delivers it to the owning user.
+        outboxService.append(OutboxService.AGGREGATE_ORDER, saved.getOid(),
+                OutboxService.ORDER_STATUS_CHANGED,
+                new OrderStatusChangedEvent(saved.getUser().getEmailId(), saved.getOid(),
+                        saved.getUser().getUid(), to));
 
         return OrderMapper.toResponse(saved);
     }

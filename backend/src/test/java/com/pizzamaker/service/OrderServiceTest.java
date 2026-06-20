@@ -5,9 +5,8 @@ import com.pizzamaker.dto.request.UpdateStatusRequest;
 import com.pizzamaker.dto.response.OrderResponse;
 import com.pizzamaker.dto.response.PageResponse;
 import com.pizzamaker.entity.*;
-import com.pizzamaker.event.OrderPlacedEvent;
-import com.pizzamaker.event.OrderStatusChangedEvent;
 import com.pizzamaker.exception.ResourceNotFoundException;
+import com.pizzamaker.outbox.OutboxService;
 import com.pizzamaker.repository.OrderLineItemRepository;
 import com.pizzamaker.repository.OrderRepository;
 import com.pizzamaker.repository.OrderStatusHistoryRepository;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
@@ -29,6 +27,8 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +39,7 @@ class OrderServiceTest {
     @Mock OrderLineItemRepository orderLineItemRepository;
     @Mock OrderStatusHistoryRepository statusHistoryRepository;
     @Mock CatalogService catalogService;
-    @Mock ApplicationEventPublisher eventPublisher;
+    @Mock OutboxService outboxService;
 
     @InjectMocks OrderService orderService;
 
@@ -75,10 +75,11 @@ class OrderServiceTest {
 
         assertThat(resp.pizzaSize()).isEqualTo(PizzaSize.M);
         assertThat(resp.status()).isEqualTo(OrderStatus.PENDING);
-        // The receipt snapshot is persisted and the confirmation is deferred to
-        // an after-commit event, not sent inline.
+        // The receipt snapshot is persisted and the confirmation is enqueued in
+        // the outbox (same transaction), not sent inline.
         verify(orderLineItemRepository).saveAll(any());
-        verify(eventPublisher).publishEvent(any(OrderPlacedEvent.class));
+        verify(outboxService).append(eq(OutboxService.AGGREGATE_ORDER), anyString(),
+                eq(OutboxService.ORDER_PLACED), any());
     }
 
     @Test
@@ -159,10 +160,11 @@ class OrderServiceTest {
         OrderResponse resp = orderService.updateStatus(oid, new UpdateStatusRequest(OrderStatus.CONFIRMED));
 
         assertThat(resp.status()).isEqualTo(OrderStatus.CONFIRMED);
-        // The transition is recorded and the real-time push is deferred to an
-        // after-commit event routed to the owning user.
+        // The transition is recorded and the real-time push is enqueued in the
+        // outbox for delivery to the owning user.
         verify(statusHistoryRepository).save(any());
-        verify(eventPublisher).publishEvent(any(OrderStatusChangedEvent.class));
+        verify(outboxService).append(eq(OutboxService.AGGREGATE_ORDER), anyString(),
+                eq(OutboxService.ORDER_STATUS_CHANGED), any());
     }
 
     @Test
