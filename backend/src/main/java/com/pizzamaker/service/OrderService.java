@@ -26,6 +26,7 @@ import com.pizzamaker.repository.OrderStatusHistoryRepository;
 import com.pizzamaker.repository.UserRepository;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -97,6 +99,9 @@ public class OrderService {
         recordStatusChange(saved, null, saved.getStatus(), saved.getCreatedBy());
 
         meterRegistry.counter("pizza.orders.placed", "size", saved.getPizzaSize().name()).increment();
+        // Business event — identified by oid (not the customer's email) to keep logs PII-free.
+        log.info("Order placed oid={} size={} amount={} delivery={}",
+                saved.getOid(), saved.getPizzaSize(), saved.getPrice(), saved.getDeliveryMethod());
 
         // The confirmation is enqueued in the outbox within this same
         // transaction, so it commits atomically with the order and is delivered
@@ -198,6 +203,7 @@ public class OrderService {
         Order saved = orderRepository.save(order);
 
         recordStatusChange(saved, from, to, saved.getUpdatedBy());
+        log.info("Order {} status {} -> {}", saved.getOid(), from, to);
 
         // Enqueue the real-time push in the outbox so it commits with the status
         // change and the relay delivers it to the owning user.

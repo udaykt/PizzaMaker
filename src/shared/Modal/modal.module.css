@@ -17,9 +17,15 @@
   transform: translate(-50%, -50%);
   border-radius: var(--radius-lg);
   z-index: 101;
-  padding: 30px 28px;
-  gap: 20px;
-  overflow: hidden;
+  padding: 24px 26px;
+  gap: 14px;
+  /* Never exceed the viewport: the confirmation is content-tall (stamp + title
+     + pizza + full receipt + actions), so cap it and let it scroll internally
+     instead of clipping the title at the top and the buttons at the bottom. */
+  max-height: calc(100dvh - 32px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   box-shadow: 0 20px 60px rgba(0,0,0,0.5);
   animation: modalIn 0.25s ease;
 }
@@ -40,8 +46,8 @@
 /* Pizza Maker round badge as a branding "stamp" — the hero seal at the top of
    the confirmation, in place of the old plain checkmark. */
 .modalStamp {
-  width: 84px;
-  height: 84px;
+  width: 68px;
+  height: 68px;
   object-fit: contain;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
 }
@@ -73,9 +79,9 @@
 }
 
 .modalPizza {
-  width: 168px;
-  height: 168px;
-  margin: -4px 0 -2px;
+  width: 150px;
+  height: 150px;
+  margin: -2px 0;
 }
 
 .modalReceipt {

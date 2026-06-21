@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Slf4j
 public class AuthRateLimitFilter extends OncePerRequestFilter {
 
     // 10 login/register attempts per minute per IP
@@ -52,6 +54,8 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
         if (bucket.tryConsume(1)) {
             chain.doFilter(request, response);
         } else {
+            // Security event: a client is hitting the auth endpoints past the limit.
+            log.warn("Rate limit exceeded for {} on {}", ip, request.getRequestURI());
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"Too many requests. Please wait before trying again.\"}");

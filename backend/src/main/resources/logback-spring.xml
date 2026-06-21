@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Build on Spring Boot's logging defaults, but inject the per-request
-         correlation id (RequestIdFilter puts it in the MDC) into every line.
-         Non-request threads (startup, the outbox relay) log as "system". -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <property name="CONSOLE_LOG_PATTERN"
-              value="%clr(%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([%X{requestId:-system}]){magenta} %clr(${PID:-}){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <!-- Dev/test: human-readable console with the per-request correlation id
+         (RequestIdFilter puts it in the MDC; "system" off-request). -->
+    <springProfile name="!prod">
+        <property name="CONSOLE_LOG_PATTERN"
+                  value="%clr(%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([%X{requestId:-system}]){magenta} %clr(${PID:-}){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
 
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-
-    <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-    </root>
+    <!-- Prod: one JSON object per line so a log shipper can index every field
+         (level, logger, thread, message, stack trace, and all MDC keys such as
+         requestId / http_status / duration_ms). -->
+    <springProfile name="prod">
+        <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <includeContext>false</includeContext>
+                <timeZone>UTC</timeZone>
+                <customFields>{"service":"pizzamaker-api"}</customFields>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="JSON"/>
+        </root>
+    </springProfile>
 </configuration>

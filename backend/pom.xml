@@ -69,6 +69,13 @@
             <artifactId>resilience4j-spring-boot3</artifactId>
             <version>${resilience4j.version}</version>
         </dependency>
+
+        <!-- Structured JSON logs (prod profile) for ingestion into ELK/Datadog/etc. -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>8.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>

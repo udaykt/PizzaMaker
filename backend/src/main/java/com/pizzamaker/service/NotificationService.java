@@ -1,5 +1,6 @@
 package com.pizzamaker.service;
 
+import com.pizzamaker.util.LogSanitizer;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,6 @@ public class NotificationService {
     @Retry(name = "notification")
     @CircuitBreaker(name = "notification")
     public void sendOrderConfirmation(String email, String oid) {
-        log.info("Sending order confirmation to {} for order {}", email, oid);
+        log.info("Sending order confirmation to {} for order {}", LogSanitizer.maskEmail(email), oid);
     }
 }
