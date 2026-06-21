@@ -24,6 +24,7 @@ import com.pizzamaker.repository.OrderLineItemRepository;
 import com.pizzamaker.repository.OrderRepository;
 import com.pizzamaker.repository.OrderStatusHistoryRepository;
 import com.pizzamaker.repository.UserRepository;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +49,7 @@ public class OrderService {
     private final OrderStatusHistoryRepository statusHistoryRepository;
     private final CatalogService catalogService;
     private final OutboxService outboxService;
+    private final MeterRegistry meterRegistry;
 
     @Transactional
     public OrderResponse placeOrder(String email, OrderRequest request, String idempotencyKey) {
@@ -93,6 +95,8 @@ public class OrderService {
 
         persistReceiptSnapshot(saved, request);
         recordStatusChange(saved, null, saved.getStatus(), saved.getCreatedBy());
+
+        meterRegistry.counter("pizza.orders.placed", "size", saved.getPizzaSize().name()).increment();
 
         // The confirmation is enqueued in the outbox within this same
         // transaction, so it commits atomically with the order and is delivered

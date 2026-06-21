@@ -52,6 +52,8 @@ public class SecurityConfig {
                 .headers(h -> h.frameOptions(fo -> fo.sameOrigin()))
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers("/api/v1/auth/**").permitAll();
+                    // Payment webhooks authenticate via HMAC signature, not JWT.
+                    req.requestMatchers(HttpMethod.POST, "/api/v1/webhooks/**").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/api/v1/menu/**").permitAll();
                     req.requestMatchers("/actuator/health", "/actuator/info").permitAll();
                     req.requestMatchers("/actuator/**").hasRole("ADMIN");

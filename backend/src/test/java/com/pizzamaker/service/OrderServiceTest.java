@@ -11,10 +11,13 @@ import com.pizzamaker.repository.OrderLineItemRepository;
 import com.pizzamaker.repository.OrderRepository;
 import com.pizzamaker.repository.OrderStatusHistoryRepository;
 import com.pizzamaker.repository.UserRepository;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +43,8 @@ class OrderServiceTest {
     @Mock OrderStatusHistoryRepository statusHistoryRepository;
     @Mock CatalogService catalogService;
     @Mock OutboxService outboxService;
+    // A real registry so counter().increment() runs without stubbing.
+    @Spy MeterRegistry meterRegistry = new SimpleMeterRegistry();
 
     @InjectMocks OrderService orderService;
 

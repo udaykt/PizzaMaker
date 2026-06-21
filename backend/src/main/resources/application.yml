@@ -36,10 +36,33 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: when-authorized
+  health:
+    circuitbreakers:
+      enabled: true
+
+# Resilience around the notification call: retry transient failures a few times
+# with backoff, and open a circuit breaker if the downstream is consistently down
+# so we stop hammering it. The outbox provides the durable, longer-horizon retry;
+# this handles fast transient blips inline.
+resilience4j:
+  retry:
+    instances:
+      notification:
+        max-attempts: 3
+        wait-duration: 200ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+  circuitbreaker:
+    instances:
+      notification:
+        sliding-window-size: 20
+        failure-rate-threshold: 60
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
 
 app:
   jwt:
@@ -47,6 +70,9 @@ app:
     # Must decode to >= 32 bytes (Base64-encoded); generate with: openssl rand -base64 32
     secret: ${JWT_SECRET:bXktc3VwZXItc2VjcmV0LWtleS1mb3ItcGl6emEtbWFrZXItYXBwLTIwMjQ=}
     expiration-ms: 86400000
+  # Shared secret for verifying inbound payment webhook signatures (HMAC-SHA256).
+  webhook:
+    secret: ${WEBHOOK_SECRET:whsec_dev_pizza_maker_local_secret}
 
 server:
   port: ${PORT:8080}

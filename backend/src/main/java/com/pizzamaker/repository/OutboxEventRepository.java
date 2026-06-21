@@ -1,6 +1,7 @@
 package com.pizzamaker.repository;
 
 import com.pizzamaker.entity.OutboxEvent;
+import com.pizzamaker.entity.OutboxStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +13,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OutboxEventRepository extends JpaRepository<OutboxEvent, Long> {
+
+    long countByStatus(OutboxStatus status);
 
     // Claims a batch of due rows with a write lock so that, in a multi-instance
     // deployment, two relays never dispatch the same event. The lock is held for
