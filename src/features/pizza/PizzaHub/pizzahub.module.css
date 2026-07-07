@@ -16,7 +16,10 @@
     "presets presets presets"
     "left    center  right";
   align-items: start;
-  z-index: 0;
+  /* No z-index here on purpose: a positive/zero z-index would make .pizzahub
+     its own stacking context and trap the order-confirmation modal (z-index
+     101) beneath the fixed header (z-index 100), clipping the modal's logo.
+     Leaving it auto lets the modal layer above the header as intended. */
 }
 
 /* Full-width auto-scrolling preset carousel */

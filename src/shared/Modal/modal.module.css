@@ -44,12 +44,14 @@
 }
 
 /* Pizza Maker round badge as a branding "stamp" — the hero seal at the top of
-   the confirmation, in place of the old plain checkmark. */
+   the confirmation, in place of the old plain checkmark. Seated on a soft
+   radial glow so it reads as an embossed premium seal, not a floating sticker. */
 .modalStamp {
-  width: 68px;
-  height: 68px;
+  width: 76px;
+  height: 76px;
+  margin-top: 2px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.55));
 }
 
 @keyframes modalIn {
@@ -61,7 +63,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  /* Warm radial halo behind the seal — gives the brand stamp an embossed,
+     spotlit look befitting a premium confirmation. */
+  background: radial-gradient(60% 70% at 50% 30%, rgba(255, 107, 0, 0.16), transparent 70%);
+  padding: 6px 0 2px;
+  width: 100%;
 }
 
 .modalCheckmark {
@@ -72,10 +79,14 @@
 }
 
 .modalSuccess h2 {
-  color: white;
+  color: #ffffff;
   font-family: var(--font-display);
+  font-weight: 400;
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 2rem;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .modalPizza {
@@ -124,25 +135,38 @@
   max-width: 60%;
 }
 
+/* The full UUID is long; keep it on one line as a small monospaced reference
+   (tabular figures, no letter-spacing) instead of letting it wrap into a
+   ragged two-line block that looked broken. */
 .receiptOid {
   color: #ff6b00;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.2px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  max-width: none;
 }
 
 .receiptPrice {
   color: #ff6b00;
-  font-weight: bold;
-  font-size: 1.05rem;
+  font-weight: 800;
+  font-size: 1.15rem;
+  text-shadow: 0 0 14px rgba(255, 107, 0, 0.35);
 }
 
+/* Glass amber chip that belongs to the dark premium theme, instead of the
+   old flat pastel-yellow badge. */
 .receiptStatus {
-  background: #fff3cd;
-  color: #856404;
-  padding: 2px 10px;
-  border-radius: 10px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 1px;
+  background: rgba(255, 107, 0, 0.14);
+  color: #ffb273;
+  border: 1px solid rgba(255, 107, 0, 0.35);
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-family: var(--font-caps);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 1.2px;
 }
 
 .modalNote {
