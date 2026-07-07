@@ -1,0 +1,9 @@
+# Keep shell scripts LF so they run on Linux/CI regardless of the OS they were
+# committed from. The Maven wrapper (mvnw) is a POSIX shell script — CRLF here
+# breaks it on the GitHub Actions Ubuntu runner.
+mvnw text eol=lf
+*.sh text eol=lf
+
+# Windows batch wrappers stay CRLF.
+mvnw.cmd text eol=crlf
+*.bat text eol=crlf
