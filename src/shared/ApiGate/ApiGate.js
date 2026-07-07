@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import logoNoBg from '@/assets/images/logo-badge-nobg.png';
+import { API_BASE } from '@/config/apiBase';
 import styles from './apiGate.module.css';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 // /actuator/health is not in the CORS allowlist — use an API endpoint that is.
 // /api/v1/menu/sizes is permitAll + covered by /api/** CORS, so it works cross-origin.
 const PING_URL = `${API_BASE}/api/v1/menu/sizes`;

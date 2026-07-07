@@ -1,6 +1,9 @@
 spring:
   datasource:
-    url: ${DATABASE_URL}
+    # Use DATABASE_URL if given (a full jdbc:postgresql URL, e.g. Neon); otherwise
+    # build it from the DATABASE_HOST/PORT/NAME parts the Render blueprint injects
+    # from its managed Postgres.
+    url: ${DATABASE_URL:jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT:5432}/${DATABASE_NAME}}
     username: ${DATABASE_USERNAME:}
     password: ${DATABASE_PASSWORD:}
     driver-class-name: org.postgresql.Driver

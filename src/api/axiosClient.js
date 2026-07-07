@@ -1,9 +1,10 @@
 import axios from 'axios';
 import store from '@/store';
 import { authActions } from '@/store/authSlice';
+import { API_BASE } from '@/config/apiBase';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
+  baseURL: API_BASE,
 });
 
 // Attach JWT to every request automatically

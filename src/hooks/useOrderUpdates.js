@@ -1,8 +1,9 @@
 import { Client } from '@stomp/stompjs';
 import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
+import { API_BASE } from '@/config/apiBase';
 
-const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080') + '/ws';
+const WS_URL = `${API_BASE}/ws`;
 
 /**
  * Subscribes to /user/queue/orders over STOMP/SockJS.

@@ -1,0 +1,53 @@
+# Render Blueprint — provisions the PizzaMaker backend + its Postgres in one go.
+# Deploy: Render Dashboard → New → Blueprint → connect this repo → Apply.
+# You'll be prompted for two secrets (JWT_SECRET, WEBHOOK_SECRET) — see README/DEPLOY.
+databases:
+  - name: pizzamaker-db
+    plan: free
+    databaseName: pizzamaker
+    user: pizzamaker
+
+services:
+  - type: web
+    name: pizzamaker-api
+    runtime: docker
+    plan: free
+    region: oregon
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      # Must match your Cloudflare Pages origin so the browser is allowed to call the API.
+      - key: ALLOWED_ORIGINS
+        value: https://pizzamaker.pages.dev
+      # Prompted at deploy (not stored in the repo). Generate with:
+      #   JWT_SECRET     -> openssl rand -base64 32
+      #   WEBHOOK_SECRET -> any random string
+      - key: JWT_SECRET
+        sync: false
+      - key: WEBHOOK_SECRET
+        sync: false
+      # DB connection is injected from the managed Postgres above.
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: pizzamaker-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: pizzamaker-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: pizzamaker-db
+          property: database
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: pizzamaker-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: pizzamaker-db
+          property: password
