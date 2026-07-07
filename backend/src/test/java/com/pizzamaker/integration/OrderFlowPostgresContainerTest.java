@@ -4,6 +4,7 @@ import com.pizzamaker.dto.request.OrderRequest;
 import com.pizzamaker.dto.response.OrderResponse;
 import com.pizzamaker.entity.*;
 import com.pizzamaker.service.OrderService;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,10 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 // End-to-end against a real PostgreSQL: exercises the actual postgresql Flyway
 // migrations (including the partial unique idempotency index H2 can't express)
-// and the full place-order path. Auto-skips on machines without Docker; runs in
-// CI where Docker is available.
+// and the full place-order path. Auto-skips on machines without Docker. Tagged
+// "docker" and excluded from the CI gate (whose anonymous Docker Hub image pulls
+// are rate-limited and flaky); run it locally with Docker via `./mvnw verify`.
 @SpringBootTest
 @Testcontainers(disabledWithoutDocker = true)
+@Tag("docker")
 class OrderFlowPostgresContainerTest {
 
     @Container
