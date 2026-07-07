@@ -4,6 +4,10 @@ Full-stack pizza ordering app with a **live, what-you-see-is-what-you-get pizza 
 
 React + Vite frontend, Spring Boot REST backend.
 
+![PizzaMaker live builder demo](docs/demo.gif)
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the deeper design write-up.
+
 ---
 
 ## Features
@@ -13,8 +17,6 @@ React + Vite frontend, Spring Boot REST backend.
 - **Auth** — standard accounts, guest checkout, and an admin role, all JWT-backed.
 - **Live order status** — order updates pushed over STOMP/WebSocket and reflected in the UI without a refresh.
 - **Resilient UI** — top-level error boundary and a styled 404 fallback instead of blank screens.
-
-> _Demo GIF: record the builder (toggling toppings + changing size) and drop it in as `docs/demo.gif`, then reference it here._
 
 ---
 
@@ -55,7 +57,7 @@ Browser
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18 + Redux Toolkit + React Router v5 |
+| Frontend | React 18 + Redux Toolkit |
 | Animation | Framer Motion (SVG pizza rendering) |
 | Build tool | Vite 5 |
 | Frontend tests | Vitest |
@@ -186,42 +188,9 @@ Pagination params: `?page=0&size=10&sort=createdAt,desc`
 
 ---
 
-## 10 FAANG Interview Questions
-
-**1. Why JWT over sessions for this API?**
-JWT is stateless — the server holds no session state, making it trivially horizontally scalable. Each request carries a self-contained, signed token. Trade-off: tokens can't be invalidated before expiry without a blocklist (Redis), which we'd add in a production system.
-
-**2. How does Spring Security's filter chain work here?**
-`JwtAuthenticationFilter` runs before `UsernamePasswordAuthenticationFilter`. It extracts the Bearer token, validates it, loads `UserDetails`, and sets the `SecurityContext`. Downstream filters and controllers see an authenticated principal — no session involved.
-
-**3. Why Flyway instead of `ddl-auto: create`?**
-Flyway gives deterministic, versioned, auditable schema migrations that run in order (`V1__`, `V2__`). `ddl-auto: create` destroys data on restart and can silently diverge between environments. Production databases must never be managed by Hibernate's DDL tool.
-
-**4. Walk me through placing an order end-to-end.**
-`POST /api/v1/orders` → `JwtAuthenticationFilter` validates token → `OrderController.placeOrder` called with `@AuthenticationPrincipal` → `@Valid` checks `@NotNull pizzaSize` → `OrderService.placeOrder` loads user, builds `Order`, saves, fires `@Async` notification → returns `OrderResponse` DTO (entity never leaves service layer).
-
-**5. How did you handle concurrent order placement safely?**
-`@Transactional` on `placeOrder` wraps the save in a single DB transaction. For true high-concurrency (e.g., seat reservation), we'd add an optimistic lock (`@Version`) on the entity to detect concurrent modifications without blocking reads.
-
-**6. What's the difference between `@Mock` and `@MockBean` in your tests?**
-`@Mock` (Mockito) creates a plain mock — no Spring context, used in `@ExtendWith(MockitoExtension)` unit tests for pure logic. `@MockBean` replaces a Spring bean in the full application context during `@SpringBootTest` — right for controller tests where the full filter chain and MVC config must be live.
-
-**7. How would you scale this to 10,000 orders/second?**
-(1) Stateless JWT means any node handles any request — add instances behind a load balancer. (2) Move order writes to an async queue (Kafka `order.placed` topic) so the HTTP response returns immediately. (3) Read replicas for `GET /orders`. (4) Cache menu endpoints with Redis. (5) Connection pooling with HikariCP (already Spring Boot default).
-
-**8. Why `@Transactional(readOnly = true)` on query methods?**
-Signals Hibernate to skip dirty-checking on entities loaded in that session (no snapshot needed), and lets the DB driver/replica route to a read replica. Small wins per query; significant at scale.
-
-**9. How would you revoke a JWT before it expires?**
-Store a `token_version` counter per user in the DB (or Redis). Embed it in the JWT claim on issue. In `JwtAuthenticationFilter`, verify the claim matches current DB value. Incrementing `token_version` on logout/password-change instantly invalidates all existing tokens for that user.
-
-**10. What's wrong with the original Firebase implementation you replaced?**
-Plaintext passwords were stored in Firestore documents — a critical OWASP A02 (Cryptographic Failures) violation. Any Firestore rules misconfiguration would have exposed all credentials in plaintext. The new backend BCrypt-hashes passwords, stores only the hash, and removes the entire client-side auth bypass surface.
-
----
-
 ## Security Notes
 
+- Passwords are BCrypt-hashed and only the hash is stored — the app never persists plaintext credentials.
 - JWT secret must be a Base64-encoded 256-bit key in production (set via `JWT_SECRET` env var).
 - The dev secret in `application.yml` is for local use only — never commit a real secret.
 - Guest users have `null` password hash; they authenticate only via JWT (no password endpoint).
