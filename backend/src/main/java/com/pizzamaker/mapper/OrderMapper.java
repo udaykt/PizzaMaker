@@ -31,6 +31,7 @@ public final class OrderMapper {
         return new OrderResponse(
                 order.getOid(),
                 order.getUser().getEmailId(),
+                order.getPizzaName(),
                 ingredients,
                 order.getPizzaSize(),
                 order.getCrustStyle(),

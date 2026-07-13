@@ -15,6 +15,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -60,9 +61,64 @@ class OrderServiceTest {
     }
 
     private OrderRequest testOrderRequest() {
-        return new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
+        return namedOrderRequest(null);
+    }
+
+    private OrderRequest namedOrderRequest(String pizzaName) {
+        return new OrderRequest(pizzaName, SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
                 List.of(new ToppingSelection("pepperoni", ToppingQuantity.REGULAR)),
                 PizzaSize.M, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
+    }
+
+    // Captures the Order actually handed to the repository, so the assertions
+    // below check what gets PERSISTED rather than what comes back in the DTO.
+    private Order placeAndCapture(String pizzaName) {
+        when(userRepository.findByEmailId("bob@example.com")).thenReturn(Optional.of(testUser()));
+        when(catalogService.activeToppingCodes()).thenReturn(Set.of("pepperoni"));
+        when(orderRepository.save(any())).thenAnswer(inv -> {
+            Order o = inv.getArgument(0);
+            o.setId(1L);
+            return o;
+        });
+
+        orderService.placeOrder("bob@example.com", namedOrderRequest(pizzaName), null);
+
+        ArgumentCaptor<Order> captor = ArgumentCaptor.forClass(Order.class);
+        verify(orderRepository).save(captor.capture());
+        return captor.getValue();
+    }
+
+    @Test
+    void placeOrder_keepsTheCustomersPizzaName() {
+        assertThat(placeAndCapture("Uday's Friday Special").getPizzaName())
+                .isEqualTo("Uday's Friday Special");
+    }
+
+    @Test
+    void placeOrder_collapsesWhitespaceInThePizzaName() {
+        assertThat(placeAndCapture("  The   Inferno  ").getPizzaName()).isEqualTo("The Inferno");
+    }
+
+    // A blank name is the same as no name at all: the client sends an empty
+    // string when the field is untouched, and storing "" would make the order
+    // look named when it isn't — the reader would show a blank title instead of
+    // falling back to the generated one.
+    @Test
+    void placeOrder_treatsABlankPizzaNameAsAbsent() {
+        assertThat(placeAndCapture("   ").getPizzaName()).isNull();
+    }
+
+    @Test
+    void placeOrder_leavesAnUnnamedPizzaNull() {
+        assertThat(placeAndCapture(null).getPizzaName()).isNull();
+    }
+
+    // @Size rejects an over-length name at the edge; this is the belt-and-braces
+    // cap for anything reaching the service another way.
+    @Test
+    void placeOrder_capsAnOverlongPizzaName() {
+        String tooLong = "x".repeat(80);
+        assertThat(placeAndCapture(tooLong).getPizzaName()).hasSize(40);
     }
 
     @Test

@@ -6,6 +6,7 @@ import { HOME_PATH, ORDERS_PATH } from '@/utils/routes';
 import Button from '@/shared/Button/Button';
 import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
 import { orderDisplayLabels, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
+import { orderPizzaName } from '@/utils/pizzaName';
 import { formatPrice } from '@/utils/formatPrice';
 import { statusLabel } from '@/utils/orderStatusLabels';
 import logoBadge from '@/assets/images/logo-badge-nobg.png';
@@ -47,6 +48,7 @@ const Modal = (props) => {
 
   const ingredients = formatIngredients(currentOrder);
   const labels = orderDisplayLabels(currentOrder);
+  const canvasProps = currentOrder ? pizzaPropsFromOrder(currentOrder) : null;
 
   return (
     <div className={styles.modal}>
@@ -56,8 +58,11 @@ const Modal = (props) => {
       </div>
       {currentOrder && (
         <div className={styles.modalPizza}>
-          <PizzaCanvas {...pizzaPropsFromOrder(currentOrder)} />
+          <PizzaCanvas {...canvasProps} />
         </div>
+      )}
+      {currentOrder && (
+        <p className={styles.modalPizzaName}>{orderPizzaName(currentOrder, canvasProps)}</p>
       )}
       <div className={styles.modalReceipt}>
         <div className={styles.receiptRow}>

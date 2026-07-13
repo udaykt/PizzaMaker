@@ -9,6 +9,9 @@ export const BAKE_LEVELS = { NORMAL: 'normal', WELL_DONE: 'well-done' };
 // The universal Delivery vs Carryout split every pizza chain's checkout offers.
 export const DELIVERY_METHODS = { DELIVERY: 'delivery', CARRYOUT: 'carryout' };
 
+// Kept in step with the column width and @Size on the backend (OrderRequest).
+export const MAX_CUSTOM_NAME_LENGTH = 40;
+
 const pizzaSlice = createSlice({
   name: 'pizza',
   initialState: {
@@ -16,6 +19,11 @@ const pizzaSlice = createSlice({
     // checkout, while PizzaDisplay plays the one-shot slice animation. See
     // OrderButton and PizzaCanvas's sliceMode prop.
     isSlicing: false,
+    // The name the customer typed for their pizza, if they bothered. Empty means
+    // "use whatever the generator suggests" — we deliberately do NOT seed this
+    // with the suggestion, because then we couldn't tell an accepted suggestion
+    // from a deliberate choice, and the name would stop tracking the build.
+    customName: '',
     size: PIZZASIZES.R,
     crustStyle: CRUST_STYLES.HAND_TOSSED,
     bakeLevel: BAKE_LEVELS.NORMAL,
@@ -27,6 +35,13 @@ const pizzaSlice = createSlice({
     },
     stopSlicing(state) {
       state.isSlicing = false;
+    },
+    setCustomName(state, action) {
+      // Bounded here as well as on the server: a name is a title, not an essay.
+      state.customName = (action.payload ?? '').slice(0, MAX_CUSTOM_NAME_LENGTH);
+    },
+    clearCustomName(state) {
+      state.customName = '';
     },
     setSize(state, action) {
       state.size = action.payload;
@@ -44,6 +59,8 @@ const pizzaSlice = createSlice({
       state.size = PIZZASIZES.R;
       state.crustStyle = CRUST_STYLES.HAND_TOSSED;
       state.bakeLevel = BAKE_LEVELS.NORMAL;
+      // Reset means reset — the name belonged to the pizza you just threw away.
+      state.customName = '';
     },
   },
 });

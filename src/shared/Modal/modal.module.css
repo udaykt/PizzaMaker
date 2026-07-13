@@ -95,6 +95,17 @@
   margin: -2px 0;
 }
 
+/* The pizza's name, right under its picture — the customer's own if they chose
+   one, otherwise the generated character name. */
+.modalPizzaName {
+  margin: 2px 0 6px;
+  text-align: center;
+  font-family: var(--font-caps);
+  font-size: 1.25rem;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+}
+
 .modalReceipt {
   width: 100%;
   background: rgba(255, 255, 255, 0.04);

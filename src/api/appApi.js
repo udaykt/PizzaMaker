@@ -25,6 +25,10 @@ const buildOrderPayload = (orderState) => {
   const pizzaState = store.getState().pizza;
   const selectedSize = pizzaState.size;
   const payload = {
+    // Only a name the customer actually chose is sent. An empty string means
+    // "no name" — the generated one is derived from the ingredients on read, so
+    // storing it would just be denormalising something we can always recompute.
+    pizzaName:         pizzaState.customName?.trim() || null,
     sauceType:         SAUCE_TYPE_TO_ENUM[base.sauce.sauceType] || 'NONE',
     mozzarella:        base.mozzarella.checked,
     cheddar:           base.cheddar.checked,

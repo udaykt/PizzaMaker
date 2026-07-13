@@ -44,6 +44,7 @@ class OrderControllerTest {
         return new OrderResponse(
                 UUID.randomUUID().toString(),
                 "test@example.com",
+                "The Inferno",
                 new OrderResponse.Ingredients(SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
                         List.of(new ToppingSelection("pepperoni", ToppingQuantity.REGULAR))),
                 PizzaSize.M,
@@ -60,7 +61,7 @@ class OrderControllerTest {
     @Test
     @WithMockUser(username = "alice@example.com", roles = "USER")
     void placeOrder_authenticated_returns201() throws Exception {
-        var req = new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
+        var req = new OrderRequest(null, SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
                 List.of(new ToppingSelection("pepperoni", ToppingQuantity.REGULAR)),
                 PizzaSize.M, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
         when(orderService.placeOrder(eq("alice@example.com"), any(), any())).thenReturn(sampleOrder());
@@ -74,7 +75,7 @@ class OrderControllerTest {
 
     @Test
     void placeOrder_unauthenticated_returns401() throws Exception {
-        var req = new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
+        var req = new OrderRequest(null, SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
                 List.of(), PizzaSize.R, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
 
         mockMvc.perform(post("/api/v1/orders")

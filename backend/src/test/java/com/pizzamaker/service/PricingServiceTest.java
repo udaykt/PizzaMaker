@@ -25,7 +25,7 @@ class PricingServiceTest {
                                   boolean mozzarella, boolean cheddar, boolean parmesanAsiago,
                                   boolean feta, boolean ricotta, boolean veganCheese,
                                   List<ToppingSelection> toppings, PizzaSize size, DeliveryMethod deliveryMethod) {
-        return new OrderRequest(sauceType, mozzarella, cheddar, parmesanAsiago, feta, ricotta, veganCheese,
+        return new OrderRequest(null, sauceType, mozzarella, cheddar, parmesanAsiago, feta, ricotta, veganCheese,
                 toppings, size, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, deliveryMethod);
     }
 
@@ -126,7 +126,7 @@ class PricingServiceTest {
 
     @Test
     void unknownOrNullSize_defaultsToMediumPricing() {
-        var req = new OrderRequest(SauceType.NONE, false, false, false, false, false, false, List.of(),
+        var req = new OrderRequest(null, SauceType.NONE, false, false, false, false, false, false, List.of(),
                 null, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.CARRYOUT);
         assertThat(PricingService.computeTotal(req)).isEqualByComparingTo("12.00");
     }
@@ -141,7 +141,7 @@ class PricingServiceTest {
 
     @Test
     void nullDeliveryMethod_defaultsToChargingDeliveryFee() {
-        var req = new OrderRequest(SauceType.NONE, false, false, false, false, false, false, List.of(),
+        var req = new OrderRequest(null, SauceType.NONE, false, false, false, false, false, false, List.of(),
                 PizzaSize.M, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, null);
         assertThat(PricingService.computeTotal(req)).isEqualByComparingTo("14.99");
     }

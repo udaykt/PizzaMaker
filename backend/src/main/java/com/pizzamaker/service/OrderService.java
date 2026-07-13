@@ -45,6 +45,9 @@ import java.util.UUID;
 @Slf4j
 public class OrderService {
 
+    // Matches the pizza_name column width (V22) and @Size on OrderRequest.
+    private static final int MAX_PIZZA_NAME_LENGTH = 40;
+
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final OrderLineItemRepository orderLineItemRepository;
@@ -76,6 +79,7 @@ public class OrderService {
                 .oid(UUID.randomUUID().toString())
                 .idempotencyKey(hasKey ? idempotencyKey : null)
                 .user(user)
+                .pizzaName(sanitizePizzaName(request.pizzaName()))
                 .sauceType(request.sauceType() != null ? request.sauceType() : SauceType.NONE)
                 .mozzarella(request.mozzarella())
                 .cheddar(request.cheddar())
@@ -111,6 +115,19 @@ public class OrderService {
                 OutboxService.ORDER_PLACED, new OrderPlacedEvent(email, saved.getOid()));
 
         return OrderMapper.toResponse(saved);
+    }
+
+    // A customer-supplied title. Blank is the same as absent (the client sends an
+    // empty string when the field is untouched), whitespace is collapsed, and the
+    // length is capped rather than rejected — @Size already rejects an
+    // over-length name at the edge, so this is defence in depth against anything
+    // that reaches the service by another path. The value is never interpolated
+    // into HTML or SQL; JPA parameterises it and React escapes it on render.
+    private String sanitizePizzaName(String raw) {
+        if (raw == null) return null;
+        String cleaned = raw.strip().replaceAll("\\s+", " ");
+        if (cleaned.isEmpty()) return null;
+        return cleaned.length() > MAX_PIZZA_NAME_LENGTH ? cleaned.substring(0, MAX_PIZZA_NAME_LENGTH) : cleaned;
     }
 
     // Snapshot the priced breakdown so a receipt survives later price changes and

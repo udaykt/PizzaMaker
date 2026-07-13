@@ -41,6 +41,13 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // The name the customer typed for this pizza, if they chose one. Null for the
+    // majority of orders, where the name is derived from the composition on the
+    // client instead — only a deliberately chosen name is worth storing, because
+    // it's the only one we could never reconstruct.
+    @Column(name = "pizza_name", length = 40)
+    private String pizzaName;
+
     // Sauce is a single choice (Domino's-style: Robust Tomato/Marinara/
     // Garlic Parmesan/Alfredo/BBQ/None), not a flat boolean.
     @Enumerated(EnumType.STRING)

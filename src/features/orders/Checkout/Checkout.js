@@ -4,9 +4,9 @@ import { useHistory } from 'react-router-dom';
 import { isPizzaEmpty } from '@/store/pizzaHubSlice';
 import { pizzaActions, DELIVERY_METHODS } from '@/store/pizzaSlice';
 import { computePriceBreakdown } from '@/utils/pricing';
-import { pizzaName } from '@/utils/pizzaName';
 import { formatPrice } from '@/utils/formatPrice';
 import Button from '@/shared/Button/Button';
+import PizzaNameField from './PizzaNameField';
 import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
 import { CONFIRM_PATH, HOME_PATH } from '@/utils/routes';
 import { createOrder } from '@/api/appApi';
@@ -132,7 +132,11 @@ const Checkout = () => {
           costs) never scroll out of view. */}
       <div className={styles.ticketCard}>
         <div className={styles.ticketHead}>
-          <h2 className={styles.ticketHeader}>{pizzaName(orderState)}</h2>
+          <PizzaNameField
+            orderState={orderState}
+            crustStyle={crustStyle}
+            bakeLevel={bakeLevel}
+          />
 
           <div className={styles.deliveryToggle}>
             {Object.values(DELIVERY_METHODS).map((m) => (

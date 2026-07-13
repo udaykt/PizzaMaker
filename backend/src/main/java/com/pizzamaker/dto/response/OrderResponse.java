@@ -15,6 +15,9 @@ import java.util.List;
 public record OrderResponse(
         String oid,
         String userEmail,
+        // The name the customer chose, or null if they never set one — in which
+        // case the client generates a name from the ingredients below.
+        String pizzaName,
         Ingredients ingredients,
         PizzaSize pizzaSize,
         CrustStyle crustStyle,

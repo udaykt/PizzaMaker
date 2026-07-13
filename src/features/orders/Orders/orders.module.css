@@ -114,15 +114,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  gap: 12px;
+  margin-bottom: 2px;
 }
 
-.orderOid {
+/* The pizza's name headlines the card. Clamped to one line — a long generated
+   name must not push the status pill around. */
+.orderName {
+  flex: 1;
+  min-width: 0;
   font-family: var(--font-caps);
-  font-size: 0.95rem;
+  font-size: 1.25rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Demoted to a support handle under the name, not the headline. */
+.orderOid {
+  display: block;
+  margin-bottom: 12px;
+  font-family: var(--font);
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.32);
+  letter-spacing: 0.5px;
 }
 
 .orderStatus {

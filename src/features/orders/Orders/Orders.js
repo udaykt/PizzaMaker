@@ -8,6 +8,7 @@ import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
 import { applyOrderToBuilder, orderDisplayLabels, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH } from '@/utils/routes';
+import { orderPizzaName } from '@/utils/pizzaName';
 import { formatPrice } from '@/utils/formatPrice';
 import { STATUS_EMOJI, statusLabel } from '@/utils/orderStatusLabels';
 import Button from '@/shared/Button/Button';
@@ -112,10 +113,13 @@ const Orders = () => {
             const statusStyle = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
             const emoji = STATUS_EMOJI[order.status] || '🍕';
             const labels = orderDisplayLabels(order);
+            const canvasProps = pizzaPropsFromOrder(order);
             return (
               <li key={order.oid} className={styles.orderCard}>
                 <div className={styles.orderCardHeader}>
-                  <span className={styles.orderOid}>#{order.oid}</span>
+                  {/* The name leads, because that's what a customer recognises
+                      their order by — the OID is a support handle, not a title. */}
+                  <span className={styles.orderName}>{orderPizzaName(order, canvasProps)}</span>
                   <span
                     className={styles.orderStatus}
                     style={{ background: statusStyle.bg, color: statusStyle.color }}
@@ -123,10 +127,11 @@ const Orders = () => {
                     {emoji} {statusLabel(order.status)}
                   </span>
                 </div>
+                <span className={styles.orderOid}>#{order.oid}</span>
                 <div className={styles.orderCardBody}>
                   <div className={styles.orderThumb}>
                     <LazyMount placeholder={<div className={styles.thumbPlaceholder} />}>
-                      <PizzaCanvas {...pizzaPropsFromOrder(order)} textured={false} />
+                      <PizzaCanvas {...canvasProps} textured={false} />
                     </LazyMount>
                   </div>
                   <div className={styles.orderDetails}>

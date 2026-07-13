@@ -43,7 +43,7 @@ class OrderFlowPostgresContainerTest {
     OrderService orderService;
 
     private OrderRequest sampleRequest() {
-        return new OrderRequest(SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
+        return new OrderRequest(null, SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
                 List.of(new ToppingSelection("pepperoni", ToppingQuantity.REGULAR)),
                 PizzaSize.L, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
     }

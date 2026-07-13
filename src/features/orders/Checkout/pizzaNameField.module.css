@@ -1,0 +1,185 @@
+/* The whole field is a fixed-height block. The generated name is unbounded (a
+   14-topping pizza is a long string) and the ticket card's geometry must not
+   depend on it — so the title clamps to two lines and the row's height is
+   pinned. Nothing below it ever shifts. */
+.wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 2 lines of the title. View mode and edit mode are pinned to the SAME height,
+   so clicking the pencil doesn't make the card jump. */
+.nameRow,
+.editRow {
+  --name-height: calc(2 * 1.15 * 1.6rem);
+
+  position: relative;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  min-height: var(--name-height);
+}
+
+.nameRow {
+  align-items: flex-start;
+}
+
+.editRow {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: white;
+  font-family: var(--font-caps);
+  font-weight: 400;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+  line-height: 1.15;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pencil {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.pencil:hover {
+  color: var(--accent);
+  border-color: rgba(255, 107, 0, 0.5);
+  background: rgba(255, 107, 0, 0.1);
+}
+
+/* Only while the first-run nudge is up — draws the eye to the thing the nudge
+   is talking about, then stops. A permanently pulsing button is a distraction. */
+.pencilPulse {
+  color: var(--accent);
+  border-color: rgba(255, 107, 0, 0.5);
+  animation: pencilPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pencilPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.45); }
+  50%      { box-shadow: 0 0 0 6px rgba(255, 107, 0, 0); }
+}
+
+/* The coach-mark.
+   Deliberately IN FLOW, not absolutely positioned. Floated under the pencil it
+   landed squarely on top of the Delivery/Carryout toggle — so for the seven
+   seconds it was up, it covered a control the customer might actually want to
+   press. A hint that blocks the UI is worse than no hint. In flow it simply
+   pushes the toggle down while it's visible; the ticket body absorbs the height
+   (it's the flex child), so nothing below it moves. */
+.nudge {
+  position: relative;
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 7px 8px 7px 11px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 0.76rem;
+  font-weight: 500;
+  box-shadow: 0 6px 18px rgba(255, 107, 0, 0.32);
+  animation: nudgeIn 0.28s ease-out;
+}
+
+/* Little arrow pointing back up at the pencil it's talking about. */
+.nudge::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  transform: rotate(45deg);
+}
+
+@keyframes nudgeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.nudgeDismiss {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.18);
+  color: #fff;
+  cursor: pointer;
+}
+
+.nudgeDismiss:hover {
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 107, 0, 0.55);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-family: var(--font-caps);
+  font-size: 1.15rem;
+  letter-spacing: 0.5px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.iconBtn {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.iconBtn:hover {
+  color: var(--accent);
+  border-color: rgba(255, 107, 0, 0.5);
+}
+
+.hint {
+  flex-basis: 100%;
+  font-family: var(--font);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+}

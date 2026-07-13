@@ -99,7 +99,7 @@ class KafkaOrderFlowTest {
     // sanitizeToppings() validates against.
     private OrderResponse placeOrder() {
         var request = new OrderRequest(
-                SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
+                null, SauceType.ROBUST_TOMATO, true, false, false, false, false, false,
                 List.of(), PizzaSize.M, CrustStyle.HAND_TOSSED, BakeLevel.NORMAL, DeliveryMethod.DELIVERY);
         return orderService.placeOrder(email, request, null);
     }
