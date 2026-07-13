@@ -12,15 +12,21 @@ export const DELIVERY_METHODS = { DELIVERY: 'delivery', CARRYOUT: 'carryout' };
 const pizzaSlice = createSlice({
   name: 'pizza',
   initialState: {
-    isSliced: false,
+    // True for the brief window between clicking "Order" and navigating to
+    // checkout, while PizzaDisplay plays the one-shot slice animation. See
+    // OrderButton and PizzaCanvas's sliceMode prop.
+    isSlicing: false,
     size: PIZZASIZES.R,
     crustStyle: CRUST_STYLES.HAND_TOSSED,
     bakeLevel: BAKE_LEVELS.NORMAL,
     deliveryMethod: DELIVERY_METHODS.DELIVERY,
   },
   reducers: {
-    toggleIsSliced(state) {
-      state.isSliced = !state.isSliced;
+    startSlicing(state) {
+      state.isSlicing = true;
+    },
+    stopSlicing(state) {
+      state.isSlicing = false;
     },
     setSize(state, action) {
       state.size = action.payload;

@@ -55,6 +55,160 @@ function seededPoints(count, seed) {
 const CHAR_SLOTS = seededPoints(12, 9173);
 const STUFFED_SLOTS = seededPoints(18, 4421);
 
+// ---------------------------------------------------------------------------
+// Slice animation — cuts the pizza into wedges that pull apart radially and
+// come back together. Used for the one-shot "order placed" cut (sliceMode
+// 'once') and the looping showpiece on the checkout page (sliceMode 'loop').
+// sliceMode 'none' (the default) renders the pizza exactly as it always has —
+// none of this code runs, so every other screen that uses PizzaCanvas
+// (presets, order history, the confirmation modal, the builder at rest) is
+// untouched.
+
+// How many wedges a real pizza gets cut into, by size — matches how an actual
+// pizza is scored before serving.
+export const SLICE_COUNTS = { small: 4, medium: 6, large: 8 };
+
+// How far each wedge slides outward from center when "sliced apart", in the
+// same px units as CENTER/crust radius below. The canvas has overflow:visible
+// (pizzaCanvas.module.css), so this has room to breathe past the crust edge.
+const EXPLODE_DISTANCE = 22;
+
+const wedgeTransition = { type: 'spring', stiffness: 170, damping: 20 };
+
+// Timing for sliceMode 'once': a short beat before the cut starts (so it reads
+// as a deliberate action, not a glitch), then the spring settles into the
+// sliced-apart pose and holds there until the caller navigates away.
+const ONCE_DELAY_MS = 150;
+// Exported so callers (OrderButton) can time navigation to happen once the cut
+// has actually had time to play, instead of guessing a duration that could
+// drift out of sync with the animation defined here.
+export const SLICE_ONCE_NAV_DELAY_MS = 950;
+
+// Timing for sliceMode 'loop': how long the pizza rests whole vs. sliced apart
+// on each cycle.
+const LOOP_ASSEMBLED_MS = 1600;
+const LOOP_SLICED_MS = 950;
+
+// One pie-sector path per wedge, apex at CENTER, running out to `radius`.
+// Index 0 starts at 12 o'clock so the cuts read as a normal pizza score line.
+function wedgeSectorPath(index, count, radius) {
+  const anglePerWedge = (2 * Math.PI) / count;
+  const start = index * anglePerWedge - Math.PI / 2;
+  const end = start + anglePerWedge;
+  const x1 = CENTER + radius * Math.cos(start);
+  const y1 = CENTER + radius * Math.sin(start);
+  const x2 = CENTER + radius * Math.cos(end);
+  const y2 = CENTER + radius * Math.sin(end);
+  // Every wedge here is <= 90° (count is always >= 4), so the large-arc flag
+  // is always 0 — kept as a real computation anyway rather than a hardcoded
+  // 0, in case SLICE_COUNTS ever gains a 2- or 3-slice option.
+  const largeArc = anglePerWedge > Math.PI ? 1 : 0;
+  return `M ${CENTER} ${CENTER} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+}
+
+// The outward offset for a wedge's own explode direction — along its angular
+// midpoint (bisector), so it slides straight out from the pizza's center
+// rather than drifting sideways.
+function wedgeOffset(index, count, distance) {
+  const anglePerWedge = (2 * Math.PI) / count;
+  const mid = index * anglePerWedge - Math.PI / 2 + anglePerWedge / 2;
+  return { x: Math.cos(mid) * distance, y: Math.sin(mid) * distance };
+}
+
+// Does a topping piece overlap this wedge's angular sector at all (not just:
+// is its centre inside it)? A piece is a disc of `radius` sitting `dist` from
+// the middle of the pizza, so it spans an angular half-width of
+// asin(radius / dist) either side of its own bearing. A piece sitting over the
+// very centre (dist <= radius) straddles every wedge.
+//
+// This is what decides whether a wedge needs to draw a given piece — and since
+// a piece near a cut line overlaps BOTH neighbouring wedges, both draw it, each
+// clipping away the half that isn't theirs. That's what produces a topping
+// genuinely cut in two by the knife, with each half riding its own slice.
+function pieceOverlapsSector(piece, start, anglePerWedge) {
+  const dist = Math.hypot(piece.x, piece.y);
+  if (dist <= piece.radius) return true;
+
+  const halfWidth = Math.asin(Math.min(1, piece.radius / dist));
+  const bearing = Math.atan2(piece.y, piece.x);
+
+  // Angular distance from the piece's bearing to the sector, measured in the
+  // sector's own frame and normalised to [0, 2π).
+  const rel = ((bearing - start) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+
+  // Inside the sector outright, or close enough to spill over either end.
+  if (rel < anglePerWedge) return true;
+  if (rel > 2 * Math.PI - halfWidth) return true;              // spills over the start edge
+  if (rel < anglePerWedge + halfWidth) return true;            // spills over the end edge
+  return false;
+}
+
+// One wedge: the crust/sauce/cheese stack AND its toppings, all clipped to the
+// wedge's sector so the cut goes straight through everything on the pie — which
+// is what a knife actually does. Toppings are inside the clip group, not beside
+// it; drawn outside it they'd hang over the gap between separating slices and
+// look like they were floating in mid-air.
+//
+// Deliberately simplified versus the interactive render below: no char spots, no
+// stuffed-crust ring, no texture filters, no drag handling — none of that reads
+// at the speed this animates, and skipping it keeps 4-8 simultaneous copies
+// smooth.
+const SliceWedge = ({
+  index,
+  count,
+  phase,
+  clipId,
+  crustStyle,
+  ids,
+  sauceType,
+  sauceGradientId,
+  cheeseLayers,
+  pieces,
+}) => {
+  const offset = phase === 'sliced' ? wedgeOffset(index, count, EXPLODE_DISTANCE) : { x: 0, y: 0 };
+  const anglePerWedge = (2 * Math.PI) / count;
+  const start = index * anglePerWedge - Math.PI / 2;
+
+  // Only the pieces this wedge could actually show. Without this filter every
+  // wedge would draw every topping (pieces × wedges image nodes) and lean on the
+  // clip to hide the rest — correct, but needlessly heavy.
+  const wedgePieces = pieces.filter((piece) => pieceOverlapsSector(piece, start, anglePerWedge));
+
+  return (
+    <motion.g
+      style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+      animate={{ x: offset.x, y: offset.y }}
+      transition={wedgeTransition}
+    >
+      <g clipPath={`url(#${clipId})`}>
+        <circle cx={CENTER} cy={CENTER} r={crustStyle.outerR} fill={`url(#${ids.crust})`} />
+        <circle cx={CENTER} cy={CENTER} r={crustStyle.innerR} fill={`url(#${ids.crustInner})`} />
+        {sauceType && sauceType !== 'none' && (
+          <circle cx={CENTER} cy={CENTER} r={crustStyle.innerR - 4} fill={`url(#${sauceGradientId})`} />
+        )}
+        {cheeseLayers.map((layer, i) =>
+          layer.on ? (
+            <circle
+              key={layer.key}
+              cx={CENTER}
+              cy={CENTER}
+              r={crustStyle.innerR - 8 - i * 2}
+              fill={`url(#${layer.gradientId})`}
+              opacity={layer.opacity}
+            />
+          ) : null
+        )}
+
+        {wedgePieces.map((piece) => (
+          <g key={piece.id} transform={`translate(${piece.x + CENTER} ${piece.y + CENTER}) rotate(${piece.rotate})`}>
+            <ToppingShape type={piece.type} r={piece.radius} />
+          </g>
+        ))}
+      </g>
+    </motion.g>
+  );
+};
+
 // A topping piece is the real photo from the art registry, sized to the
 // piece's own radius (which varies per piece for a natural, non-uniform look).
 const ToppingShape = ({ type, r }) => {
@@ -114,12 +268,46 @@ const PizzaCanvas = ({
   idle = false,
   textured = true,
   editable = false,
+  // 'none' (default, unchanged behavior) | 'once' (cut apart and hold — the
+  // order-placed transition) | 'loop' (cut apart / reassemble forever — the
+  // checkout showpiece).
+  sliceMode = 'none',
 }) => {
   const liveBase = useSelector((s) => s.pizzaHub.base);
   const liveToppings = useSelector((s) => s.pizzaHub.toppings);
   const liveSize = useSelector((s) => s.pizza.size);
   const liveCrustStyle = useSelector((s) => s.pizza.crustStyle);
   const liveBakeLevel = useSelector((s) => s.pizza.bakeLevel);
+
+  // 'assembled' | 'sliced'. A single self-scheduling effect drives both the
+  // one-shot cut and the endless loop — see the timing constants above.
+  const [phase, setPhase] = useState('assembled');
+  useEffect(() => {
+    let cancelled = false;
+    let timer;
+
+    if (sliceMode === 'once') {
+      setPhase('assembled');
+      timer = setTimeout(() => {
+        if (!cancelled) setPhase('sliced');
+      }, ONCE_DELAY_MS);
+    } else if (sliceMode === 'loop') {
+      const tick = (next) => {
+        if (cancelled) return;
+        setPhase(next);
+        const holdMs = next === 'assembled' ? LOOP_ASSEMBLED_MS : LOOP_SLICED_MS;
+        timer = setTimeout(() => tick(next === 'assembled' ? 'sliced' : 'assembled'), holdMs);
+      };
+      tick('assembled');
+    } else {
+      setPhase('assembled');
+    }
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [sliceMode]);
 
   // Unique per instance so multiple pizzas on screen don't share SVG IDs.
   const raw = useId().replace(/:/g, '');
@@ -252,6 +440,15 @@ const PizzaCanvas = ({
   const sauceTex = textured ? `url(#${ids.sauceTex})` : undefined;
   const cheeseTex = textured ? `url(#${ids.cheeseTex})` : undefined;
 
+  const isSlicingMode = sliceMode !== 'none';
+  const wedgeCount = SLICE_COUNTS[size] ?? SLICE_COUNTS.medium;
+  const wedgeClipId = (i) => `${ids.crust}-wedge-${i}`;
+  const wedgeClipRadius = crustStyle.outerR + 6; // a hair past the rim so the shadow/edge isn't clipped
+  // 'loop' keeps the pizza gently turning the whole time, same mechanism the
+  // idle demo pie already used — a slice/reassemble cycle with no rotation
+  // reads as mechanical; a slow constant turn is what makes it feel alive.
+  const shouldAutoRotate = idle || sliceMode === 'loop';
+
   return (
     <div className={styles.wrap}>
       <svg viewBox="0 0 320 320" className={styles.canvas} role="img" aria-label="Live pizza preview">
@@ -373,13 +570,20 @@ const PizzaCanvas = ({
           <filter id={ids.toppingShadow} x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="0" dy="1.2" stdDeviation="1" floodColor="#000" floodOpacity="0.4" />
           </filter>
+
+          {isSlicingMode &&
+            Array.from({ length: wedgeCount }, (_, i) => (
+              <clipPath key={i} id={wedgeClipId(i)}>
+                <path d={wedgeSectorPath(i, wedgeCount, wedgeClipRadius)} />
+              </clipPath>
+            ))}
         </defs>
 
         <motion.g
           style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-          animate={{ scale, rotate: idle ? 360 : 0 }}
+          animate={{ scale, rotate: shouldAutoRotate ? 360 : 0 }}
           transition={
-            idle
+            shouldAutoRotate
               ? {
                   rotate: { repeat: Infinity, ease: 'linear', duration: 60 },
                   scale: { type: 'spring', stiffness: 120, damping: 24 },
@@ -387,76 +591,100 @@ const PizzaCanvas = ({
               : { scale: { type: 'spring', stiffness: 120, damping: 24 } }
           }
         >
-          {/* Crust */}
-          <circle cx={CENTER} cy={CENTER} r={crustStyle.outerR} fill={`url(#${ids.crust})`} filter={`url(#${ids.shadow})`} />
+          {isSlicingMode ? (
+            // Sliced view: the same pizza, cut into wedges that pull apart and
+            // reassemble. See SliceWedge above for why this is a deliberately
+            // simplified render rather than reusing the interactive content
+            // below (no drag handlers make sense on a pizza that's mid-cut).
+            Array.from({ length: wedgeCount }, (_, i) => (
+              <SliceWedge
+                key={i}
+                index={i}
+                count={wedgeCount}
+                phase={phase}
+                clipId={wedgeClipId(i)}
+                crustStyle={crustStyle}
+                ids={ids}
+                sauceType={sauceType}
+                sauceGradientId={sauceGradientId}
+                cheeseLayers={cheeseLayers}
+                pieces={pieces}
+              />
+            ))
+          ) : (
+            <>
+              {/* Crust */}
+              <circle cx={CENTER} cy={CENTER} r={crustStyle.outerR} fill={`url(#${ids.crust})`} filter={`url(#${ids.shadow})`} />
 
-          {/* Char spots scattered along the rim, density tied to bake level */}
-          {bakeLevel.chars > 0 &&
-            CHAR_SLOTS.slice(0, bakeLevel.chars).map((slot, i) => {
-              const rim = (crustStyle.outerR + crustStyle.innerR) / 2;
-              const cx = CENTER + Math.cos(slot.angle) * rim;
-              const cy = CENTER + Math.sin(slot.angle) * rim;
-              return (
-                <ellipse
-                  key={i}
-                  cx={cx}
-                  cy={cy}
-                  rx={2 + slot.jitter * 2}
-                  ry={1.4 + slot.jitter * 1.4}
-                  fill="rgba(70, 38, 16, 0.55)"
-                  transform={`rotate(${slot.angle * (180 / Math.PI)} ${cx} ${cy})`}
-                />
-              );
-            })}
+              {/* Char spots scattered along the rim, density tied to bake level */}
+              {bakeLevel.chars > 0 &&
+                CHAR_SLOTS.slice(0, bakeLevel.chars).map((slot, i) => {
+                  const rim = (crustStyle.outerR + crustStyle.innerR) / 2;
+                  const cx = CENTER + Math.cos(slot.angle) * rim;
+                  const cy = CENTER + Math.sin(slot.angle) * rim;
+                  return (
+                    <ellipse
+                      key={i}
+                      cx={cx}
+                      cy={cy}
+                      rx={2 + slot.jitter * 2}
+                      ry={1.4 + slot.jitter * 1.4}
+                      fill="rgba(70, 38, 16, 0.55)"
+                      transform={`rotate(${slot.angle * (180 / Math.PI)} ${cx} ${cy})`}
+                    />
+                  );
+                })}
 
-          {/* Stuffed-crust cheese ring peeking from the rim */}
-          {crustStyle.stuffed &&
-            STUFFED_SLOTS.map((slot, i) => {
-              const rim = (crustStyle.outerR + crustStyle.innerR) / 2 + 1;
-              const cx = CENTER + Math.cos(slot.angle) * rim;
-              const cy = CENTER + Math.sin(slot.angle) * rim;
-              return <circle key={i} cx={cx} cy={cy} r={4 + slot.jitter * 1.5} fill="#ffdf8a" stroke="#e8b94f" strokeWidth="0.6" />;
-            })}
+              {/* Stuffed-crust cheese ring peeking from the rim */}
+              {crustStyle.stuffed &&
+                STUFFED_SLOTS.map((slot, i) => {
+                  const rim = (crustStyle.outerR + crustStyle.innerR) / 2 + 1;
+                  const cx = CENTER + Math.cos(slot.angle) * rim;
+                  const cy = CENTER + Math.sin(slot.angle) * rim;
+                  return <circle key={i} cx={cx} cy={cy} r={4 + slot.jitter * 1.5} fill="#ffdf8a" stroke="#e8b94f" strokeWidth="0.6" />;
+                })}
 
-          <circle cx={CENTER} cy={CENTER} r={crustStyle.innerR} fill={`url(#${ids.crustInner})`} filter={crustTex} />
+              <circle cx={CENTER} cy={CENTER} r={crustStyle.innerR} fill={`url(#${ids.crustInner})`} filter={crustTex} />
 
-          {/* Base layers fade in/out as sauce/cheese are toggled */}
-          <AnimatePresence>
-            {sauceType && sauceType !== 'none' && (
-              <Layer key="sauce" r={crustStyle.innerR - 4} fill={`url(#${sauceGradientId})`} filter={sauceTex} />
-            )}
-            {cheeseLayers.map((layer, i) =>
-              layer.on ? (
-                <Layer
-                  key={layer.key}
-                  r={crustStyle.innerR - 8 - i * 2}
-                  fill={`url(#${layer.gradientId})`}
-                  opacity={layer.opacity}
-                  filter={cheeseTex}
-                />
-              ) : null
-            )}
-          </AnimatePresence>
+              {/* Base layers fade in/out as sauce/cheese are toggled */}
+              <AnimatePresence>
+                {sauceType && sauceType !== 'none' && (
+                  <Layer key="sauce" r={crustStyle.innerR - 4} fill={`url(#${sauceGradientId})`} filter={sauceTex} />
+                )}
+                {cheeseLayers.map((layer, i) =>
+                  layer.on ? (
+                    <Layer
+                      key={layer.key}
+                      r={crustStyle.innerR - 8 - i * 2}
+                      fill={`url(#${layer.gradientId})`}
+                      opacity={layer.opacity}
+                      filter={cheeseTex}
+                    />
+                  ) : null
+                )}
+              </AnimatePresence>
 
-          {/* Toppings, splattered, each with a soft shadow. Drag any piece to
-              nudge it exactly where you want (editable / builder mode only). */}
-          <g ref={layerRef} filter={`url(#${ids.toppingShadow})`}>
-            <AnimatePresence>
-              {pieces.map((piece) => {
-                const pos = overrides[piece.id] ?? piece;
-                return (
-                  <ToppingPiece
-                    key={piece.id}
-                    piece={piece}
-                    pos={pos}
-                    editable={editable}
-                    onPointerDown={handlePointerDown}
-                    dragging={draggingId === piece.id}
-                  />
-                );
-              })}
-            </AnimatePresence>
-          </g>
+              {/* Toppings, splattered, each with a soft shadow. Drag any piece to
+                  nudge it exactly where you want (editable / builder mode only). */}
+              <g ref={layerRef} filter={`url(#${ids.toppingShadow})`}>
+                <AnimatePresence>
+                  {pieces.map((piece) => {
+                    const pos = overrides[piece.id] ?? piece;
+                    return (
+                      <ToppingPiece
+                        key={piece.id}
+                        piece={piece}
+                        pos={pos}
+                        editable={editable}
+                        onPointerDown={handlePointerDown}
+                        dragging={draggingId === piece.id}
+                      />
+                    );
+                  })}
+                </AnimatePresence>
+              </g>
+            </>
+          )}
         </motion.g>
       </svg>
     </div>

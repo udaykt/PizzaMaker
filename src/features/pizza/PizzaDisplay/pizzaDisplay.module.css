@@ -36,18 +36,6 @@
   border-color: var(--glass-border);
 }
 
-.slices {
-  display: flex;
-  width: 200px;
-  height: 200px;
-}
-
-@keyframes spin {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 @media screen and (max-width: 1360px) {
   .pizza {
     width: min(360px, 90vw);

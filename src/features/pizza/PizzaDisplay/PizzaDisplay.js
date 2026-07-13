@@ -21,6 +21,7 @@ const HINT_DISMISSED_KEY = 'pizzamaker_drag_hint_dismissed';
 
 const PizzaDisplay = () => {
   const loggedIn = useSelector((state) => state.auth.loggedIn);
+  const isSlicing = useSelector((state) => state.pizza.isSlicing);
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
@@ -38,7 +39,7 @@ const PizzaDisplay = () => {
     <div className={styles.pizza}>
       {loggedIn ? (
         <>
-          <PizzaCanvas editable />
+          <PizzaCanvas editable sliceMode={isSlicing ? 'once' : 'none'} />
           {showHint && (
             <button className={styles.dragHint} onClick={dismissHint}>
               Drag any topping to place it exactly where you want
