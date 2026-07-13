@@ -8,6 +8,7 @@ import com.pizzamaker.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,13 @@ import org.springframework.stereotype.Component;
 // Both listeners share one consumer group, so across N pods each message is
 // handled exactly once — these are competing consumers doing work, unlike the
 // broadcast listener that fans WebSocket pushes out to every pod.
+// @Lazy(false) is load-bearing, not decoration: spring.main.lazy-initialization is
+// true, and a lazy bean is never instantiated at startup, so the
+// KafkaListenerAnnotationBeanPostProcessor would never see it and the listener
+// container would never be registered. The app would boot cleanly and silently
+// consume nothing. OutboxRelay carries the same guard for @Scheduled.
 @Component
+@Lazy(false)
 @ConditionalOnProperty(prefix = "app.kafka", name = "enabled", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j

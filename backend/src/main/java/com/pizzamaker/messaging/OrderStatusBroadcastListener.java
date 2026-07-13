@@ -5,6 +5,7 @@ import com.pizzamaker.event.OrderStatusChangedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -38,7 +39,11 @@ import org.springframework.stereotype.Component;
 // any session, and this whole broadcast dance disappears. Deliberately not built
 // — it means running a second broker alongside Kafka to serve a demo app. This is
 // a conscious trade-off, not an oversight. See README.
+// @Lazy(false): see OrderLifecycleListener — under lazy-initialization a listener
+// bean that is never instantiated is never registered, and the app boots happily
+// consuming nothing.
 @Component
+@Lazy(false)
 @ConditionalOnProperty(prefix = "app.kafka", name = "enabled", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j
