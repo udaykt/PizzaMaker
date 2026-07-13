@@ -123,7 +123,11 @@ public class SecurityConfig {
                 : List.of("http://localhost:3000");
         config.setAllowedOrigins(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Content-Type", "Authorization"));
+        // Idempotency-Key: sent by the checkout flow so a retried/duplicated
+        // order request is deduped server-side (see OrderService.placeOrder).
+        // Without it in this allow-list, the browser's CORS preflight rejects
+        // the header before the request is ever sent.
+        config.setAllowedHeaders(List.of("Content-Type", "Authorization", "Idempotency-Key"));
         config.setAllowCredentials(true);
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", config);

@@ -46,8 +46,14 @@ const buildOrderPayload = (orderState) => {
   return payload;
 };
 
-const createOrder = async (_user, orderState) => {
-  const { data } = await api.post('/api/v1/orders', buildOrderPayload(orderState));
+// idempotencyKey is forwarded as the Idempotency-Key header the backend already
+// keys a unique index on: if this exact request is ever sent twice (a double
+// click racing the click-guard in Checkout, a browser retry, etc.) the backend
+// returns the original order instead of creating a second one.
+const createOrder = async (idempotencyKey, orderState) => {
+  const { data } = await api.post('/api/v1/orders', buildOrderPayload(orderState), {
+    headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : undefined,
+  });
   store.dispatch(orderActions.setCurrentOrder(data));
   toast.success(`Order #${data.oid} placed! We're making your pizza.`);
   return data;

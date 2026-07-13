@@ -99,7 +99,8 @@ public class OrderService {
         recordStatusChange(saved, null, saved.getStatus(), saved.getCreatedBy());
 
         meterRegistry.counter("pizza.orders.placed", "size", saved.getPizzaSize().name()).increment();
-        // Business event — identified by oid (not the customer's email) to keep logs PII-free.
+        // Business event — identified by oid (not the customer's email) to keep logs
+        // PII-free.
         log.info("Order placed oid={} size={} amount={} delivery={}",
                 saved.getOid(), saved.getPizzaSize(), saved.getPrice(), saved.getDeliveryMethod());
 
@@ -144,7 +145,8 @@ public class OrderService {
     // regular. The allow-list now lives in the topping table (CatalogService),
     // not a hardcoded Set.
     private List<ToppingSelection> sanitizeToppings(List<ToppingSelection> requested) {
-        if (requested == null) return List.of();
+        if (requested == null)
+            return List.of();
         Set<String> allowed = catalogService.activeToppingCodes();
         List<ToppingSelection> result = new ArrayList<>();
         for (ToppingSelection t : requested) {
@@ -198,7 +200,7 @@ public class OrderService {
         if (!from.canTransitionTo(to)) {
             throw new IllegalArgumentException(
                     "Invalid status transition: cannot move from " + from + " to " + to +
-                    ". Transitions must be forward-only.");
+                            ". Transitions must be forward-only.");
         }
 
         return OrderMapper.toResponse(applyTransition(order, from, to));
@@ -260,7 +262,6 @@ public class OrderService {
                 page.getNumber(),
                 page.getSize(),
                 page.getTotalElements(),
-                page.getTotalPages()
-        );
+                page.getTotalPages());
     }
 }

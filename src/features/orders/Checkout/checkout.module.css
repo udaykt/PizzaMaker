@@ -3,17 +3,38 @@
   margin: 0 auto;
   padding: 10px 0 20px;
   display: flex;
-  align-items: center;
+  /* Both columns are their own bounded, self-scrolling boxes, so stretch them
+     to a common height and let each manage its own overflow. Nothing here
+     scrolls the page. */
+  align-items: stretch;
   justify-content: center;
   gap: 28px;
+  /* The two columns share one height budget: the dashboard's visible area.
+     Without this the card can't compute a percentage height to scroll within. */
+  height: min(620px, 72vh);
+  max-height: 100%;
+}
+
+/* Left column: pizza centred in the block, actions pinned beneath it. */
+.leftPane {
+  flex-shrink: 0;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* The pizza area flexes to fill whatever's left after the buttons, and the
+     canvas centres inside it — so the pizza sits at the true centre of this
+     block rather than being pushed off-centre by the buttons below it. */
+  justify-content: center;
+  gap: 20px;
 }
 
 .previewPanel {
   position: relative;
   z-index: 0; /* own stacking context, so the glow below is reliably behind the canvas */
-  flex-shrink: 0;
-  width: 300px;
-  height: 300px;
+  flex: 1;
+  min-height: 0; /* lets it actually shrink inside the flex column */
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -21,23 +42,66 @@
 
 .previewGlow {
   position: absolute;
-  inset: 0;
+  /* Square, centred, and tied to the shorter axis so the glow stays a circle
+     behind the pizza instead of stretching into an ellipse as the pane flexes. */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(100%, 300px);
+  aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 107, 0, 0.22) 0%, rgba(255, 107, 0, 0.06) 55%, transparent 75%);
   filter: blur(4px);
   z-index: -1;
 }
 
+/* Right column: fixed head, scrolling body, pinned foot. */
 .ticketCard {
   flex: 1;
   max-width: 380px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
   padding: 22px 22px 18px;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  /* hidden, not auto: the card itself must never scroll — only .ticketBody
+     inside it does. */
+  overflow: hidden;
+}
+
+/* Pizza name + delivery toggle. Never scrolls: it's the "what am I buying"
+   anchor. */
+.ticketHead {
+  flex-shrink: 0;
+}
+
+/* The only part that scrolls — size, crust and the line items, which is what
+   grows without bound as toppings are added. */
+.ticketBody {
+  flex: 1;
+  min-height: 0; /* required, or a flex child refuses to shrink below content size and overflows instead of scrolling */
+  overflow-y: auto;
+  padding-right: 6px; /* keeps the scrollbar off the price column */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 107, 0, 0.4) transparent;
+}
+
+.ticketBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ticketBody::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 0, 0.4);
+  border-radius: 3px;
+}
+
+/* Total. Pinned, because the price is the last thing that should scroll away. */
+.ticketFoot {
+  flex-shrink: 0;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .ticketHeader {
@@ -132,10 +196,12 @@
   color: #ff6b00;
 }
 
+/* Lives under the pizza in the left pane now, not inside the ticket card. */
 .checkoutButtons {
+  flex-shrink: 0;
+  width: 100%;
   display: flex;
   gap: 14px;
-  margin-top: 18px;
 }
 
 .customizeButton,
@@ -216,15 +282,27 @@
   background: rgba(255, 107, 0, 0.2);
 }
 
+/* Stacked layout: the columns sit one above the other and the whole page
+   scrolls as one, which is the normal mobile pattern. All the inner
+   scroll/height plumbing above is unwound — nested scroll regions inside a
+   scrolling page are miserable to use on a touchscreen. */
 @media screen and (max-width: 768px) {
   .checkout {
     flex-direction: column;
     align-items: center;
     gap: 20px;
     width: 100%;
+    height: auto;
+    max-height: none;
+  }
+
+  .leftPane {
+    width: 100%;
+    max-width: 320px;
   }
 
   .previewPanel {
+    flex: none;
     width: 240px;
     height: 240px;
   }
@@ -232,5 +310,11 @@
   .ticketCard {
     width: 92vw;
     max-width: 100%;
+    overflow: visible;
+  }
+
+  .ticketBody {
+    overflow-y: visible;
+    padding-right: 0;
   }
 }
