@@ -185,6 +185,8 @@ public class OrderService {
         return toPageResponse(page);
     }
 
+    // Admin-driven transition. An illegal move is a client error and throws — the
+    // admin asked for something impossible and deserves to be told.
     @Transactional
     public OrderResponse updateStatus(String oid, UpdateStatusRequest request) {
         Order order = orderRepository.findByOid(oid)
@@ -199,6 +201,43 @@ public class OrderService {
                     ". Transitions must be forward-only.");
         }
 
+        return OrderMapper.toResponse(applyTransition(order, from, to));
+    }
+
+    // Pipeline-driven transition, called by the Kafka lifecycle consumer.
+    //
+    // Identical to updateStatus() except that an illegal move RETURNS FALSE
+    // instead of throwing, and that difference is the entire idempotency story for
+    // at-least-once delivery. Kafka can hand the same message to us twice (a
+    // consumer that crashed after doing the work but before committing its
+    // offset), and an admin can move the order forward while a hop is in flight.
+    // In both cases the transition we were asked for is no longer legal from the
+    // order's current state — which is not an error, it's the guard working. We
+    // log it and skip, rather than writing a duplicate history row, re-pushing a
+    // stale status to the customer, or dead-lettering a message that was simply
+    // late.
+    //
+    // A genuinely unknown oid still throws (ResourceNotFoundException), and the
+    // error handler classifies that as non-retryable -> straight to the DLT.
+    @Transactional
+    public boolean advanceStatusIfPossible(String oid, OrderStatus target) {
+        Order order = orderRepository.findByOid(oid)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + oid));
+
+        OrderStatus from = order.getStatus();
+        if (!from.canTransitionTo(target)) {
+            return false;
+        }
+
+        applyTransition(order, from, target);
+        return true;
+    }
+
+    // The order's @Version column means two pods advancing the same order at once
+    // is safe: one commits, the other fails with an optimistic-lock exception,
+    // which is transient and therefore retried — and on the retry canTransitionTo
+    // sees the already-advanced status and skips. No double transition.
+    private Order applyTransition(Order order, OrderStatus from, OrderStatus to) {
         order.setStatus(to);
         Order saved = orderRepository.save(order);
 
@@ -212,7 +251,7 @@ public class OrderService {
                 new OrderStatusChangedEvent(saved.getUser().getEmailId(), saved.getOid(),
                         saved.getUser().getUid(), to));
 
-        return OrderMapper.toResponse(saved);
+        return saved;
     }
 
     private PageResponse<OrderResponse> toPageResponse(Page<Order> page) {
