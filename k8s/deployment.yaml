@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pizzamaker-api
+  labels:
+    app: pizzamaker-api
+spec:
+  # Two replicas on purpose. This is the configuration that would silently break
+  # the WebSocket push if the status-change consumer used a shared consumer group:
+  # Kafka would hand each status change to one pod, and that pod usually isn't the
+  # one holding the customer's socket. OrderStatusBroadcastListener gives every pod
+  # its own group id so all of them see every status change. Scaling to 2 is what
+  # proves that design, so don't quietly drop it back to 1.
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pizzamaker-api
+  template:
+    metadata:
+      labels:
+        app: pizzamaker-api
+    spec:
+      containers:
+        - name: api
+          image: pizzamaker-api:local
+          # Never: the image is side-loaded into minikube's docker daemon with
+          # `minikube image load`. With the default (Always for a :latest-ish tag)
+          # the kubelet would try to pull it from Docker Hub, not find it, and sit
+          # in ImagePullBackOff forever.
+          imagePullPolicy: Never
+
+          ports:
+            - name: http
+              containerPort: 8080
+
+          envFrom:
+            - configMapRef:
+                name: pizzamaker-config
+            - secretRef:
+                name: pizzamaker-secrets
+
+          # Liveness: is the JVM wedged? Restart it.
+          # Readiness: can it serve traffic yet? Flyway migrations and the Kafka
+          # consumer group join both happen at startup, so a pod is up long before
+          # it is ready — sending it traffic in between would 500.
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          # Gives the JVM up to 60s (12 x 5s) to boot before the liveness probe is
+          # allowed to start killing it. Without this a slow first start on a cold
+          # minikube gets stuck in a restart loop.
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 5
+            failureThreshold: 12
+
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              # No CPU limit on purpose — a throttled JVM during startup is the
+              # classic cause of probe timeouts. Memory IS limited, because an OOM
+              # should kill the pod rather than the node.
+              memory: "1Gi"
+
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+
+      # Let in-flight HTTP requests and WebSocket frames finish before SIGKILL.
+      terminationGracePeriodSeconds: 30

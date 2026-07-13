@@ -1,0 +1,33 @@
+PizzaMaker API is installed as release "{{ .Release.Name }}" ({{ .Values.replicaCount }} replica(s)).
+
+Get the URL:
+
+    minikube service {{ include "pizzamaker.fullname" . }} --url
+
+Watch the pods come up (readiness waits for Flyway + the Kafka group join):
+
+    kubectl get pods -l app.kubernetes.io/instance={{ .Release.Name }} -w
+
+{{ if .Values.kafka.enabled }}
+Kafka is ENABLED, pointing at {{ .Values.kafka.bootstrapServers }}.
+
+Place an order, then watch it walk itself PENDING -> CONFIRMED -> PREPARING ->
+READY without anyone touching the admin endpoint:
+
+    kubectl logs -l app.kubernetes.io/instance={{ .Release.Name }} -f | grep "status"
+
+If pods are stuck in CrashLoopBackOff with OOMKilled, minikube is too small for a
+Kafka broker. Restart it with headroom:
+
+    minikube delete && minikube start --memory=4096 --cpus=4
+{{ else }}
+Kafka is DISABLED. The outbox dispatches in-process, which is a supported mode —
+but nothing auto-advances orders, so they stay PENDING until an admin calls
+PUT /api/v1/orders/{oid}/status.
+{{ end }}
+WARNING: this release used the demo secrets from values.yaml. Override them for
+anything that isn't a local cluster:
+
+    helm upgrade {{ .Release.Name }} ./helm/pizzamaker \
+      --set secrets.jwtSecret="$(openssl rand -base64 32)" \
+      --set secrets.databasePassword="$(openssl rand -base64 24)"

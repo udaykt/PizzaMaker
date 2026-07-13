@@ -1,0 +1,108 @@
+# Single-node Kafka in KRaft mode (no Zookeeper) for a local cluster.
+#
+# MEMORY BUDGET — read this before you file a bug about the pod dying.
+# Kafka is a JVM and it is not shy. With the default minikube VM (2 CPU / 2GB) you
+# are trying to fit Kafka (~1GB), Postgres (~256MB) and two API pods (~512MB each)
+# into 2GB, and the kernel OOM-killer will reap Kafka first — it shows up as a pod
+# in CrashLoopBackOff with reason: OOMKilled and no useful log line.
+#
+# Start minikube with headroom:
+#     minikube start --memory=4096 --cpus=4
+#
+# The 1Gi limit below is a floor, not a suggestion: KAFKA_HEAP_OPTS is pinned to
+# 512MB so the JVM heap stays well inside it and leaves room for the off-heap page
+# cache Kafka leans on.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: bitnami/kafka:3.7
+          ports:
+            - name: kafka
+              containerPort: 9092
+          env:
+            - name: KAFKA_CFG_NODE_ID
+              value: "1"
+            - name: KAFKA_CFG_PROCESS_ROLES
+              value: "broker,controller"
+            - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS
+              value: "1@localhost:9093"
+            - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
+              value: "CONTROLLER"
+
+            # Advertised as the in-cluster service name, because that is the
+            # address the API pods must be able to reconnect to. Advertising
+            # localhost here is the classic mistake: the broker would tell each
+            # client "reach me at localhost", and the client would then try to
+            # connect to itself.
+            - name: KAFKA_CFG_LISTENERS
+              value: "PLAINTEXT://:9092,CONTROLLER://:9093"
+            - name: KAFKA_CFG_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://kafka:9092"
+            - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
+            - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
+              value: "PLAINTEXT"
+
+            # One broker, so nothing can be replicated further than it.
+            - name: KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "1"
+            - name: ALLOW_PLAINTEXT_LISTENER
+              value: "yes"
+            - name: KAFKA_HEAP_OPTS
+              value: "-Xms256m -Xmx512m"
+
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "kafka-topics.sh --bootstrap-server localhost:9092 --list"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 6
+
+          resources:
+            requests:
+              memory: "768Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/kafka
+      volumes:
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+spec:
+  selector:
+    app: kafka
+  ports:
+    - port: 9092
+      targetPort: kafka

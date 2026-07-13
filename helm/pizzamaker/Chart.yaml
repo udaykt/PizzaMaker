@@ -1,0 +1,17 @@
+apiVersion: v2
+name: pizzamaker
+description: PizzaMaker API — Spring Boot backend with a Kafka-driven order lifecycle and STOMP push
+type: application
+
+# Chart version: bumped when the templates change.
+version: 0.1.0
+
+# The application version this chart deploys by default (the image tag).
+appVersion: "1.0.0"
+
+keywords:
+  - spring-boot
+  - kafka
+  - websocket
+maintainers:
+  - name: Uday
