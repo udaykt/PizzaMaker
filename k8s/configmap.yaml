@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pizzamaker-config
+  labels:
+    app: pizzamaker-api
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+
+  # In-cluster DNS: <service>.<namespace>.svc.cluster.local, shortened to the
+  # service name since everything here lives in one namespace.
+  DATABASE_URL: "jdbc:postgresql://postgres:5432/pizzadb"
+  DATABASE_USERNAME: "pizzauser"
+
+  # Turns on the Kafka path (outbox -> Kafka -> lifecycle consumer -> STOMP push).
+  # Set to "false" and the backend still works — the outbox just dispatches
+  # in-process and orders stop auto-advancing.
+  KAFKA_ENABLED: "true"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+
+  ALLOWED_ORIGINS: "http://localhost:3000"
+
+  # Splits /actuator/health into /health/liveness and /health/readiness, which is
+  # what the probes below hit. Boot usually infers this on Kubernetes; setting it
+  # explicitly means the manifests don't depend on that inference.
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"

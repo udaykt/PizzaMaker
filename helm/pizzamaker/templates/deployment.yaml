@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pizzamaker.fullname" . }}
+  labels:
+    {{- include "pizzamaker.labels" . | nindent 4 }}
+spec:
+  # More than one replica is the interesting case, and the one this design was
+  # built for: OrderStatusBroadcastListener gives each pod its own Kafka consumer
+  # group so every pod sees every status change and can push to the WebSocket
+  # sessions it holds. A shared group here would deliver each status change to a
+  # single pod — usually the wrong one — and pushes would vanish.
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "pizzamaker.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "pizzamaker.selectorLabels" . | nindent 8 }}
+      annotations:
+        # Rolls the pods whenever the config or secret content changes. Without
+        # this, `helm upgrade` rewrites the ConfigMap but the running pods keep
+        # their old environment (env vars are read once, at container start) and
+        # you get a "config change did nothing" mystery.
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - name: http
+              containerPort: 8080
+
+          envFrom:
+            - configMapRef:
+                name: {{ include "pizzamaker.fullname" . }}-config
+            - secretRef:
+                name: {{ include "pizzamaker.fullname" . }}-secrets
+
+          # Readiness is separate from liveness for a reason: Flyway migrations and
+          # the Kafka consumer-group join both happen during startup, so the pod is
+          # alive well before it can serve a request. Conflating the two sends
+          # traffic to a pod that will 500.
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          # Up to 60s to boot before liveness is allowed to start killing it —
+          # otherwise a slow cold start on minikube becomes a restart loop.
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 5
+            failureThreshold: 12
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+
+      # Time for in-flight requests and open WebSocket frames to drain on SIGTERM.
+      terminationGracePeriodSeconds: 30

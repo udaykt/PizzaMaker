@@ -5,6 +5,7 @@
 ---
 
 ## Table of Contents
+
 1. [Tech Stack](#tech-stack)
 2. [System Architecture](#system-architecture)
 3. [Auth Flow](#auth-flow)
@@ -23,21 +24,24 @@
 
 ## Tech Stack
 
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| Frontend | React 18 + Redux Toolkit | Industry standard, concurrent rendering |
-| Routing | React Router v5 | Client-side SPA routing |
-| HTTP Client | Axios + interceptors | JWT attach, 401 auto-logout |
-| Real-time | STOMP over SockJS | WebSocket with graceful fallback |
-| Notifications | react-hot-toast | Lightweight, accessible toasts |
-| Backend | Spring Boot 3.3.5 + Java 21 | Production-grade, FAANG standard |
-| Security | Spring Security 6 + JWT (jjwt) | Stateless, interview-ready |
-| ORM | Spring Data JPA (Hibernate) | Standard relational data access |
-| Database (dev) | H2 in-memory | Zero setup for local dev |
-| Database (prod) | PostgreSQL on Neon (serverless) | Free, resume-worthy, scalable |
-| Migrations | Flyway | Version-controlled schema |
-| API Docs | Springdoc OpenAPI / Swagger UI | Auto-generated, testable |
-| Async | Spring `@Async` + ThreadPoolTaskExecutor | Non-blocking notification simulation |
+| Layer           | Technology                               | Why                                     |
+| --------------- | ---------------------------------------- | --------------------------------------- |
+| Frontend        | React 18 + Redux Toolkit                 | Industry standard, concurrent rendering |
+| Routing         | React Router v5                          | Client-side SPA routing                 |
+| HTTP Client     | Axios + interceptors                     | JWT attach, 401 auto-logout             |
+| Real-time       | STOMP over SockJS                        | WebSocket with graceful fallback        |
+| Notifications   | react-hot-toast                          | Lightweight, accessible toasts          |
+| Backend         | Spring Boot 3.3.5 + Java 21 (LTS)        | Production-grade; 21 is what Boot 3.3 supports |
+| Security        | Spring Security 6 + JWT (jjwt)           | Stateless, interview-ready              |
+| ORM             | Spring Data JPA (Hibernate)              | Standard relational data access         |
+| Database (dev)  | H2 in-memory                             | Zero setup for local dev                |
+| Database (prod) | PostgreSQL on Neon (serverless)          | Free, resume-worthy, scalable           |
+| Migrations      | Flyway                                   | Version-controlled schema               |
+| API Docs        | Springdoc OpenAPI / Swagger UI           | Auto-generated, testable                |
+| Event log       | Apache Kafka (KRaft, no Zookeeper)       | Durable, replayable, fans out to future consumers |
+| Event delivery  | Transactional Outbox + polling relay     | Kills the dual-write problem — see below |
+| Resilience      | Resilience4j retry + circuit breaker     | Transient downstream failures don't cascade |
+| Orchestration   | Kubernetes + Helm                        | Multi-replica with health probes        |
 
 ---
 
@@ -182,23 +186,110 @@ buildOrderPayload(orderState) maps Redux → OrderRequest:
          │
          ▼
 POST /api/v1/orders  (Bearer token attached by interceptor)
+                     (optional Idempotency-Key header)
          │
          ▼
-OrderService.placeOrder():
-  1. Load User from DB by email
-  2. Build Order entity with UUID oid
-  3. Save to orders table (status = PENDING)
-  4. @Async NotificationService.sendOrderConfirmation() — simulates email
-  5. Return OrderResponse
+OrderService.placeOrder()  ─── ONE @Transactional BLOCK ────────────────┐
+                                                                        │
+  1. Idempotency check — a repeated Idempotency-Key returns the         │
+     ORIGINAL order. Double-clicking "Order" must not buy two pizzas.   │
+     The unique index on idempotency_key is the real guarantee; this    │
+     lookup is just the fast path.                                      │
+                                                                        │
+  2. sanitizeToppings() — every topping id is checked against the       │
+     active catalog. A tampered request is rejected, not accepted.      │
+                                                                        │
+  3. PricingService.computeTotal() — priced SERVER-SIDE. The client     │
+     sends a price; we ignore it.                                       │
+                                                                        │
+  4. INSERT orders                   (status = PENDING)                 │
+     INSERT order_line_items         (receipt snapshot — survives       │
+                                      later price changes)              │
+     INSERT order_status_history     (null -> PENDING)                  │
+                                                                        │
+  5. INSERT outbox_event             (ORDER_PLACED)  ◄── THE KEY MOVE   │
+                                                                        │
+  ──────────────────────────────────────────────────────────────────────┘
+         │  commit
+         ▼
+   Return OrderResponse (status = PENDING) — the customer is done waiting.
          │
          ▼
-Redux: orderActions.setCurrentOrder(data)
-toast.success("Order #abc123 placed!")
-Navigate to /confirm
-         │
-         ▼
-Modal (receipt): shows oid, size, toppings, status=PENDING
-Two buttons: "View Orders" | "Back to Menu"
+Redux: orderActions.setCurrentOrder(data) → receipt modal
+
+
+─── WHY STEP 5 IS A DATABASE ROW AND NOT A KAFKA SEND ─────────────────
+
+The naive version is a DUAL WRITE — two systems, no shared transaction:
+
+    orderRepository.save(order);              // system 1: Postgres
+    kafkaTemplate.send("orders.placed", e);   // system 2: Kafka     ❌
+
+The process can die between those two lines, and there is no try/catch
+that fixes it:
+
+    send OK  → commit fails  ⇒ the kitchen cooks an order that does not exist
+    commit OK → send fails   ⇒ the customer is charged and NOTHING happens
+
+The transactional outbox writes to ONE system instead of two. The order
+row and the event row are the same commit — the event exists if and only
+if the order does. A separate relay then moves it to Kafka.
+
+─── THE RELAY ──────────────────────────────────────────────────────────
+
+OutboxRelay  @Scheduled(fixedDelay = 2s)
+  │
+  ├─ claims a batch: SELECT ... FOR UPDATE SKIP LOCKED
+  │     SKIP LOCKED (not a bare FOR UPDATE) is what lets N pods each
+  │     claim a DIFFERENT batch instead of queueing behind one another.
+  │
+  ├─ OutboxDispatcher → KafkaOrderEventPublisher
+  │     kafkaTemplate.send(topic, orderId, event).get(timeout)
+  │                              ^^^^^^^ keyed, so one order's events
+  │                                      share a partition and stay ordered
+  │
+  │     The .get() is deliberate. The send is async; if we didn't block,
+  │     the row would be marked PROCESSED before the broker confirmed it,
+  │     and a broker outage would silently eat the event.
+  │
+  ├─ ack received  → row = PROCESSED
+  └─ send failed   → attempts++, exponential backoff (2s/4s/8s/16s),
+                     FAILED after 5 tries. Never silently dropped.
+
+─── THE KITCHEN (Kafka consumer) ───────────────────────────────────────
+
+orders.placed
+  │
+  ▼
+OrderLifecycleListener.onOrderPlaced()
+  ├─ NotificationService.sendOrderConfirmation()
+  └─ emit OrderLifecycleEvent(oid, CONFIRMED, hop=1) ──┐
+                                                       │ (after a short
+                                                       │  delay, scheduled
+   ┌───────────────────────────────────────────────────┘  OFF the consumer
+   ▼                                                      thread)
+orders.lifecycle
+  │
+  ▼
+OrderLifecycleListener.onLifecycleStage()
+  ├─ hop > maxHops?  → NonRetryableEventException → DLT   (loop fuse)
+  │
+  ├─ orderService.advanceStatusIfPossible(oid, target)
+  │     └─ !canTransitionTo(target)?  → log + SKIP, not an error.
+  │        This is the IDEMPOTENCY GUARD. Kafka is at-least-once, so a
+  │        redelivered message must not double-apply. And if an admin
+  │        moved the order first, they win and our hop no-ops.
+  │
+  └─ emit the next stage → orders.lifecycle  (self-perpetuating)
+
+     CONFIRMED → PREPARING → READY → stop.
+     (DELIVERED is a courier's act, so it stays admin-driven.)
+
+  NOTE: the stage delay is scheduled on a TaskScheduler, NOT Thread.sleep()
+  inside the listener. Sleeping in a @KafkaListener holds the consumer
+  thread, stalls every partition assigned to it, and once it exceeds
+  max.poll.interval.ms the broker evicts the member and rebalances the
+  whole group.
 ```
 
 ---
@@ -211,85 +302,139 @@ Two buttons: "View Orders" | "Back to Menu"
 useOrderUpdates hook activates:
   new Client({ webSocketFactory: () => new SockJS('/ws') })
   client.activate()
-  onConnect → client.subscribe('/topic/orders', handler)
+  onConnect → client.subscribe('/user/queue/orders', handler)
+                                ^^^^^ per-USER destination, not a topic
+
+StompAuthChannelInterceptor validates the JWT on the STOMP CONNECT frame,
+so Spring knows the principal and can route /user/** to the right session.
 
 Green pulsing "Live" dot shown in Orders page header
 
-─── When admin updates order status ────────────────────────────────
+─── A status change happens ────────────────────────────────────────
 
-Admin Panel: PUT /api/v1/orders/{oid}/status  { status: "PREPARING" }
-                    │
-                    ▼
-          OrderService.updateStatus():
-            1. Find order by oid
-            2. order.setStatus(PREPARING)
-            3. orderRepository.save(order)
-            4. messagingTemplate.convertAndSend(
-                 "/topic/orders",
-                 OrderStatusUpdate(oid, userUid, PREPARING)
-               )
-                    │
-                    ▼  (STOMP frame broadcast)
-                    │
-         ┌──────────┴────────────────────┐
-         │  All connected browsers        │
-         │  subscribed to /topic/orders   │
-         └──────────┬────────────────────┘
-                    ▼
-         useOrderUpdates handler fires:
-           update = { oid, userUid, status: "PREPARING" }
+Two things can move an order:
+  (a) the Kafka lifecycle consumer (the normal path), or
+  (b) an admin: PUT /api/v1/orders/{oid}/status
+Both converge on the same code.
 
-           if (update.userUid !== currentUser.uid) return  ← filter
+          OrderService.applyTransition():
+            1. order.setStatus(PREPARING)
+            2. save  (@Version column → optimistic lock, so two pods
+                      racing the same order can't both apply it)
+            3. INSERT order_status_history
+            4. INSERT outbox_event (ORDER_STATUS_CHANGED)  ← same TX
                     │
                     ▼
-         setOrders(prev => prev.map(o =>
-           o.oid === update.oid ? {...o, status: update.status} : o
-         ))
+          OutboxRelay → Kafka topic: orders.status-changed
                     │
+                    ▼
+          OrderStatusBroadcastListener   (on EVERY pod — see below)
+                    │
+                    ▼
+          messagingTemplate.convertAndSendToUser(
+              email, "/queue/orders",
+              OrderStatusUpdateResponse(oid, uid, PREPARING))
+                    │
+                    ▼  routed to that ONE customer's session
+                    │
+         ┌──────────┴─────────────────────┐
+         │  Only the owning user's browser │
+         └──────────┬─────────────────────┘
                     ▼
          Status badge updates: PENDING → PREPARING  (no refresh)
          toast: "Order #abc123… is now PREPARING"
 ```
+
+### The multi-replica problem (and why the consumer group is per-pod)
+
+`WebSocketConfig` uses `enableSimpleBroker()` — an **in-memory STOMP broker, inside one
+JVM**. A pod can therefore only push to WebSocket sessions **it is personally holding**. It
+has no way to reach a session parked on another pod.
+
+That makes the Kafka consumer group choice load-bearing:
+
+```
+        SHARED consumer group                 UNIQUE group PER POD
+        (what NOT to do)                      (what we do)
+
+  orders.status-changed                  orders.status-changed
+         │                                    │        │
+         ▼ (exactly one pod)                  ▼        ▼   (all pods)
+      ┌──────┐  ┌──────┐                  ┌──────┐  ┌──────┐
+      │ Pod A│  │ Pod B│                  │ Pod A│  │ Pod B│
+      │      │  │ ★    │                  │ ★    │  │ ★    │
+      └──────┘  └──────┘                  └──────┘  └──────┘
+         │          │                        │          │
+    holds Alice's   got the                holds     no session
+    socket          message                Alice's   → no-op
+                    but holds              socket
+                    nobody                 → pushes  ✓
+                    → DROPPED ✗
+```
+
+With a shared group, Kafka delivers each status change to exactly one pod — usually **not**
+the one holding that customer's socket — and `convertAndSendToUser()` finds nothing and
+silently drops it. It works perfectly at `replicas: 1` and breaks the moment you scale out.
+
+Giving each pod a unique group id (a fresh UUID per JVM start) converts competing-consumer
+semantics into **broadcast**: every pod sees every change, pushes to whatever sessions it
+holds, no-ops for the rest.
+
+Two consequences worth knowing:
+
+- The broadcast consumer **must** use `auto.offset.reset=latest`. A brand-new group id plus
+  `earliest` would replay the entire topic on every pod restart and blast every connected
+  customer with a burst of stale "your pizza is READY" toasts.
+- Each restart leaves a dead consumer group behind. Kafka reaps empty groups after
+  `offsets.retention.minutes` (7 days), so it's bounded litter, not a leak.
+
+**The correct answer at real scale** is `enableStompBrokerRelay()` pointed at RabbitMQ or
+ActiveMQ: the STOMP broker becomes shared infrastructure, any pod can address any session,
+and this whole broadcast arrangement disappears. It is deliberately not built here — it
+means running a second broker alongside Kafka to serve a demo app. That is a conscious
+trade-off, not an oversight.
 
 ---
 
 ## Feature Inventory
 
 ### Backend
-| Feature | File(s) |
-|---------|---------|
-| JWT auth (register/login/guest) | `AuthService`, `AuthController`, `JwtTokenProvider` |
-| JWT filter (stateless) | `JwtAuthenticationFilter` |
-| Order CRUD (paginated) | `OrderService`, `OrderController`, `OrderRepository` |
-| Admin-only endpoints | `SecurityConfig` (`hasRole("ADMIN")`) |
-| Admin seed on startup | `DataSeeder` (creates admin on first boot) |
-| Async notification | `NotificationService` (`@Async`) |
-| Menu/pricing API | `MenuService`, `MenuController` |
-| User profile API | `UserController` |
-| Global error handling | `GlobalExceptionHandler` |
-| DB migrations | `V1__create_users_table.sql`, `V2__create_orders_table.sql` |
-| WebSocket broadcast | `WebSocketConfig`, `OrderService.updateStatus()` |
-| OpenAPI docs | `OpenApiConfig`, `/swagger-ui/index.html` |
-| HikariCP tuning | `application-prod.yml` |
+
+| Feature                         | File(s)                                                     |
+| ------------------------------- | ----------------------------------------------------------- |
+| JWT auth (register/login/guest) | `AuthService`, `AuthController`, `JwtTokenProvider`         |
+| JWT filter (stateless)          | `JwtAuthenticationFilter`                                   |
+| Order CRUD (paginated)          | `OrderService`, `OrderController`, `OrderRepository`        |
+| Admin-only endpoints            | `SecurityConfig` (`hasRole("ADMIN")`)                       |
+| Admin seed on startup           | `DataSeeder` (creates admin on first boot)                  |
+| Async notification              | `NotificationService` (`@Async`)                            |
+| Menu/pricing API                | `MenuService`, `MenuController`                             |
+| User profile API                | `UserController`                                            |
+| Global error handling           | `GlobalExceptionHandler`                                    |
+| DB migrations                   | `V1__create_users_table.sql`, `V2__create_orders_table.sql` |
+| WebSocket broadcast             | `WebSocketConfig`, `OrderService.updateStatus()`            |
+| OpenAPI docs                    | `OpenApiConfig`, `/swagger-ui/index.html`                   |
+| HikariCP tuning                 | `application-prod.yml`                                      |
 
 ### Frontend
-| Feature | File(s) |
-|---------|---------|
-| JWT interceptor (attach + 401 logout) | `api/axiosClient.js` |
-| Session restore from localStorage | `containers/Firebase/Auth.js` |
-| Login/Signup with inline validation | `LoginPage.js`, `SignUp.js` |
-| Loading states on all form submits | same |
-| Toast notifications (all API calls) | `react-hot-toast` wired in `App.js` |
-| Live price calculator | `PizzaHub.js` + `menuSlice.js` |
-| Pizza topping pop animation | `toppingsMenu.module.css` |
-| Order history with status badges | `Orders.js` |
-| WebSocket live status updates | `hooks/useOrderUpdates.js` |
-| Receipt-style confirmation modal | `Modal.js` |
-| Profile page (avatar, badge, links) | `Profile.js` |
-| Admin panel (all orders + status update) | `Admin/AdminPanel.js` |
-| Admin nav link (ADMIN users only) | `DashboardMenu.js` |
-| Mobile responsive layout | all CSS files |
-| React 18 createRoot | `index.js` |
+
+| Feature                                  | File(s)                             |
+| ---------------------------------------- | ----------------------------------- |
+| JWT interceptor (attach + 401 logout)    | `api/axiosClient.js`                |
+| Session restore from localStorage        | `containers/Firebase/Auth.js`       |
+| Login/Signup with inline validation      | `LoginPage.js`, `SignUp.js`         |
+| Loading states on all form submits       | same                                |
+| Toast notifications (all API calls)      | `react-hot-toast` wired in `App.js` |
+| Live price calculator                    | `PizzaHub.js` + `menuSlice.js`      |
+| Pizza topping pop animation              | `toppingsMenu.module.css`           |
+| Order history with status badges         | `Orders.js`                         |
+| WebSocket live status updates            | `hooks/useOrderUpdates.js`          |
+| Receipt-style confirmation modal         | `Modal.js`                          |
+| Profile page (avatar, badge, links)      | `Profile.js`                        |
+| Admin panel (all orders + status update) | `Admin/AdminPanel.js`               |
+| Admin nav link (ADMIN users only)        | `DashboardMenu.js`                  |
+| Mobile responsive layout                 | all CSS files                       |
+| React 18 createRoot                      | `index.js`                          |
 
 ---
 
@@ -385,11 +530,11 @@ PizzaMaker/
 
 ### Prerequisites
 
-| Tool | Version | How to check |
-|------|---------|--------------|
-| Java (Temurin) | 21 | `java -version` |
-| Node.js | 18+ | `node -v` |
-| npm | 8+ | `npm -v` |
+| Tool           | Version | How to check    |
+| -------------- | ------- | --------------- |
+| Java (Temurin) | 21      | `java -version` |
+| Node.js        | 18+     | `node -v`       |
+| npm            | 8+      | `npm -v`        |
 
 ### Step 1 — Create your `.env` file
 
@@ -408,6 +553,7 @@ npm install
 ```
 
 If this fails with peer-dep errors, run:
+
 ```bash
 npm install --legacy-peer-deps
 ```
@@ -421,10 +567,12 @@ cd backend
 ```
 
 Wait for `Started PizzaMakerApplication`. On first boot:
+
 - Flyway runs V1 + V2 migrations
 - `DataSeeder` creates the initial admin user (ROLE_ADMIN)
 
 Verify:
+
 ```
 http://localhost:8080/actuator/health          → {"status":"UP"}
 http://localhost:8080/swagger-ui/index.html    → full API explorer
@@ -432,8 +580,9 @@ http://localhost:8080/h2-console               → DB browser (dev only)
 ```
 
 H2 console connection:
+
 - JDBC URL: `jdbc:h2:mem:pizzadb`
-- User: `sa` | Password: *(blank)*
+- User: `sa` | Password: _(blank)_
 
 ### Step 4 — Start the frontend
 
@@ -445,14 +594,14 @@ Opens `http://localhost:3000`. The `cross-env NODE_OPTIONS=--openssl-legacy-prov
 
 ### Common first-run problems
 
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Backend fails: "DDL mismatch" or Flyway checksum error | Stale `target/` folder | Delete `backend/target` and rerun |
-| `npm install` peer dep errors | MUI v4 / React 18 version mismatch | Run `npm install --legacy-peer-deps` |
-| Frontend shows "Network Error" on login | Backend not running, or wrong API URL | Check `.env`, confirm backend is on `:8080` |
-| WebSocket "Live" dot grey/red | CORS mismatch | Verify `ALLOWED_ORIGINS` env var matches the frontend URL |
-| H2 console: table not found | Wrong JDBC URL | Use exactly `jdbc:h2:mem:pizzadb` |
-| Render free tier: first request hangs ~30s | Backend spun down after 15 min idle | Wait for cold start; subsequent requests are fast |
+| Symptom                                                | Cause                                 | Fix                                                       |
+| ------------------------------------------------------ | ------------------------------------- | --------------------------------------------------------- |
+| Backend fails: "DDL mismatch" or Flyway checksum error | Stale `target/` folder                | Delete `backend/target` and rerun                         |
+| `npm install` peer dep errors                          | MUI v4 / React 18 version mismatch    | Run `npm install --legacy-peer-deps`                      |
+| Frontend shows "Network Error" on login                | Backend not running, or wrong API URL | Check `.env`, confirm backend is on `:8080`               |
+| WebSocket "Live" dot grey/red                          | CORS mismatch                         | Verify `ALLOWED_ORIGINS` env var matches the frontend URL |
+| H2 console: table not found                            | Wrong JDBC URL                        | Use exactly `jdbc:h2:mem:pizzadb`                         |
+| Render free tier: first request hangs ~30s             | Backend spun down after 15 min idle   | Wait for cold start; subsequent requests are fast         |
 
 ---
 
@@ -513,6 +662,7 @@ ALLOWED_ORIGINS=http://localhost:3000
 ```
 
 Then:
+
 ```bash
 docker-compose up --build
 ```
@@ -527,30 +677,32 @@ Backend on `:8080`, Postgres on `:5432`. Run frontend separately via `npm start`
 
 Set these in Render → Service → Environment:
 
-| Key | Value |
-|-----|-------|
-| `SPRING_PROFILES_ACTIVE` | `prod` |
-| `DATABASE_URL` | Neon JDBC URL (`jdbc:postgresql://...`) |
-| `DATABASE_USERNAME` | Neon username |
-| `DATABASE_PASSWORD` | Neon password |
-| `JWT_SECRET` | base64-encoded 256-bit secret (`openssl rand -base64 32`) |
-| `JWT_EXPIRATION_MS` | `86400000` |
-| `ALLOWED_ORIGINS` | `https://your-app.pages.dev,https://your-custom-domain.com` |
+| Key                      | Value                                                       |
+| ------------------------ | ----------------------------------------------------------- |
+| `SPRING_PROFILES_ACTIVE` | `prod`                                                      |
+| `DATABASE_URL`           | Neon JDBC URL (`jdbc:postgresql://...`)                     |
+| `DATABASE_USERNAME`      | Neon username                                               |
+| `DATABASE_PASSWORD`      | Neon password                                               |
+| `JWT_SECRET`             | base64-encoded 256-bit secret (`openssl rand -base64 32`)   |
+| `JWT_EXPIRATION_MS`      | `86400000`                                                  |
+| `ALLOWED_ORIGINS`        | `https://your-app.pages.dev,https://your-custom-domain.com` |
 
 **Frontend on Cloudflare Pages:**
 
 Build settings:
+
 - Build command: `npm run build`
 - Output directory: `build`
 - Node version: 18
 
 Environment variable:
 
-| Key | Value |
-|-----|-------|
+| Key                 | Value                                      |
+| ------------------- | ------------------------------------------ |
 | `REACT_APP_API_URL` | `https://your-render-service.onrender.com` |
 
 **Notes:**
+
 - Render free tier spins down after 15 minutes idle — first request takes ~30s cold start.
 - `ALLOWED_ORIGINS` must include every domain the frontend is served from.
 - WebSocket CORS is driven by the same `ALLOWED_ORIGINS` env var.
@@ -566,6 +718,7 @@ master          ← production only — Pages + Render auto-deploy from here
 ```
 
 **Workflow:**
+
 1. Cut a `feature/xxx` branch from `develop`
 2. Work locally, push to `feature/xxx`
 3. Open PR into `develop` — CI runs Java tests
@@ -584,39 +737,47 @@ master          ← production only — Pages + Render auto-deploy from here
 > Full interactive docs at `http://localhost:8080/swagger-ui/index.html`
 
 ### Auth (public)
-| Method | Path | Body | Response |
-|--------|------|------|----------|
-| POST | `/api/v1/auth/register` | `{firstName, emailId, password}` | `AuthResponse` |
-| POST | `/api/v1/auth/login` | `{emailId, password}` | `AuthResponse` |
-| POST | `/api/v1/auth/guest` | `{firstName, emailId}` | `AuthResponse` |
+
+| Method | Path                    | Body                             | Response       |
+| ------ | ----------------------- | -------------------------------- | -------------- |
+| POST   | `/api/v1/auth/register` | `{firstName, emailId, password}` | `AuthResponse` |
+| POST   | `/api/v1/auth/login`    | `{emailId, password}`            | `AuthResponse` |
+| POST   | `/api/v1/auth/guest`    | `{firstName, emailId}`           | `AuthResponse` |
 
 `AuthResponse`: `{ token, type: "Bearer", uid, firstName, userType }`
 
 ### Users (authenticated)
-| Method | Path | Response |
-|--------|------|----------|
-| GET | `/api/v1/users/me` | `UserResponse` |
+
+| Method | Path               | Response       |
+| ------ | ------------------ | -------------- |
+| GET    | `/api/v1/users/me` | `UserResponse` |
 
 ### Orders (authenticated)
-| Method | Path | Notes |
-|--------|------|-------|
-| POST | `/api/v1/orders` | Place order — `OrderRequest` body |
-| GET | `/api/v1/orders/my` | Your orders (paginated) |
-| GET | `/api/v1/orders/{oid}` | Single order (owner only) |
-| GET | `/api/v1/orders` | All orders — **ADMIN only** |
-| PUT | `/api/v1/orders/{oid}/status` | Update status — **ADMIN only** |
+
+| Method | Path                          | Notes                             |
+| ------ | ----------------------------- | --------------------------------- |
+| POST   | `/api/v1/orders`              | Place order — `OrderRequest` body |
+| GET    | `/api/v1/orders/my`           | Your orders (paginated)           |
+| GET    | `/api/v1/orders/{oid}`        | Single order (owner only)         |
+| GET    | `/api/v1/orders`              | All orders — **ADMIN only**       |
+| PUT    | `/api/v1/orders/{oid}/status` | Update status — **ADMIN only**    |
 
 ### Menu (public)
-| Method | Path | Response |
-|--------|------|----------|
-| GET | `/api/v1/menu/toppings` | List of toppings |
-| GET | `/api/v1/menu/sizes` | `{ R: 8, M: 12, L: 16 }` |
+
+| Method | Path                    | Response                 |
+| ------ | ----------------------- | ------------------------ |
+| GET    | `/api/v1/menu/toppings` | List of toppings         |
+| GET    | `/api/v1/menu/sizes`    | `{ R: 8, M: 12, L: 16 }` |
 
 ### WebSocket
-| Endpoint | Protocol | Notes |
-|----------|----------|-------|
-| `/ws` | SockJS/STOMP | Connect point |
-| `/topic/orders` | STOMP subscribe | Receive `OrderStatusUpdate { oid, userUid, status }` |
+
+| Endpoint              | Protocol        | Notes                                                                |
+| --------------------- | --------------- | ------------------------------------------------------------------- |
+| `/ws`                 | SockJS/STOMP    | Connect point. JWT is validated on the CONNECT frame.               |
+| `/user/queue/orders`  | STOMP subscribe | Receive `OrderStatusUpdateResponse { oid, userUid, status }`.       |
+|                       |                 | A **per-user** destination — you only ever get your own orders.     |
+|                       |                 | (Not a `/topic/` broadcast: that would send every customer's order  |
+|                       |                 | status to every connected browser and rely on the client to filter.)|
 
 ---
 
@@ -639,26 +800,29 @@ master          ← production only — Pages + Render auto-deploy from here
 ## Environment Variables
 
 ### Backend
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DATABASE_URL` | H2 (dev) | JDBC connection string |
-| `DATABASE_USERNAME` | `sa` | DB user |
-| `DATABASE_PASSWORD` | *(blank)* | DB password |
-| `JWT_SECRET` | hardcoded dev key | Base64-encoded HMAC secret (min 32 bytes) — generate: `openssl rand -base64 32` |
-| `JWT_EXPIRATION_MS` | `86400000` | Token lifetime (24 hours) |
-| `SPRING_PROFILES_ACTIVE` | default | Set to `prod` for PostgreSQL |
-| `ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated allowed origins for CORS and WebSocket |
+
+| Variable                 | Default                 | Description                                                                     |
+| ------------------------ | ----------------------- | ------------------------------------------------------------------------------- |
+| `DATABASE_URL`           | H2 (dev)                | JDBC connection string                                                          |
+| `DATABASE_USERNAME`      | `sa`                    | DB user                                                                         |
+| `DATABASE_PASSWORD`      | _(blank)_               | DB password                                                                     |
+| `JWT_SECRET`             | hardcoded dev key       | Base64-encoded HMAC secret (min 32 bytes) — generate: `openssl rand -base64 32` |
+| `JWT_EXPIRATION_MS`      | `86400000`              | Token lifetime (24 hours)                                                       |
+| `SPRING_PROFILES_ACTIVE` | default                 | Set to `prod` for PostgreSQL                                                    |
+| `ALLOWED_ORIGINS`        | `http://localhost:3000` | Comma-separated allowed origins for CORS and WebSocket                          |
 
 ### Frontend
-| Variable | Default | Description |
-|----------|---------|-------------|
+
+| Variable            | Default                 | Description      |
+| ------------------- | ----------------------- | ---------------- |
 | `REACT_APP_API_URL` | `http://localhost:8080` | Backend base URL |
 
 Set in a `.env` file at project root (gitignored):
+
 ```
 REACT_APP_API_URL=http://localhost:8080
 ```
 
 ---
 
-*Never push directly to `master`. Branch from `develop`, test, then promote via PR.*
+_Never push directly to `master`. Branch from `develop`, test, then promote via PR._

@@ -1,0 +1,47 @@
+image:
+  repository: pizzamaker-api
+  tag: local
+  # Never: the image is side-loaded with `minikube image load`, not pulled from a
+  # registry. Change to IfNotPresent/Always once you actually push somewhere.
+  pullPolicy: Never
+
+# Two by default — see the comment in templates/deployment.yaml. Scaling out is
+# what exercises the per-pod consumer group that keeps WebSocket pushes working.
+replicaCount: 2
+
+service:
+  type: NodePort
+  port: 8080
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 250m
+  limits:
+    memory: 1Gi
+
+config:
+  springProfile: prod
+  databaseUrl: jdbc:postgresql://postgres:5432/pizzadb
+  databaseUsername: pizzauser
+  allowedOrigins: http://localhost:3000
+
+kafka:
+  # false is a supported configuration, not a broken one: the outbox falls back to
+  # dispatching in-process. Orders then stay PENDING until an admin advances them.
+  enabled: true
+  bootstrapServers: kafka:9092
+
+# Demo defaults so `helm install` works on a fresh minikube with no arguments.
+#
+# Do NOT ship these. Override at install time:
+#   helm install pizzamaker ./helm/pizzamaker \
+#     --set secrets.jwtSecret="$(openssl rand -base64 32)" \
+#     --set secrets.databasePassword="$(openssl rand -base64 24)"
+#
+# In a real pipeline these come from Vault / AWS Secrets Manager via the External
+# Secrets Operator, and this block goes away entirely.
+secrets:
+  databasePassword: pizzapass
+  jwtSecret: bXktc3VwZXItc2VjcmV0LWtleS1mb3ItcGl6emEtbWFrZXItYXBwLTIwMjQ=
+  webhookSecret: whsec_dev_pizza_maker_local_secret

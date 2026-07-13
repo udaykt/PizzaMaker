@@ -32,6 +32,10 @@ spring:
     # which H2 doesn't support) only applies where it's actually valid.
     locations: classpath:db/migration/common,classpath:db/migration/{vendor}
 
+  kafka:
+    # Only ever contacted when app.kafka.enabled is true (see below).
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
 management:
   endpoints:
     web:
@@ -73,6 +77,41 @@ app:
   # Shared secret for verifying inbound payment webhook signatures (HMAC-SHA256).
   webhook:
     secret: ${WEBHOOK_SECRET:whsec_dev_pizza_maker_local_secret}
+
+  kafka:
+    # OFF by default, and that is deliberate: `./mvnw test`, CI and a bare
+    # `spring-boot:run` all work with no broker on the machine. With the flag off,
+    # every @KafkaListener / producer bean is @ConditionalOnProperty'd out of
+    # existence and the outbox relay dispatches in-process exactly as it did
+    # before Kafka existed (InProcessOrderEventPublisher).
+    #
+    # Turn it on with `docker compose up` (the compose file sets KAFKA_ENABLED=true)
+    # or KAFKA_ENABLED=true locally against a broker on :9092.
+    enabled: ${KAFKA_ENABLED:false}
+
+    # Shared group for the work listeners — competing consumers, each message
+    # handled by exactly one pod. The WebSocket broadcast listener deliberately
+    # does NOT use this; it generates a unique group per pod.
+    work-group: pizzamaker-orders
+
+    partitions: 3
+    replicas: 1
+
+    # Dwell time in each kitchen stage. Applied on a scheduler thread, never by
+    # sleeping in the listener.
+    stage-delay: 3s
+
+    # Loop fuse for the self-perpetuating pipeline (3 real hops + headroom).
+    max-hops: 4
+
+    # How long to wait for the broker ack before failing the send and letting the
+    # outbox retry the row.
+    send-timeout: 10s
+
+    topics:
+      order-placed: orders.placed
+      order-lifecycle: orders.lifecycle
+      order-status-changed: orders.status-changed
 
 server:
   port: ${PORT:8080}

@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pizzamaker-api
+  labels:
+    app: pizzamaker-api
+spec:
+  # NodePort so `minikube service pizzamaker-api --url` can hand you a URL without
+  # an ingress controller. In a real cluster this would be ClusterIP behind an
+  # Ingress that terminates TLS.
+  type: NodePort
+  selector:
+    app: pizzamaker-api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+
+  # WebSockets are long-lived, and the STOMP broker is in-memory per pod: a
+  # customer's session lives on exactly one pod. Round-robining every request would
+  # be fine for REST but means the SockJS handshake and its follow-up calls can
+  # land on different pods. Sticky sessions by client IP keep one client pinned to
+  # one pod for the life of the connection.
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
