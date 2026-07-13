@@ -45,7 +45,7 @@
 .hideLoginPage h1 {
   font-size: 1.65rem;
   font-weight: 700;
-  font-family: var(--font-display);
+  font-family: var(--font-caps);
   color: #ffffff;
   letter-spacing: -0.4px;
 }

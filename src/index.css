@@ -31,14 +31,6 @@
 }
 
 @font-face {
-  font-family: 'Luxury';
-  src: url('/fonts/Luxury.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
   font-family: 'Bourbon';
   src: url('/fonts/Bourbon-Regular.otf') format('opentype');
   font-weight: 400;
@@ -50,14 +42,6 @@
   font-family: 'Bourbon';
   src: url('/fonts/Bourbon-Rough.otf') format('opentype');
   font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Thirsty Script';
-  src: url('/fonts/ThirstyScript-ExtraBold.otf') format('opentype');
-  font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
@@ -77,9 +61,12 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
+  /* Two faces, one job each: --font for body copy, --font-caps for every
+     heading, label and button. The old --font-display (Luxury) and
+     --font-script (Thirsty Script) are gone — a connected script can't take a
+     long generated pizza name without wrapping to four lines, and two more
+     display faces bought nothing that Bebas Neue doesn't already do. */
   --font: 'Product Sans', 'Inter', system-ui, sans-serif;
-  --font-display: 'Luxury', serif;
-  --font-script: 'Thirsty Script', cursive;
   --font-caps: 'Bebas Neue', sans-serif;
 
   --slice-color: #c8883a;

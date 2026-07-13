@@ -16,7 +16,7 @@
 }
 
 .adminHeader h1 {
-  font-family: var(--font-display);
+  font-family: var(--font-caps);
   color: white;
   margin: 0;
 }

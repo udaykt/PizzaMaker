@@ -10,7 +10,7 @@
 }
 
 .orders h1 {
-  font-family: var(--font-display);
+  font-family: var(--font-caps);
   color: white;
   margin-top: 10px;
   margin-bottom: 0;
