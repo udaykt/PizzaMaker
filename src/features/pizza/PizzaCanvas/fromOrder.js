@@ -6,6 +6,28 @@ import { pizzaHubActions } from '@/store/pizzaHubSlice';
 import { pizzaActions } from '@/store/pizzaSlice';
 import { TOPPING_CATALOG } from '@/config/toppingCatalog';
 
+const TOPPING_LABEL = Object.fromEntries(TOPPING_CATALOG.map((t) => [t.id, t.label]));
+const CHEESE_LABELS = {
+  mozzarella: 'Mozzarella', cheddar: 'Cheddar', parmesanAsiago: 'Parmesan-Asiago',
+  feta: 'Feta', ricotta: 'Ricotta', veganCheese: 'Vegan Cheese',
+};
+
+// Everything on a placed order's pizza, as display labels.
+//
+// The old inline version (in Orders.js and Modal.js) iterated the ingredients
+// object filtering `value === true`, which caught the cheese booleans but SILENTLY
+// DROPPED the toppings — they live in `ingredients.toppings`, an array, so the
+// truthy check never matched and every order read as "Plain". This reads both.
+export function orderIngredientLabels(ingredients) {
+  if (!ingredients) return [];
+  const cheeses = Object.keys(CHEESE_LABELS)
+    .filter((k) => ingredients[k] === true)
+    .map((k) => CHEESE_LABELS[k]);
+  const toppings = (ingredients.toppings || [])
+    .map((t) => TOPPING_LABEL[t.id] || t.id);
+  return [...cheeses, ...toppings];
+}
+
 const ENUM_TO_SIZE = { R: 'small', M: 'medium', L: 'large' };
 const ENUM_TO_CRUST_STYLE = { THIN: 'thin', HAND_TOSSED: 'hand-tossed', STUFFED: 'stuffed' };
 const ENUM_TO_BAKE_LEVEL = { NORMAL: 'normal', WELL_DONE: 'well-done' };

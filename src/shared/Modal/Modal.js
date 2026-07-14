@@ -5,21 +5,12 @@ import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH, ORDERS_PATH } from '@/utils/routes';
 import Button from '@/shared/Button/Button';
 import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
-import { orderDisplayLabels, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
+import { orderDisplayLabels, orderIngredientLabels, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
 import { orderPizzaName } from '@/utils/pizzaName';
 import { formatPrice } from '@/utils/formatPrice';
 import { statusLabel } from '@/utils/orderStatusLabels';
 import logoBadge from '@/assets/images/logo-badge-nobg.png';
 import styles from './modal.module.css';
-
-// camelCase / multi-word keys need a real label — naive capitalize would render
-// "VeganCheese" or "ParmesanAsiago" with no space. Keys match the cheese
-// booleans on order.ingredients.
-const INGREDIENT_LABELS = {
-  mozzarella: 'Mozzarella', cheddar: 'Cheddar', parmesanAsiago: 'Parmesan-Asiago',
-  feta: 'Feta', ricotta: 'Ricotta', veganCheese: 'Vegan Cheese',
-  pepperoni: 'Pepperoni', sausage: 'Sausage', peppers: 'Peppers', olives: 'Olives',
-};
 
 const Modal = (props) => {
   const orderState = useSelector((state) => state.order);
@@ -37,16 +28,7 @@ const Modal = (props) => {
     dispatch(uiActions.setBackdrop(false));
   };
 
-  const formatIngredients = (order) => {
-    if (!order || !order.ingredients) return [];
-    // sauceType and the *Quantity fields are strings, not booleans — the
-    // strict === true check already excludes them on its own.
-    return Object.entries(order.ingredients)
-      .filter(([, v]) => v === true)
-      .map(([k]) => INGREDIENT_LABELS[k] || k.charAt(0).toUpperCase() + k.slice(1));
-  };
-
-  const ingredients = formatIngredients(currentOrder);
+  const ingredients = orderIngredientLabels(currentOrder?.ingredients);
   const labels = orderDisplayLabels(currentOrder);
   const canvasProps = currentOrder ? pizzaPropsFromOrder(currentOrder) : null;
 

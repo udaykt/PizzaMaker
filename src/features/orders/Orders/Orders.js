@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import useOrderUpdates from '@/hooks/useOrderUpdates';
 import { fetchUserOrders } from '@/api/appApi';
 import PizzaCanvas from '@/features/pizza/PizzaCanvas/PizzaCanvas';
-import { applyOrderToBuilder, orderDisplayLabels, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
+import { applyOrderToBuilder, orderDisplayLabels, orderIngredientLabels, pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
 import { uiActions } from '@/store/uiSlice';
 import { HOME_PATH } from '@/utils/routes';
 import { orderPizzaName } from '@/utils/pizzaName';
@@ -23,22 +23,8 @@ const STATUS_COLORS = {
   DELIVERED:  { bg: '#d6d8d9', color: '#383d41' },
 };
 
-// camelCase keys like "veganCheese" need a real label — naive capitalize
-// would render "VeganCheese" with no space.
-const INGREDIENT_LABELS = {
-  mozzarella: 'Mozzarella', provolone: 'Provolone', feta: 'Feta', veganCheese: 'Vegan Cheese',
-  pepperoni: 'Pepperoni', sausage: 'Sausage', peppers: 'Peppers', olives: 'Olives',
-};
-
-const formatIngredients = (ingredients) => {
-  if (!ingredients) return '—';
-  // sauceType and the *Quantity fields are strings, not booleans — the
-  // strict === true check already excludes them on its own.
-  return Object.entries(ingredients)
-    .filter(([, v]) => v === true)
-    .map(([k]) => INGREDIENT_LABELS[k] || k.charAt(0).toUpperCase() + k.slice(1))
-    .join(', ') || 'Plain';
-};
+const formatIngredients = (ingredients) =>
+  orderIngredientLabels(ingredients).join(', ') || 'Just cheese, kept simple';
 
 const Orders = () => {
   const reduxOrders = useSelector((state) => state.order.userOrders);
