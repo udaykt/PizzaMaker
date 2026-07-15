@@ -392,6 +392,8 @@ See `README.md` for the full version of each.
 
 | Symptom | Cause |
 |---|---|
+| Live site "takes forever" to sign in / place an order | Render free-tier **cold start** (sleeps after ~15 min idle, 30–60s to wake). NOT the code — warm, it's <1s. Softened by the keep-warm cron (`.github/workflows/keep-warm.yml`) and the "Firing up the oven" overlay (`src/shared/WarmupOverlay`). |
+| Order history / receipt shows "Plain" for a loaded pizza | Was a real bug: the old formatter filtered `value === true`, catching cheese booleans but never the `toppings` array. Fixed via `orderIngredientLabels()` in `fromOrder.js` — use it, don't reinvent it. |
 | App boots fine but consumes nothing | A listener bean missing `@Lazy(false)`. `spring.main.lazy-initialization=true` is set globally, so a lazy bean is never instantiated, so its `@KafkaListener` is never registered. Silent. |
 | Kafka pod `CrashLoopBackOff`, `OOMKilled` | minikube's default 2GB. Kafka needs ~1GB to itself. `--memory=4096`. |
 | Pod stuck in `ImagePullBackOff` | `imagePullPolicy` isn't `Never`. The image was side-loaded, not pushed to a registry. |

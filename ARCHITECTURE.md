@@ -703,7 +703,17 @@ Environment variable:
 
 **Notes:**
 
-- Render free tier spins down after 15 minutes idle — first request takes ~30s cold start.
+- Render free tier spins down after 15 minutes idle — the first request then eats
+  a 30–60s cold start (container wake + Spring Boot boot). Warm, every call is
+  <1s. Two things soften this:
+  - **Keep-warm cron** (`.github/workflows/keep-warm.yml`) pings a lightweight,
+    CORS-open, DB-free endpoint every ~12 min so the instance rarely sleeps.
+    GitHub cron is best-effort; UptimeRobot is a more punctual alternative.
+  - **Warm-up overlay** (`src/shared/WarmupOverlay`, driven by
+    `src/api/warmup.js` off the axios interceptors) shows a branded "Firing up
+    the oven" state whenever a request outlives ~1.8s, so a cold start reads as
+    intentional rather than broken. It never appears on a warm backend. This is
+    distinct from `ApiGate`, which only covers the initial page load.
 - `ALLOWED_ORIGINS` must include every domain the frontend is served from.
 - WebSocket CORS is driven by the same `ALLOWED_ORIGINS` env var.
 
