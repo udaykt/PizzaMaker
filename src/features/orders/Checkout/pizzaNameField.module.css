@@ -35,11 +35,13 @@
   min-width: 0;
   margin: 0;
   color: white;
-  font-family: var(--font-caps);
+  /* The pizza voice. Ketchup Manis has taller metrics than the caps face, so the
+     size is a touch smaller and the line-height a touch looser to compensate. */
+  font-family: var(--font-brand);
   font-weight: 400;
-  font-size: 1.6rem;
-  letter-spacing: 0.5px;
-  line-height: 1.15;
+  font-size: 1.5rem;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;

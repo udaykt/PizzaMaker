@@ -46,6 +46,19 @@
   font-display: swap;
 }
 
+/* Ketchup Manis — the pizza voice. A friendly, saucy display face used ONLY for
+   pizza names and top-level brand headings (see --font-brand). Deliberately kept
+   away from body text and UI labels: it's characterful, not legible at small
+   sizes or in long paragraphs. Licence: freeware, non-commercial. */
+@font-face {
+  font-family: 'Ketchup Manis';
+  src: url('/fonts/KetchupManis.otf') format('opentype'),
+       url('/fonts/KetchupManis.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --accent: #ff6b00;
   --accent-dim: rgba(255, 107, 0, 0.18);
@@ -66,6 +79,9 @@
      --font-script (Thirsty Script) are gone — a connected script can't take a
      long generated pizza name without wrapping to four lines, and two more
      display faces bought nothing that Bebas Neue doesn't already do. */
+  /* --font-brand is the pizza voice, reserved for pizza names and hero/brand
+     headings. Falls back to the caps face if Ketchup Manis hasn't loaded. */
+  --font-brand: 'Ketchup Manis', 'Bebas Neue', sans-serif;
   --font: 'Product Sans', 'Inter', system-ui, sans-serif;
   --font-caps: 'Bebas Neue', sans-serif;
 

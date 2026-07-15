@@ -123,10 +123,10 @@
 .orderName {
   flex: 1;
   min-width: 0;
-  font-family: var(--font-caps);
-  font-size: 1.25rem;
+  font-family: var(--font-brand);
+  font-size: 1.3rem;
   font-weight: 400;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;

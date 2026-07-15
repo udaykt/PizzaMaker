@@ -100,9 +100,9 @@
 .modalPizzaName {
   margin: 2px 0 6px;
   text-align: center;
-  font-family: var(--font-caps);
-  font-size: 1.25rem;
-  letter-spacing: 0.5px;
+  font-family: var(--font-brand);
+  font-size: 1.35rem;
+  letter-spacing: 0.3px;
   color: var(--accent);
 }
 

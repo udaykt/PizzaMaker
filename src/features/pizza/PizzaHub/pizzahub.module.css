@@ -47,12 +47,11 @@
 }
 
 .greeting h1 {
-  font-family: var(--font-caps);
-  font-size: 2.2rem;
-  /* Bebas Neue ships a single weight; 800 would have the browser synthesise a
-     fake bold, which smears a condensed face. */
+  /* Hero brand moment — the pizza voice (Ketchup Manis). */
+  font-family: var(--font-brand);
+  font-size: 2.6rem;
   font-weight: 400;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   color: var(--text);
   margin-bottom: 6px;
 }
