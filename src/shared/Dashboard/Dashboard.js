@@ -2,7 +2,7 @@
 import styles from './dashboard.module.css';
 
 const Dashboard = (props) => {
-  const emptyDashboardMessage = 'Choose from dashboard menu to see here.';
+  const emptyDashboardMessage = 'Pick something from the menu to get cooking.';
   return (
     <div className={styles.dashboard}>
       {props.children ? props.children : <p>{emptyDashboardMessage}</p>}

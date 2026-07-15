@@ -82,9 +82,9 @@ const Checkout = () => {
     return (
       <div className={styles.checkoutEmpty}>
         <span className={styles.emptyIcon}>🍕</span>
-        <p>Nothing to checkout yet.</p>
+        <p>The box is empty. Let's build something delicious.</p>
         <Button className={styles.emptyCta} onClick={customizeHandler}>
-          Customize Your Pizza
+          Start Building
         </Button>
       </div>
     );

@@ -79,8 +79,8 @@ const PizzaHub = () => {
         transition={{ duration: 0.38, ease: 'easeOut', delay: 0.08 }}
       >
         <div className={styles.greeting}>
-          <h1>Welcome {userName || 'User'}!,</h1>
-          <p>Make your own pizza. Customize and Order.</p>
+          <h1>Hey {userName || 'there'}, let's build a pizza</h1>
+          <p>Your pizza, your rules — pick a base, pile on toppings, name it, done.</p>
         </div>
         <Base />
       </motion.div>

@@ -84,7 +84,7 @@ const Modal = (props) => {
           <span className={`${styles.receiptValue} ${styles.receiptStatus}`}>{statusLabel(currentOrder?.status || 'PENDING')}</span>
         </div>
       </div>
-      <p className={styles.modalNote}>We're making your pizza! You'll see it in orders.</p>
+      <p className={styles.modalNote}>Into the oven it goes. Follow along in your orders.</p>
       <div className={styles.modalActions}>
         <Button onClick={handleViewOrders} className={styles.modalOrdersBtn}>View Orders</Button>
         <Button onClick={handleOk} className={styles.modalOkBtn}>Back to Menu</Button>

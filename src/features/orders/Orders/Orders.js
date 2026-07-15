@@ -91,7 +91,7 @@ const Orders = () => {
       {orders.length === 0 ? (
         <div className={styles.ordersEmpty}>
           <span className={styles.ordersEmptyIcon}>🍕</span>
-          <p>No orders yet! Go make your first pizza.</p>
+          <p>Your oven's cold. Go build a pizza worth naming.</p>
         </div>
       ) : (
         <ul className={styles.ordersList}>
