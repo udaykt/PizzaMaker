@@ -1,66 +1,137 @@
-.profileMenuDiv {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.wrap {
   position: fixed;
   top: 72px;
   right: 16px;
   z-index: 200;
+  animation: menuIn 0.16s ease-out;
 }
 
-.hideProfileMenuDiv {
+.hidden {
   display: none;
 }
 
-.profileMenu nav {
-  width: 250px;
-  height: 200px;
+@keyframes menuIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.profileMenu,
-.profileMenu ul {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  list-style-type: none;
-  width: 95%;
-  height: 100%;
-  user-select: none;
-  border-radius: var(--radius-md);
+.card {
+  width: 260px;
+  padding: 8px;
+  border-radius: var(--radius-lg);
   background: var(--glass-modal);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  user-select: none;
 }
 
-/* The shared <Button> has no base style of its own (its rule lives in a CSS
-   module and isn't emitted globally), so style the menu buttons fully here to
-   match the app's button aesthetic instead of falling back to the browser
-   default white button. */
-.profileMenuButton {
-  width: 170px;
-  height: 46px;
-  display: block;
+/* Identity header — who you're signed in as. */
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 10px 12px;
+}
+
+.avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-caps);
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.18);
+}
+
+.identityText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.email {
+  font-family: var(--font);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.divider {
+  height: 1px;
+  margin: 2px 6px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+/* One row — used by the nav links AND the logout button, so they line up. */
+.link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.82);
+  font-family: var(--font);
   font-size: 0.9rem;
   font-weight: 500;
-  font-family: var(--font);
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 107, 0, 0.08);
-  border: 1px solid rgba(255, 107, 0, 0.4);
-  border-radius: var(--radius-md);
+  text-align: left;
+  text-decoration: none;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.profileMenuButton:hover {
-  color: #ffffff;
-  background: rgba(255, 107, 0, 0.16);
-  border-color: var(--accent);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.2);
+.link:hover {
+  background: rgba(255, 107, 0, 0.12);
+  color: #fff;
 }
 
-.profileMenuButton:active {
-  transform: scale(0.97);
+/* The route you're currently on. */
+.linkActive {
+  background: rgba(255, 107, 0, 0.14);
+  color: #fff;
+}
+
+.linkIcon {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.adminLink {
+  color: var(--accent);
+}
+
+.logout {
+  color: #ff6b6b;
+}
+
+.logout:hover {
+  background: rgba(255, 90, 90, 0.12);
+  color: #ff8080;
 }
