@@ -1,0 +1,36 @@
+name: Keep backend warm
+
+# Render's free tier spins the API down after ~15 min idle, and the next request
+# then eats a 30-60s cold start. This pings a lightweight, CORS-open, DB-free
+# endpoint often enough to keep the instance awake, so real visitors hit a warm
+# server.
+#
+# Interval note: GitHub cron is best-effort and often runs a few minutes late, so
+# 12 min gives margin under Render's ~15 min sleep timer. Pinging ~24/7 uses
+# roughly 730 of Render free tier's 750 instance-hours/month — fine for a single
+# service, but if you add more, narrow the schedule to active hours (e.g.
+# '*/12 6-23 * * *') or move this to UptimeRobot, which is more punctual.
+on:
+  schedule:
+    - cron: '*/12 * * * *'
+  workflow_dispatch: {}
+
+# A late run stacking on a still-running one buys nothing — keep only the newest.
+concurrency:
+  group: keep-warm
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the API
+        run: |
+          URL="https://pizzamaker-api.onrender.com/api/v1/menu/sizes"
+          # --max-time 90 tolerates a full cold start; the point is to TRIGGER the
+          # wake-up, so a slow first response is success, not failure.
+          if curl -fsS --max-time 90 "$URL" -o /dev/null; then
+            echo "Backend is warm."
+          else
+            echo "Ping failed (cold start still in progress, or the service is down)."
+          fi
