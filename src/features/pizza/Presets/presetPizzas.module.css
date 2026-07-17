@@ -22,6 +22,17 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
+/* One-line orientation under the section heading. Muted on purpose — it should
+   answer "what is this row for?" on the first visit and disappear into the
+   background on every visit after. */
+.tip {
+  margin: 2px 0 10px;
+  text-align: center;
+  font-family: var(--font);
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.32);
+}
+
 .row {
   display: flex;
   gap: 10px;

@@ -49,7 +49,12 @@ const ToppingsMenu = () => {
 
   return (
     <div className={styles.toppingsMenu}>
-      <h1>Toppings</h1>
+      {/* Heading and tip share the grid's first row — a bare <p> here would be
+          auto-placed into row 2 and collide with the toppings grid. */}
+      <div className={styles.header}>
+        <h1>Toppings</h1>
+        <p className={styles.tip}>Tap to add — keep tapping for Light, Regular, Extra. Drag any piece on the pizza to move it.</p>
+      </div>
       <div className={styles.toppings}>
 
         <div className={styles.categoryHeader} style={{ '--cat-color': '#c89030' }}>

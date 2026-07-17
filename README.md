@@ -16,9 +16,12 @@ write-up.
 
 - **Live pizza builder** — an SVG pizza assembled in real time from your selections. Toppings are placed with a phyllotaxis (sunflower) distribution for an even, natural spread, and animate on/off the pie with Framer Motion as you toggle them.
 - **WYSIWYG end to end** — the same `PizzaCanvas` renders the builder, the order-confirmation modal, and the order-history thumbnails, so what you build is exactly what you order and what you see served.
-- **Auth** — standard accounts, guest checkout, and an admin role, all JWT-backed.
+- **Pizzas get names, not lists** — your toppings are read for their character and named accordingly ("The Carnivore", "Garden Party", "Blazing Kitchen Sink") from a pool of ~1,950 deterministic names. Don't like it? Rename it inline; your name is saved with the order.
+- **Slice-to-checkout animation** — clicking Order cuts the pizza into 4/6/8 wedges (by size); on checkout it rotates, slices apart and reassembles in a loop, with toppings cut cleanly by each slice edge.
+- **Auth** — standard accounts, guest checkout, and an admin role, all JWT-backed, with a full account menu (identity, quick links, admin-gated actions).
 - **Event-driven order pipeline** — an order is placed, and then cooks itself: a Kafka consumer walks it `PENDING → CONFIRMED → PREPARING → READY`, pushing each change to the customer's browser as it happens.
 - **Live order status** — updates pushed over STOMP/WebSocket to that one customer, reflected in the UI without a refresh.
+- **Cold-start-aware UX** — a keep-warm cron plus a branded "Firing up the oven" overlay make the free-tier backend's wake-up read as intentional rather than broken.
 - **Resilient UI** — top-level error boundary and a styled 404 fallback instead of blank screens.
 
 ---
@@ -92,33 +95,73 @@ avoid running a second broker for a demo.)
 
 ---
 
-## Tech Stack
+## Tech Stack — full reference
 
-| Layer              | Technology                             |
-| ------------------ | -------------------------------------- |
-| Frontend           | React 18 + Redux Toolkit                       |
-| Animation          | Framer Motion (SVG pizza rendering)            |
-| Build tool         | Vite 5                                         |
-| Frontend tests     | Vitest                                         |
-| Language (backend) | Java 21 (LTS)                                  |
-| Framework          | Spring Boot 3.3.5                              |
-| Security           | Spring Security 6 + JWT (jjwt 0.12.3)          |
-| Persistence        | Spring Data JPA + Hibernate                    |
-| DB (dev)           | H2 in-memory                                   |
-| DB (prod)          | PostgreSQL 16                                  |
-| Migrations         | Flyway                                         |
-| Messaging          | **Apache Kafka** (spring-kafka), KRaft mode    |
-| Async delivery     | **Transactional Outbox** + polling relay       |
-| Real-time          | WebSocket / STOMP over SockJS                  |
-| Resilience         | Resilience4j (retry + circuit breaker)         |
-| Rate limiting      | Bucket4j                                       |
-| API Docs           | springdoc-openapi 2.6 / Swagger UI             |
-| Observability      | Actuator + Micrometer → Prometheus             |
-| Build              | Maven + Maven Wrapper                          |
-| Tests              | JUnit 5 + Mockito + MockMvc + **EmbeddedKafka** + Testcontainers |
-| CI                 | GitHub Actions                                 |
-| Containers         | Docker + docker-compose                        |
-| Orchestration      | **Kubernetes + Helm** (minikube-ready)         |
+> Single source of truth for every tool, library and service in the project. Keep this
+> updated whenever a new dependency or module is added, so nobody has to spelunk the code
+> to know what's in use.
+
+### Frontend
+
+| Tool | Version | Role |
+| --- | --- | --- |
+| React | 18.3 | UI |
+| Redux Toolkit + react-redux | 1.6 / 7.2 | State management |
+| React Router | 5.2 | Client-side routing |
+| Vite | 5.4 | Dev server + build |
+| Framer Motion | 12 | Animation (SVG pizza, slice, overlays) |
+| Axios | 1.x | HTTP client (JWT + warm-up interceptors) |
+| @stomp/stompjs + sockjs-client | 6.1 / 1.6 | WebSocket / STOMP live updates |
+| lucide-react | icons | Menu + UI icons |
+| react-hot-toast | toasts | Notifications |
+| Vitest | 2.1 | Frontend tests |
+
+### Backend
+
+| Tool | Version | Role |
+| --- | --- | --- |
+| Java | 21 (LTS) | Language |
+| Spring Boot | 3.3.5 | Framework (web, data-jpa, security, validation, actuator, websocket, aop) |
+| Spring Security + jjwt | 6 / 0.12.3 | Stateless JWT auth |
+| Spring Data JPA + Hibernate | — | Persistence |
+| H2 / PostgreSQL | — / 16 | DB (dev / prod) |
+| Flyway | — | Versioned schema migrations |
+| Spring Kafka | — | Event pipeline (KRaft, no Zookeeper) |
+| Resilience4j | 2.2 | Retry + circuit breaker |
+| Bucket4j | 8.10 | Auth rate limiting |
+| springdoc-openapi | 2.6 | Swagger UI / OpenAPI |
+| Micrometer + Prometheus | — | Metrics (`/actuator/prometheus`) |
+| logstash-logback-encoder | 8.0 | Structured JSON logs (prod) |
+| Lombok | — | Boilerplate reduction |
+
+### Patterns & subsystems (project-specific)
+
+| Name | Where | What |
+| --- | --- | --- |
+| Transactional Outbox | `outbox/` | Atomic order + event write; kills the dual-write problem |
+| Kafka lifecycle pipeline | `messaging/` | Self-perpetuating `PENDING→CONFIRMED→PREPARING→READY`, DLT, per-pod broadcast |
+| Pizza name generator | `src/utils/pizzaName.js` | Trait-based deterministic naming (~1,950 names) |
+| Cold-start warm-up | `src/api/warmup.js`, `WarmupOverlay` | "Firing up the oven" overlay for slow requests |
+| Idempotent ordering | `Idempotency-Key` header + unique index | Double-click / retry safe |
+
+### Infra, CI/CD & hosting
+
+| Tool | Role |
+| --- | --- |
+| Docker + docker-compose | Local full stack (Postgres + Kafka + app) |
+| Kubernetes + Helm | Multi-replica deploy (minikube-ready), `k8s/` + `helm/` |
+| GitHub Actions | CI (`ci.yml`) + keep-warm cron (`keep-warm.yml`) |
+| Cloudflare Pages | Frontend hosting (`pizzamaker.pages.dev`) |
+| Render | Backend + managed Postgres (free tier) |
+| Maven (+ wrapper) | Backend build |
+
+### Testing
+
+JUnit 5 · Mockito · MockMvc · spring-security-test · **EmbeddedKafka** (spring-kafka-test) · **Testcontainers** (real Postgres) · Vitest (frontend)
+
+### Fonts
+
+Bebas Neue (`--font-caps`) · Product Sans (`--font`) · **Ketchup Manis** (`--font-brand`, pizza names + hero) · Bourbon
 
 ---
 

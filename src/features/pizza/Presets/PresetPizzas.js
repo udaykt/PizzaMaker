@@ -37,11 +37,20 @@ const PresetPizzas = () => {
   const handlePick = (preset) => {
     applyPizzaConfigToBuilder(preset.config, dispatch);
     toast.success(`${preset.name} loaded — make it yours!`);
+    // The preset bar sits at the top, but the pizza it updates is ~600px down
+    // the page (below the fold on most screens). Without this, clicking a preset
+    // looks like it did nothing — the only feedback was the toast, and the pizza
+    // silently changed out of sight. Bring the pizza to the user so the pick is
+    // visibly meaningful. Works the same whether or not they're logged in.
+    if (typeof document !== 'undefined') {
+      document.getElementById('pizza-preview')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   };
 
   return (
     <div className={styles.presets}>
       <h3 className={styles.heading}>Quick Start</h3>
+      <p className={styles.tip}>Grab a classic and make it yours — every preset is still fully editable.</p>
       <div
         ref={rowRef}
         className={styles.row}

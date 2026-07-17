@@ -5,6 +5,8 @@ import { navigationActions } from '@/store/navigationSlice';
 import { orderActions } from '@/store/orderSlice';
 import { buildUserDataInStore } from '@/utils/userState';
 import { TOPPING_CATALOG } from '@/config/toppingCatalog';
+import { orderPizzaName } from '@/utils/pizzaName';
+import { pizzaPropsFromOrder } from '@/features/pizza/PizzaCanvas/fromOrder';
 
 const SIZE_TO_ENUM = { small: 'R', medium: 'M', large: 'L' };
 const CRUST_STYLE_TO_ENUM = { thin: 'THIN', 'hand-tossed': 'HAND_TOSSED', stuffed: 'STUFFED' };
@@ -59,7 +61,11 @@ const createOrder = async (idempotencyKey, orderState) => {
     headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : undefined,
   });
   store.dispatch(orderActions.setCurrentOrder(data));
-  toast.success(`Order #${data.oid} placed! We're making your pizza.`);
+  // Name the pizza back at the customer rather than reciting a UUID at them —
+  // "Predator Pizza is in the oven" means something; "Order #8f3c-…" doesn't.
+  // The name is recomputed from the order the server echoed back, so it matches
+  // what the receipt and history will show.
+  toast.success(`${orderPizzaName(data, pizzaPropsFromOrder(data))} is in the oven 🔥`);
   return data;
 };
 

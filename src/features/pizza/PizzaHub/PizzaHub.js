@@ -92,7 +92,7 @@ const PizzaHub = () => {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.42, ease: 'easeOut', delay: 0.12 }}
       >
-        <div className={styles.pizzaDiv}>
+        <div id='pizza-preview' className={styles.pizzaDiv}>
           <PizzaDisplay />
         </div>
         <div className={styles.actionBar}>

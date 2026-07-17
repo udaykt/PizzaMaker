@@ -11,8 +11,16 @@
   user-select: none;
 }
 
-.toppingsMenu h1 {
+/* Owns row 1 so the heading and its tip travel together; the toppings grid keeps
+   row 2 to itself. */
+.header {
   grid-row: 1/2;
+  padding: 14px 12px 10px;
+  border-bottom: 1px solid var(--glass-border-subtle);
+}
+
+.toppingsMenu h1 {
+  margin: 0;
   color: var(--text);
   display: flex;
   align-items: center;
@@ -21,8 +29,17 @@
   font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: 5px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--glass-border-subtle);
+}
+
+/* One-line orientation: what this panel is and how it works. Muted so it reads
+   once and then fades into the background. */
+.tip {
+  margin: 6px 0 0;
+  text-align: center;
+  font-family: var(--font);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .toppings {
