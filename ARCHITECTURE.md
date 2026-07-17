@@ -793,6 +793,11 @@ master          ← production only — Pages + Render auto-deploy from here
 
 ## Database Setup (Neon)
 
+Production Postgres runs on **Neon**, not Render. Render's free Postgres is deleted after
+90 days; Neon's free tier is free-forever (0.5 GB, autosuspends, ~1s wake). The backend
+depends only on a `DATABASE_URL`, so nothing on the app side is tied to a specific host —
+`render.yaml` provisions the web service alone.
+
 1. Go to [neon.tech](https://neon.tech) → sign up free → **New Project** → name it `pizzamaker`
 2. Copy the connection string:
    ```
@@ -802,8 +807,15 @@ master          ← production only — Pages + Render auto-deploy from here
    ```
    jdbc:postgresql://ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
    ```
-4. Set environment variables with `SPRING_PROFILES_ACTIVE=prod`
-5. Flyway runs V1 + V2 migrations automatically on first boot
+4. In Render → backend service → Environment, set `DATABASE_URL`, `DATABASE_USERNAME`,
+   `DATABASE_PASSWORD` (the `sync: false` keys in `render.yaml`), with
+   `SPRING_PROFILES_ACTIVE=prod`
+5. Redeploy. Flyway runs every migration automatically on first boot, and `DataSeeder`
+   re-adds the admin user — a fresh Neon database needs no manual migration.
+6. To carry existing data across before the old Render DB is suspended:
+   ```
+   pg_dump "<render-internal-conn>" | psql "<neon-conn>"
+   ```
 
 ---
 

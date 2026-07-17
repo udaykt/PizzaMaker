@@ -1,12 +1,17 @@
-# Render Blueprint — provisions the PizzaMaker backend + its Postgres in one go.
+# Render Blueprint — provisions the PizzaMaker backend only.
+#
+# The database now lives on NEON (neon.tech), not Render. Render's free Postgres
+# is deleted after 90 days; Neon's free tier is free-forever (0.5 GB, autosuspend,
+# ~1s wake). The backend reaches it via a single DATABASE_URL secret, so nothing
+# here provisions or depends on a Render database.
+#
 # Deploy: Render Dashboard → New → Blueprint → connect this repo → Apply.
-# You'll be prompted for two secrets (JWT_SECRET, WEBHOOK_SECRET) — see README/DEPLOY.
-databases:
-  - name: pizzamaker-db
-    plan: free
-    databaseName: pizzamaker
-    user: pizzamaker
-
+# You'll be prompted for the `sync: false` secrets below (set them in the dashboard):
+#   DATABASE_URL       -> your Neon JDBC URL (see README "Database on Neon")
+#   DATABASE_USERNAME  -> Neon user
+#   DATABASE_PASSWORD  -> Neon password
+#   JWT_SECRET         -> openssl rand -base64 32
+#   WEBHOOK_SECRET     -> any random string
 services:
   - type: web
     name: pizzamaker-api
@@ -23,31 +28,20 @@ services:
       # Must match your Cloudflare Pages origin so the browser is allowed to call the API.
       - key: ALLOWED_ORIGINS
         value: https://pizzamaker.pages.dev
-      # Prompted at deploy (not stored in the repo). Generate with:
-      #   JWT_SECRET     -> openssl rand -base64 32
-      #   WEBHOOK_SECRET -> any random string
+
+      # Neon database — set in the Render dashboard, never committed.
+      # DATABASE_URL is a full JDBC URL, e.g.
+      #   jdbc:postgresql://ep-xxx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
+      # application-prod.yml already prefers DATABASE_URL when present.
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+
+      # App secrets — also dashboard-set.
       - key: JWT_SECRET
         sync: false
       - key: WEBHOOK_SECRET
         sync: false
-      # DB connection is injected from the managed Postgres above.
-      - key: DATABASE_HOST
-        fromDatabase:
-          name: pizzamaker-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: pizzamaker-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: pizzamaker-db
-          property: database
-      - key: DATABASE_USERNAME
-        fromDatabase:
-          name: pizzamaker-db
-          property: user
-      - key: DATABASE_PASSWORD
-        fromDatabase:
-          name: pizzamaker-db
-          property: password

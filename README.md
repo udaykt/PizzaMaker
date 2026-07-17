@@ -152,7 +152,8 @@ avoid running a second broker for a demo.)
 | Kubernetes + Helm | Multi-replica deploy (minikube-ready), `k8s/` + `helm/` |
 | GitHub Actions | CI (`ci.yml`) + keep-warm cron (`keep-warm.yml`) |
 | Cloudflare Pages | Frontend hosting (`pizzamaker.pages.dev`) |
-| Render | Backend + managed Postgres (free tier) |
+| Render | Backend web service (free tier, kept awake by the keep-warm cron) |
+| Neon | Managed Postgres — **free-forever** serverless (`DATABASE_URL`) |
 | Maven (+ wrapper) | Backend build |
 
 ### Testing
@@ -318,6 +319,45 @@ helm install pizzamaker ./helm/pizzamaker \
   --set secrets.jwtSecret="$(openssl rand -base64 32)" \
   --set secrets.databasePassword="$(openssl rand -base64 24)"
 ```
+
+---
+
+## Database on Neon (production, free forever)
+
+Production Postgres runs on **[Neon](https://neon.tech)** — serverless, free-forever
+(0.5 GB, autosuspends, wakes in ~1s). Render's own free Postgres is deleted after 90
+days, so the database deliberately lives off Render. The backend reaches it through a
+single `DATABASE_URL`, and `application-prod.yml` prefers that variable when present — so
+this is **config only, no code change**.
+
+**One-time setup (~5 min):**
+
+1. [neon.tech](https://neon.tech) → sign up → **New Project** (`pizzamaker`).
+2. Copy the connection string and put it in JDBC form:
+   ```
+   jdbc:postgresql://ep-xxx-pooler.<region>.aws.neon.tech/neondb?sslmode=require
+   ```
+3. In the Render backend → **Environment**, set (these are the `sync: false` keys in
+   [`render.yaml`](render.yaml)):
+   | Key | Value |
+   | --- | --- |
+   | `DATABASE_URL` | the JDBC URL above |
+   | `DATABASE_USERNAME` | Neon user |
+   | `DATABASE_PASSWORD` | Neon password |
+4. Redeploy. **Flyway recreates the schema on first boot** and `DataSeeder` re-adds the
+   admin user — nothing to migrate for a fresh start.
+
+**Keeping existing data** (optional): before the Render database is suspended, copy it
+over once:
+
+```bash
+pg_dump "<old-render-internal-connection-string>" \
+  | psql "<neon-connection-string>"
+```
+
+The whole hosted stack is then free-forever: **Neon** (DB) · **Render** free web service
+(API, kept awake by [`.github/workflows/keep-warm.yml`](.github/workflows/keep-warm.yml)) ·
+**Cloudflare Pages** (frontend).
 
 ---
 
