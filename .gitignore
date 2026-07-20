@@ -25,3 +25,6 @@ yarn-debug.log*
 yarn-error.log*
 
 backend/target/
+
+# Claude Code personal settings (local, do not commit)
+.claude/settings.local.json
