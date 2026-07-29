@@ -1,0 +1,47 @@
+# Overlay for the live, self-hosted deployment (a single-node k3s cluster on a
+# free-tier VM) — layered on top of values.yaml with `helm install -f`, not a
+# replacement for it. Everything not mentioned here (replicaCount, resources,
+# probes) is inherited unchanged from values.yaml.
+#
+# Install:
+#   helm install pizzamaker ./helm/pizzamaker \
+#     -f ./helm/pizzamaker/values-live.yaml \
+#     --set config.databaseUrl="jdbc:postgresql://<neon-host>/<db>?sslmode=require" \
+#     --set config.databaseUsername="<neon-user>" \
+#     --set secrets.databasePassword="<neon-password>" \
+#     --set secrets.jwtSecret="$(openssl rand -base64 32)" \
+#     --set secrets.webhookSecret="$(openssl rand -base64 24)"
+#
+# Those --set flags (Neon connection details + fresh secrets) are deliberately
+# NOT baked in here — this file is safe to commit; credentials are not.
+
+image:
+  repository: ghcr.io/udaykt/pizzamaker-api
+  tag: latest
+  # Always, not Never: this is a real registry pull, not a side-loaded image.
+  # A `latest` tag with Always means `kubectl rollout restart` picks up whatever
+  # publish-image.yml most recently pushed — there's no separate "deploy" step.
+  pullPolicy: Always
+
+service:
+  # k3s ships its own lightweight load balancer (ServiceLB / "klipper-lb") with
+  # no cloud provider needed. A Service of type LoadBalancer on a single-node
+  # k3s cluster gets bound directly to the node's public IP — so the app
+  # becomes reachable at http://<vm-ip>:8080 with nothing else to configure.
+  # NodePort (the minikube default) would work too, but LoadBalancer is the
+  # more honest "this is really internet-facing" declaration and the port
+  # number in values.yaml (8080) is used as-is rather than a random 30000+ one.
+  type: LoadBalancer
+
+config:
+  # Wide open on purpose FOR NOW: this deployment is reached via Swagger UI /
+  # curl / actuator, not from the production frontend (pizzamaker.pages.dev
+  # keeps talking to the Render backend — see the "why separate" note in
+  # docs/LIVE_DEPLOYMENT.md). If you later point a browser app at this API,
+  # narrow this to that app's real origin(s), comma-separated.
+  allowedOrigins: "*"
+  # config.databaseUrl / databaseUsername and secrets.databasePassword are
+  # intentionally left at their values.yaml (in-cluster Postgres) defaults here
+  # — override them with --set at install time to point at Neon instead. Baking
+  # a real database URL into a committed file is how credentials end up in git
+  # history.

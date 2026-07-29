@@ -717,6 +717,13 @@ Environment variable:
 - `ALLOWED_ORIGINS` must include every domain the frontend is served from.
 - WebSocket CORS is driven by the same `ALLOWED_ORIGINS` env var.
 
+**A second, independent deployment** puts the Kafka + Kubernetes stack on the
+public internet too — a self-hosted k3s cluster on a free-tier VM, reachable
+directly rather than routed through the production frontend. See
+[`docs/LIVE_DEPLOYMENT.md`](docs/LIVE_DEPLOYMENT.md) for the full setup (Oracle
+Cloud, GHCR image publishing, k3s) and the reasoning for keeping it separate
+from the Render/Cloudflare deployment above.
+
 ---
 
 ## Deployment Strategy (Branches)

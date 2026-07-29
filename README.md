@@ -320,6 +320,15 @@ helm install pizzamaker ./helm/pizzamaker \
   --set secrets.databasePassword="$(openssl rand -base64 24)"
 ```
 
+### Taking this from minikube to the real internet
+
+Everything above runs on your laptop. [`docs/LIVE_DEPLOYMENT.md`](docs/LIVE_DEPLOYMENT.md)
+is the full runbook for putting this exact stack on a genuinely free-forever
+public VM (Oracle Cloud's ARM Always-Free tier + k3s) — image publishing to
+GHCR, the two-layer firewall gotcha that traps almost everyone on Oracle, and
+why it's deliberately kept separate from the production Render/Cloudflare
+deployment.
+
 ---
 
 ## Database on Neon (production, free forever)

@@ -1,0 +1,60 @@
+name: Publish backend image
+
+# Builds the backend Docker image and pushes it to GitHub Container Registry
+# (ghcr.io), so a real server can `docker pull` / `kubectl apply` it — unlike the
+# minikube-only path (`minikube image load`), a live VM has no local image cache
+# to side-load into.
+#
+# ARM64 is included deliberately: the "genuinely free forever" VM shape on most
+# clouds (e.g. Oracle Cloud's Always-Free Ampere A1) is ARM, not x86. eclipse-
+# temurin and the maven image both publish arm64 manifests, so this needs no
+# Dockerfile changes — buildx just builds both and pushes a multi-arch manifest
+# list. `docker pull` on either architecture resolves to the right layer
+# automatically.
+on:
+  push:
+    branches: [ master ]
+    paths: [ 'backend/**', '.github/workflows/publish-image.yml' ]
+  workflow_dispatch: {}
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/pizzamaker-api
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   # required to push to ghcr.io under this repo's namespace
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          # GITHUB_TOKEN is minted per-run and scoped by the `permissions` block
+          # above — no separate secret to create or rotate.
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: backend
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+          # Cache layers in GHA's own cache — keeps rebuilds fast without a
+          # separate registry-cache mirror to manage.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
