@@ -5,7 +5,7 @@ what does what" document. `README.md` tells you how to run it; `ARCHITECTURE.md`
 formal design write-up; this one is the tour.
 
 It is kept up to date as the project changes.
-Last updated: the Kafka + Kubernetes work (see [Part 6](#part-6--the-kafka-pipeline)).
+Last updated: the k6 load-test harness (see [Part 7](#part-7--running-it)).
 
 ---
 
@@ -386,6 +386,29 @@ minikube service pizzamaker-pizzamaker --url
 
 See `README.md` for the full version of each.
 
+### Load testing the order path
+
+`k6-order-load.js` at the project root ramps VUs against `POST /api/v1/orders`.
+The account it uses is seeded by a Flyway migration that only exists on the path when
+the `loadtest` profile is active, so it can't leak into a real deployment.
+
+```bash
+cd backend && SPRING_PROFILES_ACTIVE=loadtest ./mvnw spring-boot:run
+k6 run k6-order-load.js          # BASE_URL / VUS / DURATION are env vars
+```
+
+Against minikube, add the profile to the running deployment and forward the port:
+
+```bash
+kubectl set env deployment/pizzamaker-api SPRING_PROFILES_ACTIVE=prod,loadtest
+kubectl port-forward svc/pizzamaker-api 8080:8080
+```
+
+Skip that and it still works — `setup()` falls back to `POST /api/v1/auth/register`,
+which creates the same `ROLE_USER` / `STANDARD` account the migration does. Results go
+to stdout and `k6-summary.json`. `ARCHITECTURE.md` has the full write-up of why the
+script is shaped the way it is.
+
 ---
 
 ## Part 8 — Gotchas that will bite you
@@ -400,6 +423,9 @@ See `README.md` for the full version of each.
 | Status pushes vanish at `replicas: 2` | The broadcast listener lost its per-pod group id. See Part 6. |
 | Customer gets a burst of stale toasts on restart | The broadcast consumer is on `earliest`. A brand-new group id + `earliest` = replay the entire topic. It must be `latest`. |
 | Flyway checksum error | Someone edited an already-applied migration. Never do that; add a new one. |
+| A load test 429s a few seconds in | `AuthRateLimitFilter` caps `/api/v1/auth/**` at 10 req/min per IP. Authenticate once in `setup()` and share the token — never log in per VU. |
+| Load test 401s on every request | The target wasn't started with the `loadtest` profile, so `V900__loadtest_user.sql` never ran. `k6-order-load.js` self-registers instead, but only if it sees the 401 on login. |
+| `Detected applied migration not resolved locally: 900` | The `loadtest` profile was enabled against a persistent DB and then removed. Drop the user and its `flyway_schema_history` row, or restart the ephemeral Postgres pod. |
 | `helm upgrade` changes config but nothing happens | Env vars are read once at container start. The pod template needs a config checksum annotation to force a roll — it has one; don't remove it. |
 
 ---
@@ -422,3 +448,7 @@ interview.
    modes don't behave identically.
 5. **The K8s manifests and Helm chart are unverified.** They were written without a cluster
    available to apply them to.
+6. **The k6 harness is unverified end to end.** `k6-order-load.js` is written against the
+   real DTOs and its seed migration was checked against H2, but no run has happened —
+   `k6`, `kubectl` and `minikube` weren't installed on the machine it was authored on. The
+   thresholds (p95 < 800ms) are a starting guess, not a measured baseline.

@@ -1,0 +1,22 @@
+# Opt-in profile that exists for one reason: put db/migration/loadtest on
+# Flyway's path so V900__loadtest_user.sql seeds the account k6-order-load.js
+# logs in as.
+#
+# It is additive and composable — it deliberately does NOT touch the datasource,
+# JWT, Kafka or anything else, so it can be stacked onto whichever profile
+# already describes the environment:
+#
+#   local H2      SPRING_PROFILES_ACTIVE=loadtest
+#   minikube      SPRING_PROFILES_ACTIVE=prod,loadtest
+#
+# Never add `loadtest` to a profile list on a real deployment: it creates a user
+# whose password is in this repository.
+spring:
+  flyway:
+    # Repeats the two locations from application.yml because `locations` is a
+    # list property and a profile override replaces it wholesale rather than
+    # appending to it.
+    locations:
+      - classpath:db/migration/common
+      - classpath:db/migration/{vendor}
+      - classpath:db/migration/loadtest

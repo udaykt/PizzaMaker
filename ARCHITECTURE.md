@@ -15,10 +15,11 @@
 7. [Project Structure](#project-structure)
 8. [First-Time Setup](#first-time-setup)
 9. [How to Run — All Environments](#how-to-run--all-environments)
-10. [Deployment Strategy (Branches)](#deployment-strategy-branches)
-11. [API Reference](#api-reference)
-12. [Database Setup (Neon)](#database-setup-neon)
-13. [Environment Variables](#environment-variables)
+10. [Load Testing (k6)](#load-testing-k6)
+11. [Deployment Strategy (Branches)](#deployment-strategy-branches)
+12. [API Reference](#api-reference)
+13. [Database Setup (Neon)](#database-setup-neon)
+14. [Environment Variables](#environment-variables)
 
 ---
 
@@ -726,6 +727,89 @@ from the Render/Cloudflare deployment above.
 
 ---
 
+## Load Testing (k6)
+
+`k6-order-load.js` at the project root drives the order-placement path: one
+authentication in `setup()`, then a ramping-VU scenario that POSTs
+`/api/v1/orders` and reads each created order back.
+
+**Why auth happens once, not per VU.** `AuthRateLimitFilter` allows 10 requests
+per minute per IP to `/api/v1/auth/**`. A login inside the default function
+would start returning 429 the moment the ramp passes 10 VUs, and the run would
+be measuring the rate limiter instead of the order path. The token is obtained
+once and shared across VUs.
+
+**Why topping ids are fetched, not hardcoded.** `OrderService.sanitizeToppings()`
+rejects any code that isn't active in the `topping` table with a 400. The script
+reads the live catalogue from the public `GET /api/v1/menu/toppings` first and
+picks from that, so retiring a topping can't silently turn the run red.
+
+**Why every iteration gets a fresh `Idempotency-Key`.** Reusing one makes
+`placeOrder()` return the *existing* order rather than inserting, so the test
+would stop measuring writes without failing.
+
+### The `loadtest` profile
+
+The account the script logs in as is seeded by
+`backend/src/main/resources/db/migration/loadtest/V900__loadtest_user.sql`
+(`loadtest@pizzamaker.com` / `loadtest123`, `ROLE_USER` + `STANDARD` — the same
+authorities `AuthService.register()` grants a real customer; there is no
+`CUSTOMER` role in this codebase).
+
+That file sits in its own Flyway location, and only `application-loadtest.yml`
+puts that location on `spring.flyway.locations`. A default or `prod` boot never
+resolves it, so the account cannot reach a real deployment by accident. The
+profile is additive — it touches nothing but the Flyway path — so it composes:
+
+| Target             | `SPRING_PROFILES_ACTIVE` |
+| ------------------ | ------------------------ |
+| Local H2           | `loadtest`               |
+| Docker / minikube  | `prod,loadtest`          |
+
+**Never add `loadtest` to a real deployment.** The password is in this repo.
+
+### Running it
+
+```bash
+# Local, H2
+cd backend && SPRING_PROFILES_ACTIVE=loadtest ./mvnw spring-boot:run
+k6 run k6-order-load.js
+
+# Against minikube
+kubectl set env deployment/pizzamaker-api SPRING_PROFILES_ACTIVE=prod,loadtest
+kubectl rollout status deployment/pizzamaker-api
+kubectl port-forward svc/pizzamaker-api 8080:8080   # helm: svc/pizzamaker-pizzamaker
+k6 run k6-order-load.js
+```
+
+An explicit container `env` overrides the `envFrom` ConfigMap value, so no
+manifest edit is needed; undo with a trailing dash
+(`kubectl set env deployment/pizzamaker-api SPRING_PROFILES_ACTIVE-`). Under
+Helm, prefer `--set config.springProfile=prod\,loadtest` so an upgrade doesn't
+revert it.
+
+If the target wasn't started with the profile, `setup()` falls back to the
+public `POST /api/v1/auth/register`, which creates the same `ROLE_USER` /
+`STANDARD` account — so a stock minikube deploy works with no restart.
+
+Tuning knobs are env vars: `BASE_URL`, `VUS`, `DURATION`, `RAMP_UP`,
+`RAMP_DOWN`, `READ_BACK=0`, `LOADTEST_EMAIL`, `LOADTEST_PASSWORD`.
+
+### Reading the results
+
+Thresholds are tagged to the placement request specifically
+(`http_req_failed{endpoint:place_order} < 1%`, `p(95) < 800ms`,
+`p(99) < 2000ms`), so a slow read-back can't mask a slow write. `handleSummary`
+prints orders placed, success rate, p50/p95/p99 and a PASS/FAIL verdict, and
+writes the full dataset to `k6-summary.json`.
+
+> Enabling `loadtest` against a **persistent** Postgres and then disabling it
+> leaves V900 applied but unresolvable, which fails Flyway validation on the
+> next boot. The minikube Postgres uses `emptyDir`, so restarting the pod clears
+> it; on a durable database, delete the row and its `flyway_schema_history` entry.
+
+---
+
 ## Deployment Strategy (Branches)
 
 ```
@@ -837,7 +921,7 @@ depends only on a `DATABASE_URL`, so nothing on the app side is tied to a specif
 | `DATABASE_PASSWORD`      | _(blank)_               | DB password                                                                     |
 | `JWT_SECRET`             | hardcoded dev key       | Base64-encoded HMAC secret (min 32 bytes) — generate: `openssl rand -base64 32` |
 | `JWT_EXPIRATION_MS`      | `86400000`              | Token lifetime (24 hours)                                                       |
-| `SPRING_PROFILES_ACTIVE` | default                 | Set to `prod` for PostgreSQL                                                    |
+| `SPRING_PROFILES_ACTIVE` | default                 | `prod` for PostgreSQL. Append `,loadtest` to seed the k6 account — never in a real deployment |
 | `ALLOWED_ORIGINS`        | `http://localhost:3000` | Comma-separated allowed origins for CORS and WebSocket                          |
 
 ### Frontend
